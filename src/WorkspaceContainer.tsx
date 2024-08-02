@@ -4,32 +4,6 @@ import { createListId, createListItemId, List, ListId, ListItem, ListItemId, Wor
 import { ItemGroup } from "./tangible-gpt/model";
 import { ActiveWorkspace } from "./RootPage";
 
-const moveElementUp = (array: ListItem[], id: ListItemId): ListItem[] => {
-    const index = array.findIndex(item => item.id === id);
-    if (index <= 0 || index === -1) {
-      return array;
-    }
-    
-    const newArray = array.slice();
-    const temp = newArray[index];
-    newArray[index] = newArray[index - 1];
-    newArray[index - 1] = temp;
-    return newArray;
-  };
-  
-const moveElementDown = (array: ListItem[], id: ListItemId): ListItem[] => {
-  const index = array.findIndex(item => item.id === id);
-  if (index === -1 || index >= array.length - 1) {
-    return array;
-  }
-  
-  const newArray = array.slice();
-  const temp = newArray[index];
-  newArray[index] = newArray[index + 1];
-  newArray[index + 1] = temp;
-  return newArray;
-};
-
 type Props = {
     activeWorkspace: ActiveWorkspace;
     onUpdateLists: (workspaceId: WorkspaceId, lists: List[]) => void;
@@ -100,36 +74,6 @@ const WorkspaceContainer = ({activeWorkspace, onUpdateLists}: Props) => {
                         return i;
                     }
                 })
-            };
-            const index = lists.indexOf(list);
-            const updatedLists = [...lists];
-            updatedLists[index] = updatedList;
-            onUpdateLists(workspaceId, updatedLists);
-        }
-    };
-
-    const onMoveUp = (listId: ListId, itemId: ListItemId) => {
-        const list = lists.find(l => l.id === listId);
-        if (list !== undefined) {
-            const updatedList: List = {
-                id: list.id,
-                name: list.name,
-                items: moveElementUp(list.items, itemId)
-            };
-            const index = lists.indexOf(list);
-            const updatedLists = [...lists];
-            updatedLists[index] = updatedList;
-            onUpdateLists(workspaceId, updatedLists);
-        }
-    };
-
-    const onMoveDown = (listId: ListId, itemId: ListItemId) => {
-        const list = lists.find(l => l.id === listId);
-        if (list !== undefined) {
-            const updatedList: List = {
-                id: list.id,
-                name: list.name,
-                items: moveElementDown(list.items, itemId)
             };
             const index = lists.indexOf(list);
             const updatedLists = [...lists];
@@ -228,8 +172,6 @@ const WorkspaceContainer = ({activeWorkspace, onUpdateLists}: Props) => {
                             addItem={addItem}
                             deleteItem={deleteItem}
                             editItem={editItem}
-                            onMoveUp={onMoveUp}
-                            onMoveDown={onMoveDown}
                             onFilter={onFilter}
                             onSort={onSort}
                             onGroup={onGroup}
@@ -248,10 +190,13 @@ const WorkspaceContainer = ({activeWorkspace, onUpdateLists}: Props) => {
             <br />
             <br />
             <br />
-            OpenAI Key:
-            &nbsp;
-            <input placeholder="OpenAI key" onChange={e => onUpdateOpenAiKey(e.currentTarget.value)} value={openAiKey} />
         </>
     )};
 
 export default WorkspaceContainer;
+
+/*
+            OpenAI Key:
+            &nbsp;
+            <input placeholder="OpenAI key" onChange={e => onUpdateOpenAiKey(e.currentTarget.value)} value={openAiKey} />
+*/

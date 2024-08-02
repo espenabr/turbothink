@@ -2,9 +2,7 @@ import { useState } from "react";
 import Tab from "./Tab";
 import { createWorkspaceId, List, Workspace, WorkspaceId } from "./model";
 import WorkspaceContainer from "./WorkspaceContainer";
-import IconSquarePlus from "./icons/IconSquarePlus";
 import IconPlus from "./icons/IconPlus";
-
 
 
 const loadWorkspaces = (): Workspace[] => {
@@ -125,3 +123,5 @@ const RootPage = () => {
 };
 
 export default RootPage;
+
+// <DndKitPlayground listItems={listItems} />

@@ -10,11 +10,11 @@ import SortDescendingIcon from "../../icons/IconSortDescending";
 import IconEye from "../../icons/IconEye";
 import IconSquares from "../../icons/IconSquares";
 import IconPlaylistAdd from "../../icons/IconPlaylistAdd";
-import IconTrash from "../../icons/IconTrash";
 import IconX from "../../icons/IconX";
-import IconBubbleText from "../../icons/IconBubbleText";
 import IconArrowBack from "../../icons/IconArrowBack";
 import IconFilter from "../../icons/IconFilter";
+import { closestCenter, DndContext, DragEndEvent, DragOverEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
 
 type FilteredItems = {
@@ -71,8 +71,6 @@ type Props = {
     addItem: (listId: ListId, item: ListItem) => void;
     deleteItem: (listId: ListId, id: ListItemId) => void;
     editItem: (listId: ListId, item: ListItem) => void;
-    onMoveUp: (listId: ListId, id: ListItemId) => void;
-    onMoveDown: (listId: ListId, id: ListItemId) => void;
     onFilter: (listId: ListId, items: ListItem[]) => void;
     onSort: (listId: ListId, items: ListItem[]) => void;
     onGroup: (listId: ListId, groups: ItemGroup[]) => void;
@@ -81,12 +79,16 @@ type Props = {
     onEditTitle: (listId: ListId, newTitle: string) => void;
 };
 
-const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onMoveUp, onMoveDown, onFilter, onSort, onGroup, onDeleteList, onUpdateItems, onEditTitle }: Props) => {
+const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onFilter, onSort, onGroup, onDeleteList, onUpdateItems, onEditTitle }: Props) => {
     const [suggestedModification, setSuggestedModification] = useState<SuggestedModification | null>(null);
     const [waitingForInput, setWaitingForInput] = useState<Action | null>(null);
     const [editTitleMode, setEditTitleMode] = useState<boolean>(false);
     const [editInput, setEditInput] = useState<string>(list.name);
     const [loading, setLoading] = useState<boolean>(false);
+
+    const sensors = useSensors(
+        useSensor(PointerSensor)
+    );
 
     const onClickHighlight = () => setWaitingForInput("highlight");
     const onClickFilter = () => setWaitingForInput("filter");
@@ -237,6 +239,26 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onMoveUp,
         return null;
     };
 
+    const handleDragEnd = (event: DragEndEvent) => {
+        if (event.over !== null) {
+            const over = event.over;
+
+            if (event.active.id !== event.over.id) {
+                const oldIndex = list.items.findIndex(i => i.id === event.active.id);
+                const newIndex = list.items.findIndex(i => i.id === over.id);
+
+                const updated = arrayMove(list.items, oldIndex, newIndex);
+                onUpdateItems(list.id, updated);
+            }
+        }
+    };
+
+    const handleDragOver = (event: DragOverEvent) => {
+//        console.log("active", event.active);
+//        console.log("over", event.over);
+        console.log(list.name);
+    };
+
     return (
         <ul className="list">
             <li className="list-item" style={{ backgroundColor: "lightGray" }}>
@@ -258,11 +280,11 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onMoveUp,
                 ) : (
                     <>
                         {waitingForInput !== null ? (
-                                <InstructionInput openAiKey={openAiKey}
-                                    onCancel={() => setWaitingForInput(null)}
-                                    currentItems={list.items}
-                                    onInput={onHighlightInput}
-                                    action={waitingForInput}
+                            <InstructionInput openAiKey={openAiKey}
+                                onCancel={() => setWaitingForInput(null)}
+                                currentItems={list.items}
+                                onInput={onHighlightInput}
+                                action={waitingForInput}
                             />
                         ) : (
                             <>
@@ -283,16 +305,23 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onMoveUp,
                 )}
             </li>
 
-            {list.items.map(item => (
-                <ListItemElement item={item}
-                    modification={itemModification(item)}
-                    onEdit={item => editItem(list.id, item)}
-                    onDelete={id => deleteItem(list.id, id)}
-                    onMoveUp={id => onMoveUp(list.id, id)}
-                    onMoveDown={id => onMoveDown(list.id, id)}
-                    key={item.id}
-                />
-            ))}
+            <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+                onDragOver={handleDragOver}>
+
+                <SortableContext items={list.items} strategy={verticalListSortingStrategy}>
+                    {list.items.map(item => (
+                        <ListItemElement item={item}
+                            modification={itemModification(item)}
+                            onEdit={item => editItem(list.id, item)}
+                            onDelete={id => deleteItem(list.id, id)}
+                            key={item.id}
+                        />
+                    ))}
+                </SortableContext>
+            </DndContext>
 
             <li>
                 {suggestedModification === null ? (
@@ -307,14 +336,3 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onMoveUp,
 };
 
 export default ListElement;
-
-
-/*
-                                    <span className="icon" onClick={onClickSort} title="Sort">▼</span>
-                                    <span className="icon" onClick={onClickHighlight} title="Highlight">🧹</span>
-                                    <span className="icon" onClick={onClickFilter} title="Filter">🔍</span>
-                                    <span className="icon" onClick={onClickGroup} title="Group">✨</span>
-                                    <span className="icon" onClick={onExtendList} title="Extend">+</span>
-                                    <span className="icon" onClick={onDelete} title="Delete">❌</span>
-
-*/

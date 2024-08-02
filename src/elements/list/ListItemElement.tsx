@@ -1,8 +1,9 @@
 import { CSSProperties, useState } from "react";
+import { CSS } from '@dnd-kit/utilities';
 import { ListItem, ListItemId } from "../../model";
 import IconX from "../../icons/IconX";
-import IconArrowUp from "../../icons/IconArrowUp";
-import IconArrowDown from "../../icons/IconArrowDown";
+import IconArrowBack from "../../icons/IconArrowBack";
+import { useSortable } from "@dnd-kit/sortable";
 
 
 export type Highlighted = {
@@ -56,17 +57,32 @@ type Props = {
     modification: Modification | null;
     onEdit: (item: ListItem) => void;
     onDelete: (id: ListItemId) => void;
-    onMoveUp?: (id: ListItemId) => void;
-    onMoveDown?: (id: ListItemId) => void;
 };
 
-const ListItemElement = ({item, modification, onEdit, onDelete, onMoveUp, onMoveDown}: Props) => {
+const ListItemElement = ({item, modification, onEdit, onDelete}: Props) => {
     const [ editMode, setEditMode ] = useState<boolean>(false);
     const [ editInput, setEditInput ] = useState<string>(item.text);
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+    } = useSortable({ id: item.id });
+
+
+    const style: CSSProperties = {
+        ...itemStyle(modification),
+        transform: CSS.Transform.toString(transform),
+        transition
+    };
 
     return (
         <li className="list-item"
-            style={itemStyle(modification)}
+            style={style}
+            ref={setNodeRef}
+            {...attributes}
+            {...listeners}
             title={modification?.type === "grouped" ? modification.groupName : undefined}>
             {editMode ? (
                 <>
@@ -80,7 +96,7 @@ const ListItemElement = ({item, modification, onEdit, onDelete, onMoveUp, onMove
                         }}
                     />
                     &nbsp;
-                    <span style={{cursor: "pointer", color: "green"}} onClick={() => setEditMode(false)}>↩</span>
+                    <span style={{cursor: "pointer", color: "green"}} onClick={() => setEditMode(false)}><IconArrowBack /></span>
                 </>
             ) : (
                 <>
@@ -90,12 +106,6 @@ const ListItemElement = ({item, modification, onEdit, onDelete, onMoveUp, onMove
                     <span onClick={() => setEditMode(true)}
                         style={textStyle(modification)}>{item.text}</span>
                     <div className="icons">
-                        <span className="icon"
-                            onClick={() => onMoveUp && onMoveUp(item.id)}
-                            title="Move up"><IconArrowUp /></span>
-                        <span className="icon" 
-                            onClick={() => onMoveDown && onMoveDown(item.id)}
-                            title="Move down"><IconArrowDown /></span>
                         <span className="icon"
                             onClick={() => onDelete(item.id)}
                             title="Delete"><IconX /></span>
@@ -107,18 +117,3 @@ const ListItemElement = ({item, modification, onEdit, onDelete, onMoveUp, onMove
 };
 
 export default ListItemElement;
-
-
-/*
-                        <span className="icon"
-                            onClick={() => onMoveUp && onMoveUp(item.id)}
-                            style={{color: "gray"}}
-                            title="Move up">▲</span>
-                        <span className="icon" 
-                            onClick={() => onMoveDown && onMoveDown(item.id)}
-                            style={{color: "gray"}}
-                            title="Move down">▼</span>
-                        <span className="icon"
-                            onClick={() => onDelete(item.id)}
-                            title="Delete"><IconX /></span>
-*/

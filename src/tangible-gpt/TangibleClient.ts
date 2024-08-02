@@ -1,4 +1,3 @@
-import { IconNavigationExclamation } from "@tabler/icons-react";
 import GptApiClient, {
     CompletionResponse,
     ContentMessage,
@@ -990,7 +989,7 @@ ${itemsPrompt}`;
         
         const prompt = noOfAddedItems === 1
             ? `Extend this list with the most obvious item: ${itemsPrompt}`
-            : `Extend this list with the most obvious ${IconNavigationExclamation} items: ${itemsPrompt}`;
+            : `Extend this list with the most obvious ${noOfAddedItems} items: ${itemsPrompt}`;
 
         const responseFormatDescription =
             `The response must be a sorted JSON array of strings (items), nothing else`;
