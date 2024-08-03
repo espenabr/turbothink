@@ -65,35 +65,27 @@ const RootPage = () => {
         setActiveWorkspace({ workspaceId: workspaceId, lists: loadLists(workspaceId) });
     };
 
-    const onDelete = (workspaceId: WorkspaceId) => {
+    const onDeleteWorkspace = (workspaceId: WorkspaceId) => {
         const index = workspaces.findIndex(w => w.id === workspaceId);
         if (index >= 0) {
             const updatedWorkspaces = workspaces.slice().filter(w => w.id !== workspaceId);
-
             setWorkspaces(updatedWorkspaces);
             persistWorkspaces(updatedWorkspaces);
-
             if (index > 0) {
                 const workspaceId = updatedWorkspaces[index - 1].id;
                 setActiveWorkspace({ workspaceId: workspaceId, lists: loadLists(workspaceId) });
             } else {
-                alert("null")
                 const workspaceId = updatedWorkspaces[0].id;
                 setActiveWorkspace({ workspaceId: workspaceId, lists: loadLists(workspaceId) });
             }
         }
     };
 
-    const onRename = (workspaceId: WorkspaceId, newName: string) => {
-        const workspace = workspaces.find(w => w.id === workspaceId);
-        if (workspace !== undefined) {
-            const updatedWorkspace: Workspace = {
-                id: workspace.id,
-                name: newName
-            };
-            const index = workspaces.indexOf(workspace);
+    const onRenameWorkspace = (workspaceId: WorkspaceId, newName: string) => {
+        const index = workspaces.findIndex(w => w.id === workspaceId);
+        if (index >= 0) {
             const updatedWorkspaces = workspaces.slice();
-            updatedWorkspaces[index] = updatedWorkspace;
+            updatedWorkspaces[index] = { id: workspaces[index].id, name: newName };
             setWorkspaces(updatedWorkspaces);
             persistWorkspaces(updatedWorkspaces);
         }
@@ -107,16 +99,14 @@ const RootPage = () => {
     const onUpdateWorkspaces = (workspaces: Workspace[]) => {
         setWorkspaces(workspaces);
         persistWorkspaces(workspaces);
-    }
+    };
 
-    const handleDragEnd = (event: DragEndEvent) => {
+    const onDragEnd = (event: DragEndEvent) => {
         if (event.over !== null) {
             const over = event.over;
-
             if (event.active.id !== event.over.id) {
                 const oldIndex = workspaces.findIndex(i => i.id === event.active.id);
                 const newIndex = workspaces.findIndex(i => i.id === over.id);
-
                 const updated = arrayMove(workspaces, oldIndex, newIndex);
                 onUpdateWorkspaces(updated);
             }
@@ -126,30 +116,22 @@ const RootPage = () => {
     return (
         <div>
             <div className="tabs-container">
-                <DndContext
-                    sensors={sensors}
+                <DndContext sensors={sensors}
                     collisionDetection={closestCenter}
-                    onDragEnd={handleDragEnd}>
-
+                    onDragEnd={onDragEnd}>
                     <SortableContext items={workspaces} strategy={horizontalListSortingStrategy}>
-
                         {workspaces.map(w => (
                             <Tab workspace={w}
                                 active={activeWorkspace.workspaceId === w.id}
                                 canBeDeleted={workspaces.length > 1}
-                                onDelete={onDelete}
+                                onDelete={onDeleteWorkspace}
                                 onChangeTab={onChangeTab}
-                                onRename={onRename}
+                                onRename={onRenameWorkspace}
                                 key={w.id}
                             />
                         ))}
-
-
                     </SortableContext>
-
-
                 </DndContext>
-
                 <div className="tab" style={{ cursor: "pointer" }} onClick={onAddTab}>
                     <strong><IconPlus /></strong>
                 </div>
@@ -160,5 +142,3 @@ const RootPage = () => {
 };
 
 export default RootPage;
-
-// <DndKitPlayground listItems={listItems} />

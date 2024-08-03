@@ -1,7 +1,7 @@
 import { useState } from "react";
 import TangibleClient from "../tangible-gpt/TangibleClient";
 import { withoutPrefix } from "../common";
-import { Action } from "./list/ListElement";
+import { Action } from "./ListElement";
 import { ListItem } from "../model";
 import IconArrowBack from "../icons/IconArrowBack";
 import IconRefresh from "../icons/IconRefresh";

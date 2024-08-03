@@ -1,18 +1,18 @@
 import { CSSProperties, useState } from "react";
 import ListItemElement, { Modification } from "./ListItemElement";
-import InstructionInput from "../InsertuctionInput";
-import TangibleClient from "../../tangible-gpt/TangibleClient";
+import InstructionInput from "./InsertuctionInput";
+import TangibleClient from "../tangible-gpt/TangibleClient";
 import AddListItem from "./AddListItem";
-import AcceptOrRejectSuggestion from "../AcceptOrRejectSuggestion";
-import { withoutTrailingDot } from "../../common";
-import { createListItemId, List, ListId, ListItem, ListItemId } from "../../model";
-import SortDescendingIcon from "../../icons/IconSortDescending";
-import IconEye from "../../icons/IconEye";
-import IconSquares from "../../icons/IconSquares";
-import IconPlaylistAdd from "../../icons/IconPlaylistAdd";
-import IconX from "../../icons/IconX";
-import IconArrowBack from "../../icons/IconArrowBack";
-import IconFilter from "../../icons/IconFilter";
+import AcceptOrRejectSuggestion from "./AcceptOrRejectSuggestion";
+import { withoutTrailingDot } from "../common";
+import { createListItemId, List, ListId, ListItem, ListItemId } from "../model";
+import SortDescendingIcon from "../icons/IconSortDescending";
+import IconEye from "../icons/IconEye";
+import IconSquares from "../icons/IconSquares";
+import IconPlaylistAdd from "../icons/IconPlaylistAdd";
+import IconX from "../icons/IconX";
+import IconArrowBack from "../icons/IconArrowBack";
+import IconFilter from "../icons/IconFilter";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from '@dnd-kit/utilities';
@@ -51,6 +51,8 @@ type SuggestedModification = FilteredItems | SortedItems | HighlightedItems | Gr
 
 export type Action = "highlight" | "filter" | "sort" | "group";
 
+const groupColors: string[] = ["#FFCDD2", "#F8BBD0", "#E1BEE7", "#D1C4E9", "#C5CAE9", "#BBDEFB", "#B2EBF2", "#B2DFDB", "#C8E6C9", "#DCEDC8"];
+
 const toSortedListItems = (sortedItems: string[], oldItems: ListItem[]): ListItem[] => {
     let unmatchedItems = oldItems.slice();
 
@@ -72,15 +74,13 @@ type Props = {
     addItem: (listId: ListId, item: ListItem) => void;
     deleteItem: (listId: ListId, id: ListItemId) => void;
     editItem: (listId: ListId, item: ListItem) => void;
-    onFilter: (listId: ListId, items: ListItem[]) => void;
-    onSort: (listId: ListId, items: ListItem[]) => void;
-    onGroup: (listId: ListId, groups: ItemGroup[]) => void;
+    onGroup: (groups: ItemGroup[]) => void;
     onDeleteList: (listId: ListId) => void;
     onUpdateItems: (listId: ListId, items: ListItem[]) => void;
     onEditTitle: (listId: ListId, newTitle: string) => void;
 };
 
-const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onFilter, onSort, onGroup, onDeleteList, onUpdateItems, onEditTitle }: Props) => {
+const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, onDeleteList, onUpdateItems, onEditTitle }: Props) => {
     const [suggestedModification, setSuggestedModification] = useState<SuggestedModification | null>(null);
     const [waitingForInput, setWaitingForInput] = useState<Action | null>(null);
     const [editTitleMode, setEditTitleMode] = useState<boolean>(false);
@@ -89,13 +89,7 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onFilter,
 
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { delay: 200, tolerance: 5 } }));
 
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        transition,
-    } = useSortable({ id: list.id });
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: list.id });
 
     const onClickHighlight = () => setWaitingForInput("highlight");
     const onClickFilter = () => setWaitingForInput("filter");
@@ -106,34 +100,27 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onFilter,
         const tc = new TangibleClient(openAiKey);
         const items = list.items;
 
+        setLoading(true);
         if (waitingForInput === "highlight") {
-            setLoading(true);
             const response = await tc.expectFiltered(items.map(i => i.text), instruction);
-            setLoading(false);
             if (response.outcome === "Success") {
-                const suggested: SuggestedModification = {
+                setSuggestedModification({
                     type: "highlighted",
                     predicate: instruction,
                     items: response.value
-                };
-                setSuggestedModification(suggested);
+                });
             }
         } else if (waitingForInput === "filter") {
-            setLoading(true);
             const response = await tc.expectFiltered(items.map(i => i.text), instruction);
-            setLoading(false);
             if (response.outcome === "Success") {
-                const suggested: SuggestedModification = {
+                setSuggestedModification({
                     type: "filtered",
                     predicate: instruction,
                     items: response.value
-                };
-                setSuggestedModification(suggested);
+                });
             }
         } else if (waitingForInput === "sort") {
-            setLoading(true);
             const response = await tc.expectSorted(items.map(i => i.text), instruction);
-            setLoading(false);
             if (response.outcome === "Success") {
                 const suggested: SuggestedModification = {
                     type: "sorted",
@@ -143,43 +130,45 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onFilter,
                 setSuggestedModification(suggested);
             }
         } else if (waitingForInput === "group") {
-            setLoading(true);
             const response = await tc.expectGroups(items.map(i => i.text), undefined, instruction);
-            setLoading(false);
             if (response.outcome === "Success") {
-                const suggested: SuggestedModification = {
+                setSuggestedModification({
                     type: "grouped",
                     criteria: instruction,
                     groups: response.value.map(g => ({
                         name: g.name,
                         items: g.items.map(i => withoutTrailingDot(i))
                     }))
-                };
-                setSuggestedModification(suggested);
+                });
             }
         }
+        setLoading(false);
         setWaitingForInput(null);
     };
+
     const onReject = () => {
         if (suggestedModification !== null) {
             setSuggestedModification(null);
         }
     };
+
     const onAccept = () => {
-        if (suggestedModification?.type === "filtered") {
-            const validItems = list.items.filter(i => suggestedModification.items.includes(i.text));
-            onFilter(list.id, validItems);
-        } else if (suggestedModification?.type === "sorted") {
-            const sortedItems = toSortedListItems(suggestedModification.items, list.items);
-            onSort(list.id, sortedItems);
-        } else if (suggestedModification?.type === "grouped") {
-            onGroup(list.id, suggestedModification.groups);
+        switch (suggestedModification?.type) {
+            case "filtered":
+                onUpdateItems(list.id, list.items.filter(i => suggestedModification.items.includes(i.text)));
+                break;
+            case "sorted":
+                onUpdateItems(list.id, toSortedListItems(suggestedModification.items, list.items));
+                break;
+            case "grouped":
+                onGroup(suggestedModification.groups);
+                break;
         }
         setSuggestedModification(null);
     };
-    const onDelete = () => {
-        onDeleteList(list.id);
-    };
+
+    const onDelete = () => onDeleteList(list.id);;
+
     const onExtendList = async () => {
         const tc = new TangibleClient(openAiKey);
 
@@ -188,8 +177,10 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onFilter,
             const response = await tc.expectExtendedItems(list.items.map(i => i.text));
             setLoading(false);
             if (response.outcome === "Success") {
-                const items: ListItem[] = response.value.map(i => ({ id: createListItemId(), text: i }));
-                onUpdateItems(list.id, items);
+                onUpdateItems(
+                    list.id,
+                    response.value.map(i => ({ id: createListItemId(), text: i }))
+                );
             }
         }
     }
@@ -217,24 +208,12 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onFilter,
                 }
             } else if (suggestedModification.type === "grouped") {
                 const group = suggestedModification.groups.find(g => g.items.includes(item.text));
-                const colors: string[] = [
-                    "#FFCDD2",
-                    "#F8BBD0",
-                    "#E1BEE7",
-                    "#D1C4E9",
-                    "#C5CAE9",
-                    "#BBDEFB",
-                    "#B2EBF2",
-                    "#B2DFDB",
-                    "#C8E6C9",
-                    "#DCEDC8",
-                ];
                 if (group !== undefined) {
                     const index = suggestedModification.groups.indexOf(group);
                     return {
                         type: "grouped",
                         groupName: group.name,
-                        backgroundColor: colors[index]
+                        backgroundColor: groupColors[index]
                     };
                 } else {
                     return null;
@@ -313,11 +292,9 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onFilter,
                 )}
             </li>
 
-            <DndContext
-                sensors={sensors}
+            <DndContext sensors={sensors}
                 collisionDetection={closestCenter}
                 onDragEnd={handleDragEnd}>
-
                 <SortableContext items={list.items} strategy={verticalListSortingStrategy}>
                     {list.items.map(item => (
                         <ListItemElement item={item}

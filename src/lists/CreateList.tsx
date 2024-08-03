@@ -1,7 +1,7 @@
 import { useState } from "react";
-import TangibleClient from "../../tangible-gpt/TangibleClient";
-import { withoutPrefix, withoutTrailingDot } from "../../common";
-import { List, ListId } from "../../model";
+import TangibleClient from "../tangible-gpt/TangibleClient";
+import { withoutPrefix, withoutTrailingDot } from "../common";
+import { List, ListId } from "../model";
 
 
 const createPrompt = (instruction: string, lists: List[]) => {
@@ -40,6 +40,7 @@ const CreateList = ({ openAiKey, lists, onCreateList }: Props) => {
     };
 
     const checkboxValue = (listId: ListId) => selectedLists.has(listId) ? "checked" : undefined;
+    
     const onClickCheckbox = (listId: ListId) => {
         if (selectedLists.has(listId)) {
             const updatedLists = new Set(selectedLists);
