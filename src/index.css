@@ -108,10 +108,30 @@ body {
     cursor: pointer;
 }
 
+.tab span {
+    visibility: hidden;
+    opacity: 0;
+}
+
+.tab:hover span {
+    visibility: visible;
+    opacity: 1;
+}
+
 .active-tab {
     flex: 1;
     border-bottom: black solid thin;
     text-align: center;
+}
+
+.active-tab span {
+    visibility: hidden;
+    opacity: 0;
+}
+
+.active-tab:hover span {
+    visibility: visible;
+    opacity: 1;
 }
 
 .tab a {

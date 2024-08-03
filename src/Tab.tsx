@@ -54,14 +54,16 @@ const Tab = ({ workspace, active, canBeDeleted, onDelete, onChangeTab, onRename 
             ) : (
                 <>
                     {workspace.name}
-                    <span style={{ cursor: "pointer", color: "#424242" }}
-                        onClick={onEdit}
-                        title="Rename"><IconPencil /></span>
-                    {canBeDeleted && (
+                    <span className="tab-icons-container">
                         <span style={{ cursor: "pointer", color: "#424242" }}
-                            onClick={() => onDelete(workspace.id)}
-                            title="Delete"><IconX /></span>
-                    )}
+                            onClick={onEdit}
+                            title="Rename"><IconPencil /></span>
+                        {canBeDeleted && (
+                            <span style={{ cursor: "pointer", color: "#424242" }}
+                                onClick={() => onDelete(workspace.id)}
+                                title="Delete"><IconX /></span>
+                        )}
+                    </span>
                 </>
             )}
         </div>
