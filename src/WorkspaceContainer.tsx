@@ -3,6 +3,8 @@ import ListElement from "./elements/list/ListElement";
 import { createListId, createListItemId, List, ListId, ListItem, ListItemId, WorkspaceId } from "./model";
 import { ItemGroup } from "./tangible-gpt/model";
 import { ActiveWorkspace } from "./RootPage";
+import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { arrayMove, rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 
 type Props = {
     activeWorkspace: ActiveWorkspace;
@@ -10,6 +12,8 @@ type Props = {
 };
 
 const WorkspaceContainer = ({activeWorkspace, onUpdateLists}: Props) => {
+    const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { delay: 200, tolerance: 5 } }));
+
     const workspaceId = activeWorkspace.workspaceId;
     const lists = activeWorkspace.lists;
 
@@ -162,35 +166,52 @@ const WorkspaceContainer = ({activeWorkspace, onUpdateLists}: Props) => {
 
     const openAiKey = localStorage.getItem("openAiKey") || "";
 
+    const handleDragEnd = (event: DragEndEvent) => {
+        if (event.over !== null) {
+            const over = event.over;
+            if (event.active.id !== event.over.id) {
+                const oldIndex = lists.findIndex(l => l.id === event.active.id);
+                const newIndex = lists.findIndex(l => l.id === over.id);
+                const updated = arrayMove(lists, oldIndex, newIndex);
+                onUpdateLists(workspaceId, updated);
+            }
+        }
+    };
+
+
     return (
-        <>
             <div className="grid-container">
-                {lists.map(list => (
-                    <div className="grid-item" key={list.id}>
-                        <ListElement openAiKey={openAiKey}
-                            list={list}
-                            addItem={addItem}
-                            deleteItem={deleteItem}
-                            editItem={editItem}
-                            onFilter={onFilter}
-                            onSort={onSort}
-                            onGroup={onGroup}
-                            onDeleteList={onDeleteList}
-                            onUpdateItems={onUpdateItems}
-                            onEditTitle={onEditTitle}
-                            key={list.id}
-                        />
-                    </div>
-                ))}
+                <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}>
+
+                    <SortableContext items={lists} strategy={rectSortingStrategy}>
+                        {lists.map(list => (
+                            <div className="grid-item" key={list.id}>
+                                <ListElement openAiKey={openAiKey}
+                                    list={list}
+                                    addItem={addItem}
+                                    deleteItem={deleteItem}
+                                    editItem={editItem}
+                                    onFilter={onFilter}
+                                    onSort={onSort}
+                                    onGroup={onGroup}
+                                    onDeleteList={onDeleteList}
+                                    onUpdateItems={onUpdateItems}
+                                    onEditTitle={onEditTitle}
+                                    key={list.id}
+                                />
+                            </div>
+                        ))}
+                    </SortableContext>
+                </DndContext>
+
                 <CreateList openAiKey={openAiKey}
                     lists={lists}
                     onCreateList={onCreateList} />
             </div>
-            <br />
-            <br />
-            <br />
-            <br />
-        </>
+
     )};
 
 export default WorkspaceContainer;

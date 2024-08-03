@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { CSSProperties, useState } from "react";
 import ListItemElement, { Modification } from "./ListItemElement";
 import InstructionInput from "../InsertuctionInput";
 import TangibleClient from "../../tangible-gpt/TangibleClient";
@@ -13,8 +13,9 @@ import IconPlaylistAdd from "../../icons/IconPlaylistAdd";
 import IconX from "../../icons/IconX";
 import IconArrowBack from "../../icons/IconArrowBack";
 import IconFilter from "../../icons/IconFilter";
-import { closestCenter, DndContext, DragEndEvent, DragOverEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from '@dnd-kit/utilities';
 
 
 type FilteredItems = {
@@ -86,9 +87,15 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onFilter,
     const [editInput, setEditInput] = useState<string>(list.name);
     const [loading, setLoading] = useState<boolean>(false);
 
-    const sensors = useSensors(
-        useSensor(PointerSensor)
-    );
+    const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { delay: 200, tolerance: 5 } }));
+
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+    } = useSortable({ id: list.id });
 
     const onClickHighlight = () => setWaitingForInput("highlight");
     const onClickFilter = () => setWaitingForInput("filter");
@@ -242,25 +249,26 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onFilter,
     const handleDragEnd = (event: DragEndEvent) => {
         if (event.over !== null) {
             const over = event.over;
-
             if (event.active.id !== event.over.id) {
                 const oldIndex = list.items.findIndex(i => i.id === event.active.id);
                 const newIndex = list.items.findIndex(i => i.id === over.id);
-
                 const updated = arrayMove(list.items, oldIndex, newIndex);
                 onUpdateItems(list.id, updated);
             }
         }
     };
 
-    const handleDragOver = (event: DragOverEvent) => {
-//        console.log("active", event.active);
-//        console.log("over", event.over);
-        console.log(list.name);
+    const style: CSSProperties = {
+        transform: CSS.Transform.toString(transform),
+        transition
     };
 
     return (
-        <ul className="list">
+        <ul className="list"
+            style={style}
+            ref={setNodeRef}
+            {...attributes}
+            {...listeners}>
             <li className="list-item" style={{ backgroundColor: "lightGray" }}>
                 {loading ? (
                     <div className="spinner" />
@@ -308,8 +316,7 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onFilter,
             <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-                onDragOver={handleDragOver}>
+                onDragEnd={handleDragEnd}>
 
                 <SortableContext items={list.items} strategy={verticalListSortingStrategy}>
                     {list.items.map(item => (
