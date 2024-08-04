@@ -25,7 +25,7 @@ const ListItemContent = ({ text, modification, onEnableEdit, onDelete }: Props) 
             {modification?.type === "reordered" && (
                 <span style={{ paddingRight: "10px" }}>{modification.newText}</span>
             )}
-            <span onClick={() => onEnableEdit}
+            <span onClick={() => onEnableEdit()}
                 style={textStyle(modification)}>{text}</span>
             <div className="icons" style={{backgroundColor: "white"}}>
                 <span className="icon"
