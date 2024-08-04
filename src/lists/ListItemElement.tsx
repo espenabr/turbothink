@@ -87,10 +87,13 @@ const ListItemElement = ({ item, modification, onEdit, onDelete }: Props) => {
             {editMode ? (
                 <>
                     <input value={editInput}
+                        style={{ width: "85%" }}
                         onChange={e => setEditInput(e.currentTarget.value)}
                         onKeyUp={onEditItem} />
-                    &nbsp;
-                    <span style={{ cursor: "pointer", color: "green" }} onClick={() => setEditMode(false)}><IconArrowBack /></span>
+                    <span style={{ cursor: "pointer", color: "green", paddingLeft: "5px" }}
+                        onClick={() => setEditMode(false)}>
+                        <IconArrowBack />
+                    </span>
                 </>
             ) : (
                 <>
@@ -102,7 +105,9 @@ const ListItemElement = ({ item, modification, onEdit, onDelete }: Props) => {
                     <div className="icons" style={{backgroundColor: "white"}}>
                         <span className="icon"
                             onClick={() => onDelete(item.id)}
-                            title="Delete"><IconX /></span>
+                            title="Delete"
+                            ><IconX />
+                        </span>
                     </div>
                 </>
             )}

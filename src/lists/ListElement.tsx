@@ -1,4 +1,4 @@
-import { CSSProperties, useState } from "react";
+import { CSSProperties, KeyboardEvent, useState } from "react";
 import ListItemElement, { Modification } from "./ListItemElement";
 import InstructionInput from "./InsertuctionInput";
 import TangibleClient from "../tangible-gpt/TangibleClient";
@@ -237,6 +237,13 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, 
         }
     };
 
+    const onEditListName = (event: KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "Enter" && editInput.length > 0) {
+            setEditTitleMode(false);
+            onEditTitle(list.id, editInput);
+        }
+    };
+
     const style: CSSProperties = {
         transform: CSS.Transform.toString(transform),
         transition
@@ -254,14 +261,9 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, 
                 ) : editTitleMode ? (
                     <>
                         <input value={editInput}
+                            style={{ width: "85%" }}
                             onChange={e => setEditInput(e.currentTarget.value)}
-                            onKeyUp={e => {
-                                if (e.key === "Enter" && editInput.length > 0) {
-                                    setEditTitleMode(false);
-                                    onEditTitle(list.id, editInput);
-                                }
-                            }}
-                        />
+                            onKeyUp={onEditListName} />
                         <span className="icon" onClick={() => setEditTitleMode(false)}><IconArrowBack /></span>
                     </>
                 ) : (
