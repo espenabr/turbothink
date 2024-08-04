@@ -1,7 +1,6 @@
 import { KeyboardEvent, useState } from "react";
 import { createListItemId, ListItem } from "../model";
 
-
 type Props = {
     onAdd: (item: ListItem) => void;
 };
@@ -17,11 +16,13 @@ const AddListItem = ({ onAdd }: Props) => {
     };
 
     return (
-        <input value={itemInput}
+        <input
+            value={itemInput}
             style={{ width: "97%" }}
             placeholder="New item"
-            onChange={e => setItemInput(e.currentTarget.value)}
-            onKeyUp={onAddItem} />
+            onChange={(e) => setItemInput(e.currentTarget.value)}
+            onKeyUp={onAddItem}
+        />
     );
 };
 

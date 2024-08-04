@@ -9,10 +9,13 @@ type Props = {
 const AcceptOrRejectSuggestion = ({ onReject, onAccept }: Props) => (
     <>
         {onAccept !== undefined && (
-            <span className="icon" onClick={() => onAccept()}><IconCheck /></span>
+            <span className="icon" onClick={() => onAccept()}>
+                <IconCheck />
+            </span>
         )}
-        <span className="icon"
-            onClick={() => onReject()}><IconArrowBack /></span>
+        <span className="icon" onClick={() => onReject()}>
+            <IconArrowBack />
+        </span>
     </>
 );
 

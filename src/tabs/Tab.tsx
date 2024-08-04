@@ -1,6 +1,6 @@
 import { CSSProperties, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from '@dnd-kit/utilities';
+import { CSS } from "@dnd-kit/utilities";
 import { Workspace, WorkspaceId } from "../model";
 import EditTab from "./EditTab";
 import TabContent from "./TabContent";
@@ -22,7 +22,7 @@ const Tab = ({ workspace, active, canBeDeleted, onDelete, onChangeTab, onRename 
 
     const style: CSSProperties = {
         transform: CSS.Transform.toString(transform),
-        transition
+        transition,
     };
 
     const onRenameTab = (nweName: string) => {
@@ -31,21 +31,23 @@ const Tab = ({ workspace, active, canBeDeleted, onDelete, onChangeTab, onRename 
     };
 
     return (
-        <div className={tabClass}
+        <div
+            className={tabClass}
             onClick={() => onChangeTab(workspace.id)}
             ref={setNodeRef}
             style={style}
             {...attributes}
-            {...listeners}>
+            {...listeners}
+        >
             {editMode ? (
-                <EditTab workspaceName={workspace.name}
-                    onRename={onRenameTab}
-                    onCancel={() => setEditMode(false)} />
+                <EditTab workspaceName={workspace.name} onRename={onRenameTab} onCancel={() => setEditMode(false)} />
             ) : (
-                <TabContent workspaceName={workspace.name}
+                <TabContent
+                    workspaceName={workspace.name}
                     canBeDeleted={canBeDeleted}
                     onEnableEdit={() => setEditMode(true)}
-                    onDelete={() => onDelete(workspace.id)} />
+                    onDelete={() => onDelete(workspace.id)}
+                />
             )}
         </div>
     );

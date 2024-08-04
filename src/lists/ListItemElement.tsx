@@ -1,10 +1,9 @@
 import { CSSProperties, useState } from "react";
-import { CSS } from '@dnd-kit/utilities';
+import { CSS } from "@dnd-kit/utilities";
 import { ListItem, ListItemId } from "../model";
 import { useSortable } from "@dnd-kit/sortable";
 import EditListItem from "./EditListItem";
 import ListItemContent from "./ListItemContent";
-
 
 export type Highlighted = {
     type: "highlighted";
@@ -58,7 +57,7 @@ const ListItemElement = ({ item, modification, onEdit, onDelete }: Props) => {
     const style: CSSProperties = {
         ...itemStyle(modification),
         transform: CSS.Transform.toString(transform),
-        transition
+        transition,
     };
 
     const onEditItem = (newText: string) => {
@@ -67,21 +66,23 @@ const ListItemElement = ({ item, modification, onEdit, onDelete }: Props) => {
     };
 
     return (
-        <li className="list-item"
+        <li
+            className="list-item"
             style={style}
             ref={setNodeRef}
             {...attributes}
             {...listeners}
-            title={modification?.type === "grouped" ? modification.groupName : undefined}>
+            title={modification?.type === "grouped" ? modification.groupName : undefined}
+        >
             {editMode ? (
-                <EditListItem text={item.text} 
-                    onEdit={onEditItem} 
-                    onCancel={() => setEditMode(false)} />
+                <EditListItem text={item.text} onEdit={onEditItem} onCancel={() => setEditMode(false)} />
             ) : (
-                <ListItemContent text={item.text}
+                <ListItemContent
+                    text={item.text}
                     modification={modification}
                     onEnableEdit={() => setEditMode(true)}
-                    onDelete={() => onDelete(item.id)} />
+                    onDelete={() => onDelete(item.id)}
+                />
             )}
         </li>
     );

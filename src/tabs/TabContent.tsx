@@ -1,7 +1,6 @@
 import IconPencil from "../icons/IconPencil";
 import IconX from "../icons/IconX";
 
-
 type Props = {
     workspaceName: string;
     canBeDeleted: boolean;
@@ -15,15 +14,11 @@ const TabContent = ({ workspaceName, canBeDeleted, onEnableEdit, onDelete }: Pro
         <>
             {workspaceName}
             <span style={{ paddingLeft: "10px" }}>
-                <span style={{ cursor: "pointer", color: "#424242" }}
-                    onClick={() => onEnableEdit()}
-                    title="Rename">
+                <span style={{ cursor: "pointer", color: "#424242" }} onClick={() => onEnableEdit()} title="Rename">
                     <IconPencil />
                 </span>
                 {canBeDeleted && (
-                    <span style={{ cursor: "pointer", color: "#424242" }}
-                        onClick={() => onDelete()}
-                        title="Delete">
+                    <span style={{ cursor: "pointer", color: "#424242" }} onClick={() => onDelete()} title="Delete">
                         <IconX />
                     </span>
                 )}

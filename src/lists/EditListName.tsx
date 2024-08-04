@@ -1,8 +1,6 @@
 import { useState, KeyboardEvent } from "react";
 import IconArrowBack from "../icons/IconArrowBack";
 
-
-
 type Props = {
     listName: string;
     onRename: (newName: string) => void;
@@ -20,13 +18,17 @@ const EditListName = ({ listName, onRename, onCancel }: Props) => {
 
     return (
         <>
-            <input value={editInput}
+            <input
+                value={editInput}
                 style={{ width: "85%" }}
-                onChange={e => setEditInput(e.currentTarget.value)}
-                onKeyUp={onEditListName} />
-            <span className="icon" onClick={onCancel}><IconArrowBack /></span>
+                onChange={(e) => setEditInput(e.currentTarget.value)}
+                onKeyUp={onEditListName}
+            />
+            <span className="icon" onClick={onCancel}>
+                <IconArrowBack />
+            </span>
         </>
-    )
+    );
 };
 
 export default EditListName;

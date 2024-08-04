@@ -8,10 +8,9 @@ import { withoutTrailingDot } from "../common";
 import { createListItemId, List, ListId, ListItem, ListItemId } from "../model";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { CSS } from '@dnd-kit/utilities';
+import { CSS } from "@dnd-kit/utilities";
 import ListHeaderIcons from "./ListHeaderIcons";
 import EditListName from "./EditListName";
-
 
 type FilteredItems = {
     type: "filtered";
@@ -34,7 +33,7 @@ type HighlightedItems = {
 type ItemGroup = {
     name: string;
     items: string[];
-}
+};
 
 type GroupedItems = {
     type: "grouped";
@@ -46,16 +45,27 @@ type SuggestedModification = FilteredItems | SortedItems | HighlightedItems | Gr
 
 export type Action = "highlight" | "filter" | "sort" | "group";
 
-const groupColors: string[] = ["#FFCDD2", "#F8BBD0", "#E1BEE7", "#D1C4E9", "#C5CAE9", "#BBDEFB", "#B2EBF2", "#B2DFDB", "#C8E6C9", "#DCEDC8"];
+const groupColors: string[] = [
+    "#FFCDD2",
+    "#F8BBD0",
+    "#E1BEE7",
+    "#D1C4E9",
+    "#C5CAE9",
+    "#BBDEFB",
+    "#B2EBF2",
+    "#B2DFDB",
+    "#C8E6C9",
+    "#DCEDC8",
+];
 
 const toSortedListItems = (sortedItems: string[], oldItems: ListItem[]): ListItem[] => {
     let unmatchedItems = oldItems.slice();
 
-    return sortedItems.flatMap(si => {
-        const match: ListItem | undefined = unmatchedItems.find(ui => ui.text === si);
+    return sortedItems.flatMap((si) => {
+        const match: ListItem | undefined = unmatchedItems.find((ui) => ui.text === si);
 
         if (match !== undefined) {
-            unmatchedItems = unmatchedItems.filter(ui => ui.id !== match.id);
+            unmatchedItems = unmatchedItems.filter((ui) => ui.id !== match.id);
             return [match];
         } else {
             return [];
@@ -65,7 +75,7 @@ const toSortedListItems = (sortedItems: string[], oldItems: ListItem[]): ListIte
 
 type Props = {
     openAiKey: string;
-    list: List,
+    list: List;
     addItem: (listId: ListId, item: ListItem) => void;
     deleteItem: (listId: ListId, id: ListItemId) => void;
     editItem: (listId: ListId, item: ListItem) => void;
@@ -75,13 +85,27 @@ type Props = {
     onEditTitle: (listId: ListId, newTitle: string) => void;
 };
 
-const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, onDeleteList, onUpdateItems, onEditTitle }: Props) => {
+const ListElement = ({
+    openAiKey,
+    list,
+    addItem,
+    deleteItem,
+    editItem,
+    onGroup,
+    onDeleteList,
+    onUpdateItems,
+    onEditTitle,
+}: Props) => {
     const [suggestedModification, setSuggestedModification] = useState<SuggestedModification | null>(null);
     const [waitingForInput, setWaitingForInput] = useState<Action | null>(null);
     const [editNameMode, setEditNameMode] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
 
-    const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { delay: 200, tolerance: 5 } }));
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: { delay: 200, tolerance: 5 },
+        }),
+    );
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: list.id });
 
     const onClickHighlight = () => setWaitingForInput("highlight");
@@ -95,43 +119,56 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, 
 
         setLoading(true);
         if (waitingForInput === "highlight") {
-            const response = await tc.expectFiltered(items.map(i => i.text), instruction);
+            const response = await tc.expectFiltered(
+                items.map((i) => i.text),
+                instruction,
+            );
             if (response.outcome === "Success") {
                 setSuggestedModification({
                     type: "highlighted",
                     predicate: instruction,
-                    items: response.value
+                    items: response.value,
                 });
             }
         } else if (waitingForInput === "filter") {
-            const response = await tc.expectFiltered(items.map(i => i.text), instruction);
+            const response = await tc.expectFiltered(
+                items.map((i) => i.text),
+                instruction,
+            );
             if (response.outcome === "Success") {
                 setSuggestedModification({
                     type: "filtered",
                     predicate: instruction,
-                    items: response.value
+                    items: response.value,
                 });
             }
         } else if (waitingForInput === "sort") {
-            const response = await tc.expectSorted(items.map(i => i.text), instruction);
+            const response = await tc.expectSorted(
+                items.map((i) => i.text),
+                instruction,
+            );
             if (response.outcome === "Success") {
                 const suggested: SuggestedModification = {
                     type: "sorted",
                     orderBy: instruction,
-                    items: response.value
+                    items: response.value,
                 };
                 setSuggestedModification(suggested);
             }
         } else if (waitingForInput === "group") {
-            const response = await tc.expectGroups(items.map(i => i.text), undefined, instruction);
+            const response = await tc.expectGroups(
+                items.map((i) => i.text),
+                undefined,
+                instruction,
+            );
             if (response.outcome === "Success") {
                 setSuggestedModification({
                     type: "grouped",
                     criteria: instruction,
-                    groups: response.value.map(g => ({
+                    groups: response.value.map((g) => ({
                         name: g.name,
-                        items: g.items.map(i => withoutTrailingDot(i))
-                    }))
+                        items: g.items.map((i) => withoutTrailingDot(i)),
+                    })),
                 });
             }
         }
@@ -148,7 +185,10 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, 
     const onAccept = () => {
         switch (suggestedModification?.type) {
             case "filtered":
-                onUpdateItems(list.id, list.items.filter(i => suggestedModification.items.includes(i.text)));
+                onUpdateItems(
+                    list.id,
+                    list.items.filter((i) => suggestedModification.items.includes(i.text)),
+                );
                 break;
             case "sorted":
                 onUpdateItems(list.id, toSortedListItems(suggestedModification.items, list.items));
@@ -160,18 +200,18 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, 
         setSuggestedModification(null);
     };
 
-    const onDelete = () => onDeleteList(list.id);;
+    const onDelete = () => onDeleteList(list.id);
 
     const onExtendList = async () => {
         const tc = new TangibleClient(openAiKey);
         if (list.items.length > 0) {
             setLoading(true);
-            const response = await tc.expectExtendedItems(list.items.map(i => i.text));
+            const response = await tc.expectExtendedItems(list.items.map((i) => i.text));
             setLoading(false);
             if (response.outcome === "Success") {
                 onUpdateItems(
                     list.id,
-                    response.value.map(i => ({ id: createListItemId(), text: i }))
+                    response.value.map((i) => ({ id: createListItemId(), text: i })),
                 );
             }
         }
@@ -190,22 +230,24 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, 
 
                     if (suggestedItems.indexOf(item) !== items.indexOf(item)) {
                         const index = items.indexOf(item);
-                        return suggestedItems[index] !== undefined ? {
-                            type: "reordered",
-                            newText: suggestedItems[index].text
-                        } : null;
+                        return suggestedItems[index] !== undefined
+                            ? {
+                                  type: "reordered",
+                                  newText: suggestedItems[index].text,
+                              }
+                            : null;
                     } else {
                         return null;
                     }
                 }
             } else if (suggestedModification.type === "grouped") {
-                const group = suggestedModification.groups.find(g => g.items.includes(item.text));
+                const group = suggestedModification.groups.find((g) => g.items.includes(item.text));
                 if (group !== undefined) {
                     const index = suggestedModification.groups.indexOf(group);
                     return {
                         type: "grouped",
                         groupName: group.name,
-                        backgroundColor: groupColors[index]
+                        backgroundColor: groupColors[index],
                     };
                 } else {
                     return null;
@@ -221,8 +263,8 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, 
         if (event.over !== null) {
             const over = event.over;
             if (event.active.id !== event.over.id) {
-                const oldIndex = list.items.findIndex(i => i.id === event.active.id);
-                const newIndex = list.items.findIndex(i => i.id === over.id);
+                const oldIndex = list.items.findIndex((i) => i.id === event.active.id);
+                const newIndex = list.items.findIndex((i) => i.id === over.id);
                 const updated = arrayMove(list.items, oldIndex, newIndex);
                 onUpdateItems(list.id, updated);
             }
@@ -232,30 +274,29 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, 
     const onRenameList = (newName: string) => {
         setEditNameMode(false);
         onEditTitle(list.id, newName);
-    }
+    };
 
     const style: CSSProperties = {
         transform: CSS.Transform.toString(transform),
-        transition
+        transition,
     };
 
     return (
-        <ul className="list"
-            style={style}
-            ref={setNodeRef}
-            {...attributes}
-            {...listeners}>
+        <ul className="list" style={style} ref={setNodeRef} {...attributes} {...listeners}>
             <li className="list-item" style={{ backgroundColor: "lightGray" }}>
                 {loading ? (
                     <div className="spinner" />
                 ) : editNameMode ? (
-                    <EditListName listName={list.name}
+                    <EditListName
+                        listName={list.name}
                         onRename={onRenameList}
-                        onCancel={() => setEditNameMode(false)} />
+                        onCancel={() => setEditNameMode(false)}
+                    />
                 ) : (
                     <>
                         {waitingForInput !== null ? (
-                            <InstructionInput openAiKey={openAiKey}
+                            <InstructionInput
+                                openAiKey={openAiKey}
                                 onCancel={() => setWaitingForInput(null)}
                                 currentItems={list.items}
                                 onInput={onHighlightInput}
@@ -266,38 +307,48 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, 
                                 <span onClick={() => setEditNameMode(true)}>
                                     <strong>{list.name}</strong>
                                 </span>
-                                <ListHeaderIcons onSort={onClickSort}
+                                <ListHeaderIcons
+                                    onSort={onClickSort}
                                     onHighlight={onClickHighlight}
                                     onFilter={onClickFilter}
                                     onGroup={onClickGroup}
                                     onExtendList={onExtendList}
-                                    onDelete={onDelete} />
+                                    onDelete={onDelete}
+                                />
                             </>
                         )}
                     </>
                 )}
             </li>
 
-            <DndContext sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={onDragEnd}>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
                 <SortableContext items={list.items} strategy={verticalListSortingStrategy}>
-                    {list.items.map(item => (
-                        <ListItemElement item={item}
+                    {list.items.map((item) => (
+                        <ListItemElement
+                            item={item}
                             modification={itemModification(item)}
-                            onEdit={item => editItem(list.id, item)}
-                            onDelete={id => deleteItem(list.id, id)}
-                            key={item.id} />
+                            onEdit={(item) => editItem(list.id, item)}
+                            onDelete={(id) => deleteItem(list.id, id)}
+                            key={item.id}
+                        />
                     ))}
                 </SortableContext>
             </DndContext>
 
             <li>
                 {suggestedModification === null ? (
-                    <AddListItem onAdd={item => addItem(list.id, item)} />
+                    <AddListItem onAdd={(item) => addItem(list.id, item)} />
                 ) : (
-                    <AcceptOrRejectSuggestion onReject={onReject}
-                        onAccept={suggestedModification?.type === "filtered" || suggestedModification?.type === "sorted" || suggestedModification?.type === "grouped" ? onAccept : undefined} />
+                    <AcceptOrRejectSuggestion
+                        onReject={onReject}
+                        onAccept={
+                            suggestedModification?.type === "filtered" ||
+                            suggestedModification?.type === "sorted" ||
+                            suggestedModification?.type === "grouped"
+                                ? onAccept
+                                : undefined
+                        }
+                    />
                 )}
             </li>
         </ul>

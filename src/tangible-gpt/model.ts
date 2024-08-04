@@ -26,12 +26,7 @@ type BooleanParam = {
     name: string;
 };
 
-export type Param =
-    | IntegerParam
-    | StringParam
-    | EnumParam
-    | BooleanParam
-    | DoubleParam;
+export type Param = IntegerParam | StringParam | EnumParam | BooleanParam | DoubleParam;
 
 export type FunctionCall<I = string, O = string> = {
     name: string;
@@ -40,14 +35,9 @@ export type FunctionCall<I = string, O = string> = {
     function: (params: I) => Promise<O>;
 };
 
-export type ReasoningStrategy =
-    | "Simple"
-    | "ThinkStepByStep"
-    | "SuggestMultipleAndPickOne";
+export type ReasoningStrategy = "Simple" | "ThinkStepByStep" | "SuggestMultipleAndPickOne";
 
-export type TangibleResponse<T> =
-    | TangibleResponseSuccess<T>
-    | TangibleResponseFailure;
+export type TangibleResponse<T> = TangibleResponseSuccess<T> | TangibleResponseFailure;
 
 export type TangibleResponseSuccess<T> = {
     outcome: "Success";
@@ -70,9 +60,7 @@ export type TangibleOptionResponseSuccess<T> = {
     history: Message[];
 };
 
-export type TangibleOptionResponse<T> =
-    | TangibleOptionResponseSuccess<T>
-    | TangibleResponseFailure;
+export type TangibleOptionResponse<T> = TangibleOptionResponseSuccess<T> | TangibleResponseFailure;
 
 export type TangibleEitherResponse<L, R> = {
     value: L | R;
@@ -101,11 +89,7 @@ type EnumColumn = {
     options: string[];
 };
 
-export type Column =
-    | TextColumn
-    | BooleanColumn
-    | NumberColumn
-    | EnumColumn;
+export type Column = TextColumn | BooleanColumn | NumberColumn | EnumColumn;
 
 export type TextCell = {
     type: "TextCell";

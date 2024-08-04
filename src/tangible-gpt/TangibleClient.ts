@@ -46,9 +46,7 @@ const initialPrompt = (
 ): string => {
     switch (reasoningStrategy) {
         case "Simple":
-            return responseFormatDescription !== null
-                ? `${prompt}\n\n${responseFormatDescription}`
-                : prompt;
+            return responseFormatDescription !== null ? `${prompt}\n\n${responseFormatDescription}` : prompt;
         case "ThinkStepByStep":
             return `${prompt}\n\nLet's think step by step`;
         case "SuggestMultipleAndPickOne":
@@ -56,8 +54,7 @@ const initialPrompt = (
     }
 };
 
-const mapToObject = (map: Map<string, Property>): { [k: string]: Property } =>
-    Object.fromEntries(map.entries());
+const mapToObject = (map: Map<string, Property>): { [k: string]: Property } => Object.fromEntries(map.entries());
 
 const toPropertyType = (param: Param): PropertyType => {
     switch (param.type) {
@@ -74,15 +71,14 @@ const toPropertyType = (param: Param): PropertyType => {
     }
 };
 
-const functionCallTools = <I = string, O = string>(
-    functionCalls: FunctionCall<I, O>[],
-): Tool[] => {
+const functionCallTools = <I = string, O = string>(functionCalls: FunctionCall<I, O>[]): Tool[] => {
     return functionCalls.map((fc) => {
         const properties: [string, Property][] = fc.params.map((p) => {
             const propertyType = toPropertyType(p);
-            const property: Property = p.type === "enum"
-                ? { type: propertyType, description: p.name, enum: p.enum }
-                : { type: propertyType, description: p.name };
+            const property: Property =
+                p.type === "enum"
+                    ? { type: propertyType, description: p.name, enum: p.enum }
+                    : { type: propertyType, description: p.name };
 
             return [p.name, property];
         });
@@ -101,8 +97,7 @@ const functionCallTools = <I = string, O = string>(
     });
 };
 
-const last = <T>(arr: T[]): T | null =>
-    arr.length > 0 ? arr[arr.length - 1] : null;
+const last = <T>(arr: T[]): T | null => (arr.length > 0 ? arr[arr.length - 1] : null);
 
 const iDontKnow = (response: TangibleResponseSuccess<string>): boolean =>
     response.value.toLowerCase().trim().includes("i don't know");
@@ -124,8 +119,7 @@ const parseSingleChoice = (s: string, options: string[]): string | null => {
     return found !== undefined ? found : null;
 };
 
-const serializeRow = (row: Row): string =>
-    row.cells.map(serializeCell).join(";");
+const serializeRow = (row: Row): string => row.cells.map(serializeCell).join(";");
 
 const serializeCell = (cell: Cell): string => {
     switch (cell.type) {
@@ -181,24 +175,15 @@ const describeColumn = (c: Column) => {
         case "TextColumn":
             return `${c.name}: String`;
         case "EnumColumn":
-            return `${c.name}: One of the following (others are unacceptable): ${
-                c.options.join(", ")
-            }`;
+            return `${c.name}: One of the following (others are unacceptable): ${c.options.join(", ")}`;
     }
 };
 
-const groupsPrompt = (
-    items: string[],
-    groupNames?: Set<string>,
-    groupingCriteria?: string,
-): string => {
+const groupsPrompt = (items: string[], groupNames?: Set<string>, groupingCriteria?: string): string => {
     const criteriaPrompt = groupingCriteria
         ? `Items should be grouped by the following criteria: ${groupingCriteria}`
         : ``;
-    const itemsPrompt =
-        `Here are the items that should be distributed in the right groups:\n\n${
-            items.join("\n")
-        }`;
+    const itemsPrompt = `Here are the items that should be distributed in the right groups:\n\n${items.join("\n")}`;
 
     if (groupNames !== undefined) {
         return `I want you to put some items into different groups.
@@ -217,11 +202,7 @@ ${itemsPrompt}`;
     }
 };
 
-const success = <T>(
-    value: T,
-    rawMessage: string,
-    history: Message[],
-): TangibleResponseSuccess<T> => ({
+const success = <T>(value: T, rawMessage: string, history: Message[]): TangibleResponseSuccess<T> => ({
     outcome: "Success",
     value: value,
     rawMessage: rawMessage,
@@ -239,11 +220,7 @@ const successOption = <T>(
     history: history,
 });
 
-const failure = (
-    reason: string,
-    rawMessage: string,
-    history: Message[],
-): TangibleResponseFailure => ({
+const failure = (reason: string, rawMessage: string, history: Message[]): TangibleResponseFailure => ({
     outcome: "Failure",
     reason: reason,
     rawMessage: rawMessage,
@@ -256,16 +233,17 @@ const parseTable = (columns: Column[], s: string): Table | null => {
     const lines = s.split("\n").filter((l) => l.includes(";"));
 
     const rows: (Row | null)[] = lines.map((line) => {
-        const parts = line.split(";").map(withoutQuotes).map((p) => p.trim());
+        const parts = line
+            .split(";")
+            .map(withoutQuotes)
+            .map((p) => p.trim());
         const cells: (Cell | null)[] = columns.map((column, idx) => {
             const part = parts[idx];
             switch (column.type) {
                 case "BooleanColumn": {
                     const parsedBoolean = parseBoolean(part);
 
-                    return parsedBoolean !== null
-                        ? toBooleanCell(parsedBoolean, column)
-                        : null;
+                    return parsedBoolean !== null ? toBooleanCell(parsedBoolean, column) : null;
                 }
                 case "NumberColumn": {
                     let parsedNumber: number | null;
@@ -275,19 +253,12 @@ const parseTable = (columns: Column[], s: string): Table | null => {
                         parsedNumber = null;
                     }
 
-                    return parsedNumber !== null
-                        ? toNumberCell(parsedNumber, column)
-                        : null;
+                    return parsedNumber !== null ? toNumberCell(parsedNumber, column) : null;
                 }
                 case "EnumColumn": {
-                    const parsedSingleChoice = parseSingleChoice(
-                        part,
-                        column.options,
-                    );
+                    const parsedSingleChoice = parseSingleChoice(part, column.options);
 
-                    return parsedSingleChoice !== null
-                        ? toSingleChoiceCell(parsedSingleChoice, column)
-                        : null;
+                    return parsedSingleChoice !== null ? toSingleChoiceCell(parsedSingleChoice, column) : null;
                 }
                 case "TextColumn": {
                     return toTextCell(part, column);
@@ -330,10 +301,9 @@ class TangibleClient {
         functionCalls: FunctionCall<I, O>[] = [],
         reasoningStrategy: ReasoningStrategy = "Simple",
     ): Promise<TangibleResponse<R>> => {
-        const responseFormatDescription =
-            `The response must be valid JSON and only JSON, nothing else\n\nExample:\n${
-                JSON.stringify(example)
-            }`;
+        const responseFormatDescription = `The response must be valid JSON and only JSON, nothing else\n\nExample:\n${JSON.stringify(
+            example,
+        )}`;
 
         return this.interact(
             initialPrompt(reasoningStrategy, prompt, responseFormatDescription),
@@ -343,49 +313,32 @@ class TangibleClient {
             responseFormatDescription,
         ).then((r) => {
             try {
-                return success(
-                    JSON.parse(r.value) as R,
-                    r.rawMessage,
-                    r.history,
-                );
+                return success(JSON.parse(r.value) as R, r.rawMessage, r.history);
             } catch {
                 return failure("Could not parse JSON", r.rawMessage, r.history);
             }
         });
     };
 
-    private plainTextChat = (
-        prompt: string,
-        history: Message[] = [],
-    ): Promise<TangibleResponseSuccess<string>> => {
+    private plainTextChat = (prompt: string, history: Message[] = []): Promise<TangibleResponseSuccess<string>> => {
         const message: ContentMessage = userContentMessage(prompt);
         const messages = history.concat(message);
 
-        return this.gptApiClient.chatCompletion(messages)
-            .then((response) => {
-                const lastChoice = last(response.choices);
+        return this.gptApiClient.chatCompletion(messages).then((response) => {
+            const lastChoice = last(response.choices);
 
-                if (lastChoice !== null) {
-                    const reply = lastChoice.message;
+            if (lastChoice !== null) {
+                const reply = lastChoice.message;
 
-                    return success(
-                        reply.content,
-                        reply.content,
-                        history.concat(message).concat(reply),
-                    );
-                } else {
-                    const errorMsg = `Invalid format from GPT: ${
-                        JSON.stringify(response)
-                    }`;
-                    return rejection(errorMsg);
-                }
-            });
+                return success(reply.content, reply.content, history.concat(message).concat(reply));
+            } else {
+                const errorMsg = `Invalid format from GPT: ${JSON.stringify(response)}`;
+                return rejection(errorMsg);
+            }
+        });
     };
 
-    private chatWithFunctionCalls = <
-        I extends JSONSerializable = null,
-        O extends JSONSerializable = null,
-    >(
+    private chatWithFunctionCalls = <I extends JSONSerializable = null, O extends JSONSerializable = null>(
         prompt: string,
         functionCalls: FunctionCall<I, O>[],
         history: Message[],
@@ -394,42 +347,33 @@ class TangibleClient {
         const messages = history.concat(message);
         const tools = functionCallTools(functionCalls);
 
-        const initialResponse = this.gptApiClient.chatCompletion(
-            messages,
-            tools,
-        );
+        const initialResponse = this.gptApiClient.chatCompletion(messages, tools);
 
-        return initialResponse.then((ir) =>
-            this.callFunctionIfApplicable(
-                ir,
-                functionCalls,
-                [message as Message].concat(ir.choices.map((c) => c.message)),
+        return initialResponse
+            .then((ir) =>
+                this.callFunctionIfApplicable(
+                    ir,
+                    functionCalls,
+                    [message as Message].concat(ir.choices.map((c) => c.message)),
+                ),
             )
-        ).then((response) => {
-            const reply = last(response.choices.map((c) => c.message));
-            const history = [message as Message].concat(
-                response.choices.map((c) => c.message),
-            );
-            if (reply !== null) {
-                return success(reply.content, reply.content, history);
-            } else {
-                return rejection(
-                    "Invalid format from GPT: " + JSON.stringify(response),
-                );
-            }
-        });
+            .then((response) => {
+                const reply = last(response.choices.map((c) => c.message));
+                const history = [message as Message].concat(response.choices.map((c) => c.message));
+                if (reply !== null) {
+                    return success(reply.content, reply.content, history);
+                } else {
+                    return rejection("Invalid format from GPT: " + JSON.stringify(response));
+                }
+            });
     };
 
-    private callFunctionIfApplicable = <
-        I extends JSONSerializable = null,
-        O extends JSONSerializable = null,
-    >(
+    private callFunctionIfApplicable = <I extends JSONSerializable = null, O extends JSONSerializable = null>(
         initialResponse: CompletionResponse,
         functionCalls: FunctionCall<I, O>[],
         history: Message[],
     ): Promise<CompletionResponse> => {
-        const last =
-            initialResponse.choices[initialResponse.choices.length - 1];
+        const last = initialResponse.choices[initialResponse.choices.length - 1];
 
         switch (last.finish_reason) {
             case "stop":
@@ -438,54 +382,39 @@ class TangibleClient {
                 const toolCalls: ToolCall[] = last.message.tool_calls;
 
                 const promises: Promise<ResultFromToolMessage>[] = toolCalls
-                    .map(
-                        (tc) => {
-                            const matchingFunctionCall:
-                                | FunctionCall<I, O>
-                                | undefined = functionCalls.find((fc) =>
-                                    fc.name === tc.function.name
-                                );
+                    .map((tc) => {
+                        const matchingFunctionCall: FunctionCall<I, O> | undefined = functionCalls.find(
+                            (fc) => fc.name === tc.function.name,
+                        );
 
-                            // Far from ideal we don't type check the parameters, especially for enums
+                        // Far from ideal we don't type check the parameters, especially for enums
 
-                            const parsed = JSON.parse(
-                                tc.function.arguments,
-                            ) as I;
+                        const parsed = JSON.parse(tc.function.arguments) as I;
 
-                            if (matchingFunctionCall !== undefined) {
-                                const promise = matchingFunctionCall.function(
-                                    parsed,
-                                );
+                        if (matchingFunctionCall !== undefined) {
+                            const promise = matchingFunctionCall.function(parsed);
 
-                                return promise.then((result) => ({
-                                    messageType: "ResultFromToolMessage",
-                                    role: "tool",
-                                    name: tc.function.name,
-                                    content: JSON.stringify(result),
-                                    tool_call_id: tc.id,
-                                }));
-                            } else {
-                                return null;
-                            }
-                        },
-                    ).filter((p) => p !== null) as Promise<
-                        ResultFromToolMessage
-                    >[];
+                            return promise.then((result) => ({
+                                messageType: "ResultFromToolMessage",
+                                role: "tool",
+                                name: tc.function.name,
+                                content: JSON.stringify(result),
+                                tool_call_id: tc.id,
+                            }));
+                        } else {
+                            return null;
+                        }
+                    })
+                    .filter((p) => p !== null) as Promise<ResultFromToolMessage>[];
 
                 return Promise.all(promises).then((messages) => {
-                    return this.gptApiClient.chatCompletion(
-                        history.concat(messages),
-                        functionCallTools(functionCalls),
-                    );
+                    return this.gptApiClient.chatCompletion(history.concat(messages), functionCallTools(functionCalls));
                 });
             }
         }
     };
 
-    private withPossibleFunctionCalls = <
-        I extends JSONSerializable = null,
-        O extends JSONSerializable = null,
-    >(
+    private withPossibleFunctionCalls = <I extends JSONSerializable = null, O extends JSONSerializable = null>(
         prompt: string,
         history: Message[],
         functionCalls: FunctionCall<I, O>[],
@@ -497,24 +426,16 @@ class TangibleClient {
         }
     };
 
-    private interact = <
-        I extends JSONSerializable = null,
-        O extends JSONSerializable = null,
-    >(
+    private interact = <I extends JSONSerializable = null, O extends JSONSerializable = null>(
         prompt: string,
         history: Message[],
         functionCalls: FunctionCall<I, O>[],
         ReasoningStrategy: ReasoningStrategy,
         responseFormatDescription: string | null,
     ): Promise<TangibleResponseSuccess<string>> =>
-        this.withPossibleFunctionCalls(prompt, history, functionCalls)
-            .then((response) =>
-                this.afterPossibleReasoning(
-                    response,
-                    ReasoningStrategy,
-                    responseFormatDescription,
-                )
-            );
+        this.withPossibleFunctionCalls(prompt, history, functionCalls).then((response) =>
+            this.afterPossibleReasoning(response, ReasoningStrategy, responseFormatDescription),
+        );
 
     private afterPossibleReasoning = (
         response: TangibleResponseSuccess<string>,
@@ -525,36 +446,29 @@ class TangibleClient {
             case "Simple":
                 return Promise.resolve(response);
             case "ThinkStepByStep": {
-                const prompt = responseFormatDescription !== null
-                    ? `Give me an answer.\n\n${responseFormatDescription}`
-                    : `Give me an answer.`;
+                const prompt =
+                    responseFormatDescription !== null
+                        ? `Give me an answer.\n\n${responseFormatDescription}`
+                        : `Give me an answer.`;
                 return this.expectPlainText(prompt, response.history);
             }
             case "SuggestMultipleAndPickOne": {
-                const prompt2 = responseFormatDescription !== null
-                    ? `Pick the best answer.\n\n${responseFormatDescription}`
-                    : `Pick the best answer.`;
+                const prompt2 =
+                    responseFormatDescription !== null
+                        ? `Pick the best answer.\n\n${responseFormatDescription}`
+                        : `Pick the best answer.`;
                 return this.expectPlainText(prompt2, response.history);
             }
         }
     };
 
-    public expectPlainText = <
-        I extends JSONSerializable = null,
-        O extends JSONSerializable = null,
-    >(
+    public expectPlainText = <I extends JSONSerializable = null, O extends JSONSerializable = null>(
         prompt: string,
         history: Message[] = [],
         functionCalls: FunctionCall<I, O>[] = [],
         reasoningStrategy: ReasoningStrategy = "Simple",
     ): Promise<TangibleResponseSuccess<string>> =>
-        this.interact(
-            initialPrompt(reasoningStrategy, prompt, null),
-            history,
-            functionCalls,
-            reasoningStrategy,
-            null,
-        );
+        this.interact(initialPrompt(reasoningStrategy, prompt, null), history, functionCalls, reasoningStrategy, null);
 
     public expectJsonOption = <
         R extends JSONSerializable,
@@ -567,10 +481,9 @@ class TangibleClient {
         functionCalls: FunctionCall<I, O>[] = [],
         reasoningStrategy: ReasoningStrategy = "Simple",
     ): Promise<TangibleOptionResponse<R>> => {
-        const responseFormatDescription =
-            `If you don't, know the answer, simply say "I don't know". Otherwise, the response must be in valid JSON and only JSON, nothing else.\n\nExample:\n${
-                JSON.stringify(example)
-            }`;
+        const responseFormatDescription = `If you don't, know the answer, simply say "I don't know". Otherwise, the response must be in valid JSON and only JSON, nothing else.\n\nExample:\n${JSON.stringify(
+            example,
+        )}`;
 
         return this.interact(
             initialPrompt(reasoningStrategy, prompt, responseFormatDescription),
@@ -580,11 +493,7 @@ class TangibleClient {
             responseFormatDescription,
         ).then((r) => {
             try {
-                return success(
-                    iDontKnow(r) ? null : JSON.parse(r.value),
-                    r.rawMessage,
-                    r.history,
-                );
+                return success(iDontKnow(r) ? null : JSON.parse(r.value), r.rawMessage, r.history);
             } catch {
                 const reason = "Could not parse JSON";
                 return failure(reason, r.rawMessage, r.history);
@@ -592,17 +501,13 @@ class TangibleClient {
         });
     };
 
-    public expectPlainTextOption = <
-        I extends JSONSerializable = null,
-        O extends JSONSerializable = null,
-    >(
+    public expectPlainTextOption = <I extends JSONSerializable = null, O extends JSONSerializable = null>(
         prompt: string,
         history: Message[] = [],
         functionCalls: FunctionCall<I, O>[] = [],
         reasoningStrategy: ReasoningStrategy = "Simple",
     ): Promise<TangibleOptionResponse<string>> => {
-        const responseFormatDescription =
-            `If you don't know the answer, simply say "I don't know"`;
+        const responseFormatDescription = `If you don't know the answer, simply say "I don't know"`;
 
         return this.interact(
             initialPrompt(reasoningStrategy, prompt, responseFormatDescription),
@@ -610,22 +515,16 @@ class TangibleClient {
             functionCalls,
             reasoningStrategy,
             responseFormatDescription,
-        ).then((r) =>
-            success(iDontKnow(r) ? null : r.value, r.rawMessage, r.history)
-        );
+        ).then((r) => success(iDontKnow(r) ? null : r.value, r.rawMessage, r.history));
     };
 
-    public expectBoolean = <
-        I extends JSONSerializable = null,
-        O extends JSONSerializable = null,
-    >(
+    public expectBoolean = <I extends JSONSerializable = null, O extends JSONSerializable = null>(
         prompt: string,
         history: Message[] = [],
         functionCalls: FunctionCall<I, O>[] = [],
         reasoningStrategy: ReasoningStrategy = "Simple",
     ): Promise<TangibleResponse<boolean>> => {
-        const responseFormatDescription =
-            `I only want a yes or no answer, nothing else. Reply with either "yes" or "no"`;
+        const responseFormatDescription = `I only want a yes or no answer, nothing else. Reply with either "yes" or "no"`;
 
         return this.interact(
             initialPrompt(reasoningStrategy, prompt, responseFormatDescription),
@@ -638,26 +537,18 @@ class TangibleClient {
             if (value !== null) {
                 return success(value, r.rawMessage, r.history);
             } else {
-                return failure(
-                    "Could not parse boolean value",
-                    r.rawMessage,
-                    r.history,
-                );
+                return failure("Could not parse boolean value", r.rawMessage, r.history);
             }
         });
     };
 
-    public expectBooleanOption = <
-        I extends JSONSerializable = null,
-        O extends JSONSerializable = null,
-    >(
+    public expectBooleanOption = <I extends JSONSerializable = null, O extends JSONSerializable = null>(
         prompt: string,
         history: Message[] = [],
         functionCalls: FunctionCall<I, O>[] = [],
         reasoningStrategy: ReasoningStrategy = "Simple",
     ): Promise<TangibleOptionResponse<boolean>> => {
-        const responseFormatDescription =
-            `If you don't know the answer, simply reply with "I don't know", nothing else.\nI only want a yes or no answer, nothing else. Reply with either "yes" or "no"`;
+        const responseFormatDescription = `If you don't know the answer, simply reply with "I don't know", nothing else.\nI only want a yes or no answer, nothing else. Reply with either "yes" or "no"`;
 
         return this.interact(
             initialPrompt(reasoningStrategy, prompt, responseFormatDescription),
@@ -673,27 +564,19 @@ class TangibleClient {
                 if (value !== null) {
                     return successOption(value, r.rawMessage, r.history);
                 } else {
-                    return failure(
-                        "Could not parse boolean value",
-                        r.rawMessage,
-                        r.history,
-                    );
+                    return failure("Could not parse boolean value", r.rawMessage, r.history);
                 }
             }
         });
     };
 
-    public expectNumber = <
-        I extends JSONSerializable = null,
-        O extends JSONSerializable = null,
-    >(
+    public expectNumber = <I extends JSONSerializable = null, O extends JSONSerializable = null>(
         prompt: string,
         history: Message[] = [],
         functionCalls: FunctionCall<I, O>[] = [],
         reasoningStrategy: ReasoningStrategy = "Simple",
     ): Promise<TangibleResponse<number>> => {
-        const responseFormatDescription =
-            `I only want a number (all digits) as an answer, nothing else.`;
+        const responseFormatDescription = `I only want a number (all digits) as an answer, nothing else.`;
 
         return this.interact(
             initialPrompt(reasoningStrategy, prompt, responseFormatDescription),
@@ -711,17 +594,13 @@ class TangibleClient {
         });
     };
 
-    public expectNumberOption = <
-        I extends JSONSerializable = null,
-        O extends JSONSerializable = null,
-    >(
+    public expectNumberOption = <I extends JSONSerializable = null, O extends JSONSerializable = null>(
         prompt: string,
         history: Message[] = [],
         functionCalls: FunctionCall<I, O>[] = [],
         reasoningStrategy: ReasoningStrategy = "Simple",
     ): Promise<TangibleOptionResponse<number>> => {
-        const responseFormatDescription =
-            `If you don't know the answer, simply reply with "I don't know", nothing else.\nI only want a number as an answer, nothing else.`;
+        const responseFormatDescription = `If you don't know the answer, simply reply with "I don't know", nothing else.\nI only want a number as an answer, nothing else.`;
 
         return this.interact(
             initialPrompt(reasoningStrategy, prompt, responseFormatDescription),
@@ -734,11 +613,7 @@ class TangibleClient {
                 return successOption(null, r.rawMessage, r.history);
             } else {
                 try {
-                    return successOption(
-                        parseFloat(r.value),
-                        r.rawMessage,
-                        r.history,
-                    );
+                    return successOption(parseFloat(r.value), r.rawMessage, r.history);
                 } catch {
                     const reason = "Could not parse float value";
                     return failure(reason, r.rawMessage, r.history);
@@ -759,8 +634,7 @@ class TangibleClient {
         reasoningStrategy: ReasoningStrategy = "Simple",
     ): Promise<TangibleResponse<T>> => {
         const optionsDescription = options.map((o) => o.toString()).join(", ");
-        const responseFormatDescription =
-            `I want you to respond with one of the following values, nothing else:\n${optionsDescription}`;
+        const responseFormatDescription = `I want you to respond with one of the following values, nothing else:\n${optionsDescription}`;
 
         return this.interact(
             initialPrompt(reasoningStrategy, prompt, responseFormatDescription),
@@ -769,15 +643,12 @@ class TangibleClient {
             reasoningStrategy,
             responseFormatDescription,
         ).then((r) => {
-            const found = options.find((o) =>
-                o.toString().toLowerCase() === r.value
-            );
+            const found = options.find((o) => o.toString().toLowerCase() === r.value);
 
             if (found !== undefined) {
                 return success(found, r.rawMessage, r.history);
             } else {
-                const reason =
-                    `Invalid value for enum. Only valid: ${optionsDescription}`;
+                const reason = `Invalid value for enum. Only valid: ${optionsDescription}`;
                 return failure(reason, r.rawMessage, r.history);
             }
         });
@@ -795,8 +666,7 @@ class TangibleClient {
         reasoningStrategy: ReasoningStrategy = "Simple",
     ): Promise<TangibleOptionResponse<T>> => {
         const optionsDescription = options.map((o) => o.toString()).join(", ");
-        const responseFormatDescription =
-            `If you don't know, simply reply "I don't know", nothing else.\nI want you to respond with one of the following values, nothing else:\n${optionsDescription}`;
+        const responseFormatDescription = `If you don't know, simply reply "I don't know", nothing else.\nI want you to respond with one of the following values, nothing else:\n${optionsDescription}`;
 
         return this.interact(
             initialPrompt(reasoningStrategy, prompt, responseFormatDescription),
@@ -808,15 +678,12 @@ class TangibleClient {
             if (iDontKnow(r)) {
                 return successOption(null, r.rawMessage, r.history);
             } else {
-                const found = options.find((o) =>
-                    o.toString().toLowerCase() === r.value
-                );
+                const found = options.find((o) => o.toString().toLowerCase() === r.value);
 
                 if (found !== undefined) {
                     return successOption(found, r.rawMessage, r.history);
                 } else {
-                    const reason =
-                        `Invalid value for enum. Only valid: ${optionsDescription}`;
+                    const reason = `Invalid value for enum. Only valid: ${optionsDescription}`;
                     return failure(reason, r.rawMessage, r.history);
                 }
             }
@@ -836,8 +703,7 @@ class TangibleClient {
     ): Promise<TangibleResponse<Set<T>>> => {
         const optionsDescription = options.map((o) => o.toString()).join(", ");
 
-        const responseFormatDescription =
-            `Given the following options:\n${optionsDescription}\nI want you to respond with those that apply. If none of them apply, just say "None".\nI want a list of options on a single line, separated by comma, and nothing else in the response.`;
+        const responseFormatDescription = `Given the following options:\n${optionsDescription}\nI want you to respond with those that apply. If none of them apply, just say "None".\nI want a list of options on a single line, separated by comma, and nothing else in the response.`;
 
         return this.interact(
             initialPrompt(reasoningStrategy, prompt, responseFormatDescription),
@@ -848,29 +714,21 @@ class TangibleClient {
         ).then((r) => {
             const splitted = r.value.split(",").map((p) => p.toLowerCase());
 
-            const allSelectionsValid = splitted.every((p) =>
-                options.find((o) => o.toString().toLowerCase() === p) !==
-                    undefined
+            const allSelectionsValid = splitted.every(
+                (p) => options.find((o) => o.toString().toLowerCase() === p) !== undefined,
             );
-            const result = options.filter((o) =>
-                splitted.find((p) => p === o.toString().toLowerCase()) !==
-                    undefined
-            );
+            const result = options.filter((o) => splitted.find((p) => p === o.toString().toLowerCase()) !== undefined);
 
             if (allSelectionsValid) {
                 return success(new Set(result), r.rawMessage, r.history);
             } else {
-                const reason =
-                    `Invalid value(s) for enum. Only valid:  ${optionsDescription}`;
+                const reason = `Invalid value(s) for enum. Only valid:  ${optionsDescription}`;
                 return failure(reason, r.rawMessage, r.history);
             }
         });
     };
 
-    public expectGroups = <
-        I extends JSONSerializable = null,
-        O extends JSONSerializable = null,
-    >(
+    public expectGroups = <I extends JSONSerializable = null, O extends JSONSerializable = null>(
         items: string[],
         groupNames?: Set<string>,
         groupingCriteria?: string,
@@ -884,10 +742,11 @@ class TangibleClient {
             { name: "group1", items: ["item1", "item2"] },
             { name: "group2", items: ["item3"] },
         ];
-        const responseFormatDescription =
-            `The response must be in valid JSON and only JSON, nothing else\n\nExample:\n${
-                JSON.stringify(example, null, 2)
-            }`;
+        const responseFormatDescription = `The response must be in valid JSON and only JSON, nothing else\n\nExample:\n${JSON.stringify(
+            example,
+            null,
+            2,
+        )}`;
 
         return this.interact(
             initialPrompt(reasoningStrategy, prompt, responseFormatDescription),
@@ -897,11 +756,7 @@ class TangibleClient {
             responseFormatDescription,
         ).then((r) => {
             try {
-                return success(
-                    JSON.parse(r.value) as ItemGroup[],
-                    r.rawMessage,
-                    r.history,
-                );
+                return success(JSON.parse(r.value) as ItemGroup[], r.rawMessage, r.history);
             } catch {
                 const reason = "Invalid response";
                 return failure(reason, r.rawMessage, r.history);
@@ -909,17 +764,13 @@ class TangibleClient {
         });
     };
 
-    public expectItems = <
-        I extends JSONSerializable = null,
-        O extends JSONSerializable = null,
-    >(
+    public expectItems = <I extends JSONSerializable = null, O extends JSONSerializable = null>(
         prompt: string,
         history: Message[] = [],
         functionCalls: FunctionCall<I, O>[] = [],
         reasoningStrategy: ReasoningStrategy = "Simple",
     ): Promise<TangibleResponse<string[]>> => {
-        const responseFormatDescription =
-            `I only want a list of items. Each item on its own line. Nothing else.`;
+        const responseFormatDescription = `I only want a list of items. Each item on its own line. Nothing else.`;
 
         return this.interact(
             initialPrompt(reasoningStrategy, prompt, responseFormatDescription),
@@ -933,10 +784,7 @@ class TangibleClient {
         });
     };
 
-    public expectSorted = <
-        I extends JSONSerializable = null,
-        O extends JSONSerializable = null,
-    >(
+    public expectSorted = <I extends JSONSerializable = null, O extends JSONSerializable = null>(
         items: string[],
         sortingCriteria?: string,
         history: Message[] = [],
@@ -944,14 +792,14 @@ class TangibleClient {
         reasoningStrategy: ReasoningStrategy = "Simple",
     ): Promise<TangibleResponse<string[]>> => {
         const itemsPrompt = items.join("\n");
-        const prompt = sortingCriteria !== undefined
-            ? `I want you to sort a list of items based on the following criteria: ${sortingCriteria}
+        const prompt =
+            sortingCriteria !== undefined
+                ? `I want you to sort a list of items based on the following criteria: ${sortingCriteria}
 
 Here are the items to be sorted\n${itemsPrompt}`
-            : `I want you to sort the following items in the most obvious way:
+                : `I want you to sort the following items in the most obvious way:
 ${itemsPrompt}`;
-        const responseFormatDescription =
-            `The response must be a sorted JSON array of strings (items), nothing else`;
+        const responseFormatDescription = `The response must be a sorted JSON array of strings (items), nothing else`;
 
         return this.interact(
             initialPrompt(reasoningStrategy, prompt, responseFormatDescription),
@@ -961,24 +809,15 @@ ${itemsPrompt}`;
             responseFormatDescription,
         ).then((r) => {
             try {
-                return success(
-                    JSON.parse(r.value) as string[],
-                    r.rawMessage,
-                    r.history,
-                );
+                return success(JSON.parse(r.value) as string[], r.rawMessage, r.history);
             } catch {
-                const reason =
-                    "Could not parse JSON (expected array of strings) from GPT";
+                const reason = "Could not parse JSON (expected array of strings) from GPT";
                 return failure(reason, r.rawMessage, r.history);
             }
         });
     };
 
-
-    public expectExtendedItems = <
-        I extends JSONSerializable = null,
-        O extends JSONSerializable = null,
-    >(
+    public expectExtendedItems = <I extends JSONSerializable = null, O extends JSONSerializable = null>(
         items: string[],
         noOfAddedItems: number = 1,
         history: Message[] = [],
@@ -986,13 +825,13 @@ ${itemsPrompt}`;
         reasoningStrategy: ReasoningStrategy = "Simple",
     ): Promise<TangibleResponse<string[]>> => {
         const itemsPrompt = items.join("\n");
-        
-        const prompt = noOfAddedItems === 1
-            ? `Extend this list with the most obvious item: ${itemsPrompt}`
-            : `Extend this list with the most obvious ${noOfAddedItems} items: ${itemsPrompt}`;
 
-        const responseFormatDescription =
-            `The response must be a sorted JSON array of strings (items), nothing else`;
+        const prompt =
+            noOfAddedItems === 1
+                ? `Extend this list with the most obvious item: ${itemsPrompt}`
+                : `Extend this list with the most obvious ${noOfAddedItems} items: ${itemsPrompt}`;
+
+        const responseFormatDescription = `The response must be a sorted JSON array of strings (items), nothing else`;
 
         return this.interact(
             initialPrompt(reasoningStrategy, prompt, responseFormatDescription),
@@ -1002,23 +841,15 @@ ${itemsPrompt}`;
             responseFormatDescription,
         ).then((r) => {
             try {
-                return success(
-                    JSON.parse(r.value) as string[],
-                    r.rawMessage,
-                    r.history,
-                );
+                return success(JSON.parse(r.value) as string[], r.rawMessage, r.history);
             } catch {
-                const reason =
-                    "Could not parse JSON (expected array of strings) from GPT";
+                const reason = "Could not parse JSON (expected array of strings) from GPT";
                 return failure(reason, r.rawMessage, r.history);
             }
         });
     };
 
-    public expectFiltered = <
-        I extends JSONSerializable = null,
-        O extends JSONSerializable = null,
-    >(
+    public expectFiltered = <I extends JSONSerializable = null, O extends JSONSerializable = null>(
         items: string[],
         predicate: string,
         history: Message[] = [],
@@ -1031,8 +862,7 @@ Only include the items that adhere the following is true: ${predicate}
 The items are:
 ${items.join("\n")}`;
 
-        const responseFormatDescription =
-            `The response must be a filtered JSON array of strings (items), nothing else`;
+        const responseFormatDescription = `The response must be a filtered JSON array of strings (items), nothing else`;
 
         return this.interact(
             initialPrompt(reasoningStrategy, prompt, responseFormatDescription),
@@ -1042,33 +872,24 @@ ${items.join("\n")}`;
             responseFormatDescription,
         ).then((r) => {
             try {
-                return success(
-                    JSON.parse(r.value) as string[],
-                    r.rawMessage,
-                    r.history,
-                );
+                return success(JSON.parse(r.value) as string[], r.rawMessage, r.history);
             } catch {
-                const reason =
-                    "Could not parse JSON (expected array of strings)";
+                const reason = "Could not parse JSON (expected array of strings)";
                 return failure(reason, r.rawMessage, r.history);
             }
         });
     };
 
-    public expectTable = <
-        I extends JSONSerializable = null,
-        O extends JSONSerializable = null,
-    >(
+    public expectTable = <I extends JSONSerializable = null, O extends JSONSerializable = null>(
         prompt: string,
         columns: Column[],
         history: Message[] = [],
         functionCalls: FunctionCall<I, O>[] = [],
         reasoningStrategy: ReasoningStrategy = "Simple",
     ): Promise<TangibleResponse<Table>> => {
-        const responseFormatDescription =
-            `The response must be CSV format (semicolon separated) with columns: ${
-                columns.map((c) => c.name).join(";")
-            }
+        const responseFormatDescription = `The response must be CSV format (semicolon separated) with columns: ${columns
+            .map((c) => c.name)
+            .join(";")}
 No header row, just data
 
 Columns:
@@ -1092,10 +913,7 @@ ${columns.map(describeColumn).join("\n")}`;
         });
     };
 
-    public expectTableWithAddedColumn = <
-        I extends JSONSerializable = null,
-        O extends JSONSerializable = null,
-    >(
+    public expectTableWithAddedColumn = <I extends JSONSerializable = null, O extends JSONSerializable = null>(
         columnToAdd: Column,
         intention: string,
         table: Table,
@@ -1112,10 +930,9 @@ ${intention}`;
 
         const resultColumns = table.columns.concat(columnToAdd);
 
-        const responseFormatDescription =
-            `The response must be in CSV format (semicolon separated) with columns: ${
-                resultColumns.map((c) => c.name).join(";")
-            } header row, just data
+        const responseFormatDescription = `The response must be in CSV format (semicolon separated) with columns: ${resultColumns
+            .map((c) => c.name)
+            .join(";")} header row, just data
 
 Columns:
 ${resultColumns.map(describeColumn).join("\n")}`;
@@ -1137,10 +954,7 @@ ${resultColumns.map(describeColumn).join("\n")}`;
         });
     };
 
-    public expectTableWithAddedRow = <
-        I extends JSONSerializable = null,
-        O extends JSONSerializable = null,
-    >(
+    public expectTableWithAddedRow = <I extends JSONSerializable = null, O extends JSONSerializable = null>(
         table: Table,
         rowDescription: string,
         history: Message[] = [],
@@ -1152,10 +966,9 @@ ${resultColumns.map(describeColumn).join("\n")}`;
 Expand this table with another row:
 ${rowDescription}`;
 
-        const responseFormatDescription =
-            `The response must be in CSV format (semicolon separated) with columns: ${
-                table.columns.map((c) => c.name).join(";")
-            };
+        const responseFormatDescription = `The response must be in CSV format (semicolon separated) with columns: ${table.columns
+            .map((c) => c.name)
+            .join(";")};
 No header row, just data
 
 Columns:

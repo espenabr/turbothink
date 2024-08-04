@@ -1,7 +1,6 @@
 import { Brand } from "./common";
 import { v4 as uuid } from "uuid";
 
-
 export type ListId = Brand<string, `ListId`>;
 export type ListItemId = Brand<string, `ListItemId`>;
 export type WorkspaceId = Brand<string, `WorkspaceId`>;

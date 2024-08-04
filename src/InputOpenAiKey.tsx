@@ -1,6 +1,5 @@
 import { useState, KeyboardEvent } from "react";
 
-
 type Props = {
     currentKey: string;
     onInput: (key: string) => void;
@@ -19,16 +18,10 @@ const InputOpenAiKey = ({ currentKey, onInput }: Props) => {
 
     return (
         <div>
-            <div>
-                Enter your OpenAI key
-            </div>
-            <input value={keyInput}
-                onKeyUp={onEdit}
-                onChange={e => setKeyInput(e.currentTarget.value)} />
+            <div>Enter your OpenAI key</div>
+            <input value={keyInput} onKeyUp={onEdit} onChange={(e) => setKeyInput(e.currentTarget.value)} />
 
-            {keyInput.length > 0 && !validKey(keyInput) && (
-                <span style={{ color: "red" }} >Invalid key!</span>
-            )}
+            {keyInput.length > 0 && !validKey(keyInput) && <span style={{ color: "red" }}>Invalid key!</span>}
         </div>
     );
 };

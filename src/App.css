@@ -4,7 +4,7 @@
     display: grid;
     grid-template-columns: repeat(5, 1fr);
 }
-  
+
 .grid-item {
     border-radius: 5px;
 }
@@ -33,7 +33,7 @@
     margin-left: 5px;
     margin-right: 5px;
     width: 300px;
-    height:fit-content;
+    height: fit-content;
     background-color: #e9e9f8;
 }
 

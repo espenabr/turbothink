@@ -107,25 +107,18 @@ class GptApiClient {
             tools: tools ?? null,
         };
 
-        return fetch(
-            "https://api.openai.com/v1/chat/completions",
-            {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${this.openAiKey}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(body),
+        return fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${this.openAiKey}`,
+                "Content-Type": "application/json",
             },
-        ).then((response) => {
+            body: JSON.stringify(body),
+        }).then((response) => {
             if (response.ok) {
                 return response.json();
             } else {
-                return Promise.reject(
-                    new Error(
-                        `${response.status.toString()} ${response.statusText}`,
-                    ),
-                );
+                return Promise.reject(new Error(`${response.status.toString()} ${response.statusText}`));
             }
         });
     };
