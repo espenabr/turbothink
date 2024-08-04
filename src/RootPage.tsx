@@ -1,10 +1,10 @@
 import { useState } from "react";
-import Tab from "./Tab";
 import { createWorkspaceId, List, Workspace, WorkspaceId } from "./model";
 import WorkspaceContainer from "./WorkspaceContainer";
 import IconPlus from "./icons/IconPlus";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
+import Tab from "./tabs/Tab";
 
 
 const loadWorkspaces = (): Workspace[] => {
