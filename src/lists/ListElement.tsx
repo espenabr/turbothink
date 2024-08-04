@@ -6,16 +6,12 @@ import AddListItem from "./AddListItem";
 import AcceptOrRejectSuggestion from "./AcceptOrRejectSuggestion";
 import { withoutTrailingDot } from "../common";
 import { createListItemId, List, ListId, ListItem, ListItemId } from "../model";
-import SortDescendingIcon from "../icons/IconSortDescending";
-import IconEye from "../icons/IconEye";
-import IconSquares from "../icons/IconSquares";
-import IconPlaylistAdd from "../icons/IconPlaylistAdd";
-import IconX from "../icons/IconX";
 import IconArrowBack from "../icons/IconArrowBack";
-import IconFilter from "../icons/IconFilter";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from '@dnd-kit/utilities';
+import ListHeaderIcons from "./ListHeaderIcons";
+import EditListName from "./EditListName";
 
 
 type FilteredItems = {
@@ -84,7 +80,6 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, 
     const [suggestedModification, setSuggestedModification] = useState<SuggestedModification | null>(null);
     const [waitingForInput, setWaitingForInput] = useState<Action | null>(null);
     const [editTitleMode, setEditTitleMode] = useState<boolean>(false);
-    const [editInput, setEditInput] = useState<string>(list.name);
     const [loading, setLoading] = useState<boolean>(false);
 
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { delay: 200, tolerance: 5 } }));
@@ -183,7 +178,7 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, 
                 );
             }
         }
-    }
+    };
 
     const itemModification = (item: ListItem): Modification | null => {
         if (suggestedModification !== null) {
@@ -237,12 +232,10 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, 
         }
     };
 
-    const onEditListName = (event: KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === "Enter" && editInput.length > 0) {
-            setEditTitleMode(false);
-            onEditTitle(list.id, editInput);
-        }
-    };
+    const onRenameList = (newName: string) => {
+        setEditTitleMode(false);
+        onEditTitle(list.id, newName);
+    }
 
     const style: CSSProperties = {
         transform: CSS.Transform.toString(transform),
@@ -259,13 +252,9 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, 
                 {loading ? (
                     <div className="spinner" />
                 ) : editTitleMode ? (
-                    <>
-                        <input value={editInput}
-                            style={{ width: "85%" }}
-                            onChange={e => setEditInput(e.currentTarget.value)}
-                            onKeyUp={onEditListName} />
-                        <span className="icon" onClick={() => setEditTitleMode(false)}><IconArrowBack /></span>
-                    </>
+                    <EditListName listName={list.name}
+                        onRename={onRenameList}
+                        onCancel={() => setEditTitleMode(false)} />
                 ) : (
                     <>
                         {waitingForInput !== null ? (
@@ -280,14 +269,12 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, 
                                 <span onClick={() => setEditTitleMode(true)}>
                                     <strong>{list.name}</strong>
                                 </span>
-                                <div className="icons">
-                                    <span className="icon" onClick={onClickSort}><SortDescendingIcon /></span>
-                                    <span className="icon" onClick={onClickHighlight} title="Highlight"><IconEye /></span>
-                                    <span className="icon" onClick={onClickFilter} title="Filter"><IconFilter /></span>
-                                    <span className="icon" onClick={onClickGroup} title="Group"><IconSquares /></span>
-                                    <span className="icon" onClick={onExtendList} title="Extend"><IconPlaylistAdd /></span>
-                                    <span className="icon" onClick={onDelete} title="Delete"><IconX /></span>
-                                </div>
+                                <ListHeaderIcons onSort={onClickSort}
+                                    onHighlight={onClickHighlight}
+                                    onFilter={onClickFilter}
+                                    onGroup={onClickGroup}
+                                    onExtendList={onExtendList}
+                                    onDelete={onDelete} />
                             </>
                         )}
                     </>
