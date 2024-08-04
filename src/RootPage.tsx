@@ -5,6 +5,7 @@ import IconPlus from "./icons/IconPlus";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import Tab from "./tabs/Tab";
+import InputOpenAiKey from "./InputOpenAiKey";
 
 
 const loadWorkspaces = (): Workspace[] => {
@@ -39,12 +40,20 @@ const persistLists = (workspaceId: WorkspaceId, lists: List[]) => {
     localStorage.setItem(`workspace-${workspaceId}`, JSON.stringify(lists));
 };
 
+const persistOpenAiKey = (s: string) => {
+    localStorage.setItem("openAiKey", s);
+};
+
+const loadOpenAiKey = () => localStorage.getItem("openAiKey");
+
 export type ActiveWorkspace = {
     workspaceId: WorkspaceId;
     lists: List[];
 };
 
 const RootPage = () => {
+    const [openAiKey, setOpenAiKey] = useState<string | null>(loadOpenAiKey());
+
     const [workspaces, setWorkspaces] = useState<Workspace[]>(loadWorkspaces);
     const [activeWorkspace, setActiveWorkspace] = useState<ActiveWorkspace>({ workspaceId: workspaces[0].id, lists: loadLists(workspaces[0].id) });
 
@@ -113,7 +122,14 @@ const RootPage = () => {
         }
     };
 
-    return (
+    const onInputKey = (k: string) => {
+        setOpenAiKey(k);
+        persistOpenAiKey(k);
+    }
+
+    return openAiKey === null ? (
+        <InputOpenAiKey currentKey={openAiKey || ""} onInput={onInputKey} />
+    ) : (
         <div>
             <div className="tabs-container">
                 <DndContext sensors={sensors}
@@ -136,7 +152,11 @@ const RootPage = () => {
                     <strong><IconPlus /></strong>
                 </div>
             </div>
-            <WorkspaceContainer activeWorkspace={activeWorkspace} onUpdateLists={onUpdateLists} />
+            <WorkspaceContainer openAiKey={openAiKey}
+                activeWorkspace={activeWorkspace}
+                onUpdateLists={onUpdateLists} />
+
+            <button onClick={() => setOpenAiKey(null)}>Chagne OpenAI key</button>
         </div>
     );
 };

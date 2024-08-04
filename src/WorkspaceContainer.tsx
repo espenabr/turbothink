@@ -7,11 +7,12 @@ import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useS
 import { arrayMove, rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 
 type Props = {
+    openAiKey: string;
     activeWorkspace: ActiveWorkspace;
     onUpdateLists: (workspaceId: WorkspaceId, lists: List[]) => void;
 };
 
-const WorkspaceContainer = ({ activeWorkspace, onUpdateLists }: Props) => {
+const WorkspaceContainer = ({ openAiKey, activeWorkspace, onUpdateLists }: Props) => {
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { delay: 200, tolerance: 5 } }));
 
     const workspaceId = activeWorkspace.workspaceId;
@@ -92,12 +93,6 @@ const WorkspaceContainer = ({ activeWorkspace, onUpdateLists }: Props) => {
         onUpdateLists(workspaceId, updatedLists);
     };
 
-    const onUpdateOpenAiKey = (s: string) => {
-        localStorage.setItem("openAiKey", s);
-    };
-
-    const openAiKey = localStorage.getItem("openAiKey") || "";
-
     const onDragEnd = (event: DragEndEvent) => {
         if (event.over !== null) {
             const over = event.over;
@@ -137,14 +132,7 @@ const WorkspaceContainer = ({ activeWorkspace, onUpdateLists }: Props) => {
                 lists={lists}
                 onCreateList={onCreateList} />
         </div>
-
-    )
+    );
 };
 
 export default WorkspaceContainer;
-
-/*
-            OpenAI Key:
-            &nbsp;
-            <input placeholder="OpenAI key" onChange={e => onUpdateOpenAiKey(e.currentTarget.value)} value={openAiKey} />
-*/
