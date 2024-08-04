@@ -37,13 +37,15 @@ body {
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
+    background-color: lightgray;
 }
 
 .icon {
-    margin-left: 5px;
+    margin-left: 2px;
     cursor: pointer;
     color: #424242;
 }
+
 /*
 .overlay {
     position: fixed;
@@ -111,6 +113,7 @@ body {
 .tab span {
     visibility: hidden;
     opacity: 0;
+    background-color: white;
 }
 
 .tab:hover span {

@@ -99,7 +99,7 @@ const ListItemElement = ({ item, modification, onEdit, onDelete }: Props) => {
                     )}
                     <span onClick={() => setEditMode(true)}
                         style={textStyle(modification)}>{item.text}</span>
-                    <div className="icons">
+                    <div className="icons" style={{backgroundColor: "white"}}>
                         <span className="icon"
                             onClick={() => onDelete(item.id)}
                             title="Delete"><IconX /></span>
