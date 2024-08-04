@@ -1,9 +1,10 @@
-import { CSSProperties, KeyboardEvent, useState } from "react";
+import { CSSProperties, useState } from "react";
 import { CSS } from '@dnd-kit/utilities';
 import { ListItem, ListItemId } from "../model";
 import IconX from "../icons/IconX";
-import IconArrowBack from "../icons/IconArrowBack";
 import { useSortable } from "@dnd-kit/sortable";
+import EditListItem from "./EditListItem";
+import ListItemContent from "./ListItemContent";
 
 
 export type Highlighted = {
@@ -61,7 +62,6 @@ type Props = {
 
 const ListItemElement = ({ item, modification, onEdit, onDelete }: Props) => {
     const [editMode, setEditMode] = useState<boolean>(false);
-    const [editInput, setEditInput] = useState<string>(item.text);
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: item.id });
 
     const style: CSSProperties = {
@@ -70,11 +70,9 @@ const ListItemElement = ({ item, modification, onEdit, onDelete }: Props) => {
         transition
     };
 
-    const onEditItem = (event: KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === "Enter" && editInput.length > 0) {
-            setEditMode(false);
-            onEdit({ id: item.id, text: editInput });
-        }
+    const onEditItem = (newText: string) => {
+        setEditMode(false);
+        onEdit({ id: item.id, text: newText });
     };
 
     return (
@@ -85,31 +83,14 @@ const ListItemElement = ({ item, modification, onEdit, onDelete }: Props) => {
             {...listeners}
             title={modification?.type === "grouped" ? modification.groupName : undefined}>
             {editMode ? (
-                <>
-                    <input value={editInput}
-                        style={{ width: "85%" }}
-                        onChange={e => setEditInput(e.currentTarget.value)}
-                        onKeyUp={onEditItem} />
-                    <span style={{ cursor: "pointer", color: "green", paddingLeft: "5px" }}
-                        onClick={() => setEditMode(false)}>
-                        <IconArrowBack />
-                    </span>
-                </>
+                <EditListItem text={item.text} 
+                    onEdit={onEditItem} 
+                    onCancel={() => setEditMode(false)} />
             ) : (
-                <>
-                    {modification?.type === "reordered" && (
-                        <span style={{ paddingRight: "10px" }}>{modification.newText}</span>
-                    )}
-                    <span onClick={() => setEditMode(true)}
-                        style={textStyle(modification)}>{item.text}</span>
-                    <div className="icons" style={{backgroundColor: "white"}}>
-                        <span className="icon"
-                            onClick={() => onDelete(item.id)}
-                            title="Delete"
-                            ><IconX />
-                        </span>
-                    </div>
-                </>
+                <ListItemContent text={item.text}
+                    modification={modification}
+                    onEnableEdit={() => setEditMode(true)}
+                    onDelete={() => onDelete(item.id)} />
             )}
         </li>
     );
