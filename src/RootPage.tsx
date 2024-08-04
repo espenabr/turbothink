@@ -132,7 +132,7 @@ const RootPage = () => {
                         ))}
                     </SortableContext>
                 </DndContext>
-                <div className="tab" style={{ cursor: "pointer" }} onClick={onAddTab}>
+                <div className="tab" onClick={onAddTab}>
                     <strong><IconPlus /></strong>
                 </div>
             </div>

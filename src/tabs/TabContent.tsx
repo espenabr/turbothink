@@ -18,7 +18,7 @@ const TabContent = ({ workspaceName, canBeDeleted, onEnableEdit, onDelete }: Pro
                 <span style={{ cursor: "pointer", color: "#424242" }}
                     onClick={() => onEnableEdit()}
                     title="Rename">
-                        <IconPencil />
+                    <IconPencil />
                 </span>
                 {canBeDeleted && (
                     <span style={{ cursor: "pointer", color: "#424242" }}

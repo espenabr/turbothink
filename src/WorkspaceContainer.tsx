@@ -98,7 +98,7 @@ const WorkspaceContainer = ({ activeWorkspace, onUpdateLists }: Props) => {
 
     const openAiKey = localStorage.getItem("openAiKey") || "";
 
-    const handleDragEnd = (event: DragEndEvent) => {
+    const onDragEnd = (event: DragEndEvent) => {
         if (event.over !== null) {
             const over = event.over;
             if (event.active.id !== event.over.id) {
@@ -114,7 +114,7 @@ const WorkspaceContainer = ({ activeWorkspace, onUpdateLists }: Props) => {
         <div className="grid-container">
             <DndContext sensors={sensors}
                 collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}>
+                onDragEnd={onDragEnd}>
                 <SortableContext items={lists} strategy={rectSortingStrategy}>
                     {lists.map(list => (
                         <div className="grid-item" key={list.id}>
@@ -127,8 +127,7 @@ const WorkspaceContainer = ({ activeWorkspace, onUpdateLists }: Props) => {
                                 onDeleteList={onDeleteList}
                                 onUpdateItems={onUpdateItems}
                                 onEditTitle={onEditTitle}
-                                key={list.id}
-                            />
+                                key={list.id} />
                         </div>
                     ))}
                 </SortableContext>

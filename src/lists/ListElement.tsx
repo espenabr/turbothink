@@ -1,4 +1,4 @@
-import { CSSProperties, KeyboardEvent, useState } from "react";
+import { CSSProperties, useState } from "react";
 import ListItemElement, { Modification } from "./ListItemElement";
 import InstructionInput from "./InsertuctionInput";
 import TangibleClient from "../tangible-gpt/TangibleClient";
@@ -6,7 +6,6 @@ import AddListItem from "./AddListItem";
 import AcceptOrRejectSuggestion from "./AcceptOrRejectSuggestion";
 import { withoutTrailingDot } from "../common";
 import { createListItemId, List, ListId, ListItem, ListItemId } from "../model";
-import IconArrowBack from "../icons/IconArrowBack";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from '@dnd-kit/utilities';
@@ -79,11 +78,10 @@ type Props = {
 const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, onDeleteList, onUpdateItems, onEditTitle }: Props) => {
     const [suggestedModification, setSuggestedModification] = useState<SuggestedModification | null>(null);
     const [waitingForInput, setWaitingForInput] = useState<Action | null>(null);
-    const [editTitleMode, setEditTitleMode] = useState<boolean>(false);
+    const [editNameMode, setEditNameMode] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
 
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { delay: 200, tolerance: 5 } }));
-
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: list.id });
 
     const onClickHighlight = () => setWaitingForInput("highlight");
@@ -166,7 +164,6 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, 
 
     const onExtendList = async () => {
         const tc = new TangibleClient(openAiKey);
-
         if (list.items.length > 0) {
             setLoading(true);
             const response = await tc.expectExtendedItems(list.items.map(i => i.text));
@@ -220,7 +217,7 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, 
         return null;
     };
 
-    const handleDragEnd = (event: DragEndEvent) => {
+    const onDragEnd = (event: DragEndEvent) => {
         if (event.over !== null) {
             const over = event.over;
             if (event.active.id !== event.over.id) {
@@ -233,7 +230,7 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, 
     };
 
     const onRenameList = (newName: string) => {
-        setEditTitleMode(false);
+        setEditNameMode(false);
         onEditTitle(list.id, newName);
     }
 
@@ -251,10 +248,10 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, 
             <li className="list-item" style={{ backgroundColor: "lightGray" }}>
                 {loading ? (
                     <div className="spinner" />
-                ) : editTitleMode ? (
+                ) : editNameMode ? (
                     <EditListName listName={list.name}
                         onRename={onRenameList}
-                        onCancel={() => setEditTitleMode(false)} />
+                        onCancel={() => setEditNameMode(false)} />
                 ) : (
                     <>
                         {waitingForInput !== null ? (
@@ -266,7 +263,7 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, 
                             />
                         ) : (
                             <>
-                                <span onClick={() => setEditTitleMode(true)}>
+                                <span onClick={() => setEditNameMode(true)}>
                                     <strong>{list.name}</strong>
                                 </span>
                                 <ListHeaderIcons onSort={onClickSort}
@@ -283,15 +280,14 @@ const ListElement = ({ openAiKey, list, addItem, deleteItem, editItem, onGroup, 
 
             <DndContext sensors={sensors}
                 collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}>
+                onDragEnd={onDragEnd}>
                 <SortableContext items={list.items} strategy={verticalListSortingStrategy}>
                     {list.items.map(item => (
                         <ListItemElement item={item}
                             modification={itemModification(item)}
                             onEdit={item => editItem(list.id, item)}
                             onDelete={id => deleteItem(list.id, id)}
-                            key={item.id}
-                        />
+                            key={item.id} />
                     ))}
                 </SortableContext>
             </DndContext>

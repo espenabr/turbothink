@@ -4,7 +4,6 @@ import IconArrowBack from "../icons/IconArrowBack";
 
 type Props = {
     workspaceName: string;
-
     onRename: (newName: string) => void;
     onCancel: () => void;
 };

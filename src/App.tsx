@@ -7,10 +7,6 @@ function App() {
           <RootPage />
       </div>
   )
-}
+};
 
-export default App
-
-/*
-<Elements />
-*/
+export default App;

@@ -1,7 +1,6 @@
 import { CSSProperties, useState } from "react";
 import { CSS } from '@dnd-kit/utilities';
 import { ListItem, ListItemId } from "../model";
-import IconX from "../icons/IconX";
 import { useSortable } from "@dnd-kit/sortable";
 import EditListItem from "./EditListItem";
 import ListItemContent from "./ListItemContent";
@@ -42,14 +41,6 @@ const itemStyle = (mod: Modification | null): CSSProperties => {
             case "grouped":
                 return { backgroundColor: mod.backgroundColor };
         }
-    }
-};
-
-const textStyle = (mod: Modification | null): CSSProperties => {
-    if (mod !== null && mod.type === "reordered") {
-        return { color: "lightGray", textDecoration: "line-through" }
-    } else {
-        return {};
     }
 };
 

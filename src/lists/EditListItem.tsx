@@ -22,7 +22,8 @@ const EditListItem = ({ text, onEdit, onCancel }: Props) => {
                 style={{ width: "85%" }}
                 onChange={e => setEditInput(e.currentTarget.value)}
                 onKeyUp={onEditItem} />
-            <span style={{ cursor: "pointer", color: "green", paddingLeft: "5px" }}
+            <span className="icon"
+                style={{ cursor: "pointer" }}
                 onClick={() => onCancel()}>
                 <IconArrowBack />
             </span>

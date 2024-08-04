@@ -1,4 +1,4 @@
-import IconArrowDown from "../icons/IconArrowBack";
+import IconArrowBack from "../icons/IconArrowBack";
 import IconCheck from "../icons/IconCheck";
 
 type Props = {
@@ -6,18 +6,14 @@ type Props = {
     onAccept?: () => void;
 };
 
-const AcceptOrRejectSuggestion = ({ onReject, onAccept }: Props) => {
-
-    return (
-        <>
-            <span className="icon"
-                onClick={() => onReject()}><IconArrowDown /></span>
-            {onAccept !== undefined && (
-                <span className="icon"
-                    onClick={() => onAccept()}><IconCheck /></span>
-            )}
-        </>
-    );
-};
+const AcceptOrRejectSuggestion = ({ onReject, onAccept }: Props) => (
+    <>
+        {onAccept !== undefined && (
+            <span className="icon" onClick={() => onAccept()}><IconCheck /></span>
+        )}
+        <span className="icon"
+            onClick={() => onReject()}><IconArrowBack /></span>
+    </>
+);
 
 export default AcceptOrRejectSuggestion;
