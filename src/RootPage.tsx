@@ -170,7 +170,7 @@ const RootPage = () => {
             </div>
             <WorkspaceContainer openAiKey={openAiKey} activeWorkspace={activeWorkspace} onUpdateLists={onUpdateLists} />
 
-            <button onClick={() => setOpenAiKey(null)}>Chagne OpenAI key</button>
+            <button onClick={() => setOpenAiKey(null)}>Change OpenAI key</button>
         </div>
     );
 };

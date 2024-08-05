@@ -10,9 +10,15 @@ const InputOpenAiKey = ({ currentKey, onInput }: Props) => {
 
     const validKey = (s: string) => s.length === 56 && s.substring(0, 3) === "sk-";
 
-    const onEdit = (event: KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === "Enter" && validKey(keyInput)) {
+    const onInputKey = () => {
+        if (validKey(keyInput)) {
             onInput(keyInput);
+        }
+    };
+
+    const onEdit = (event: KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "Enter") {
+            onInputKey();
         }
     };
 
@@ -20,7 +26,7 @@ const InputOpenAiKey = ({ currentKey, onInput }: Props) => {
         <div>
             <div>Enter your OpenAI key</div>
             <input value={keyInput} onKeyUp={onEdit} onChange={(e) => setKeyInput(e.currentTarget.value)} />
-
+            <button onClick={onInputKey}>OK</button>
             {keyInput.length > 0 && !validKey(keyInput) && <span style={{ color: "red" }}>Invalid key!</span>}
         </div>
     );
