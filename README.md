@@ -7,8 +7,8 @@ the response. The hypothesis is that familiar UI elements like lists can reduce 
 for many use cases.
 
 This is a standalone client-side web application and does not submit any data to a server except
-the OpenAI API. The gpt-4 model is used by default, but other OpenAI chat completion APIs should
-also work.
+the OpenAI API. The `gpt-4` model is used by default, but other OpenAI chat completion APIs should
+work as well.
 
 All data is stored in your browser's local storage.
 
