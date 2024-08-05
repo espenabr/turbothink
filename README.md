@@ -31,7 +31,7 @@ npm run dev
 ## Features
 
 - AI-based grouping, sorting and filtering lists 
-- AI-suggested criterias for grouping, sorting and filtering
+- Get suggestions of criterias for grouping, sorting and filtering
 - Generate lists based on other lists
 
 ## Future improvements
