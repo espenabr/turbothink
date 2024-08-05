@@ -1,6 +1,8 @@
 {
   "name": "tangible-ui",
   "private": true,
+  "author": "Espen Abrahamsen",
+  "license": "MIT",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
