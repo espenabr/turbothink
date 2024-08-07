@@ -55,8 +55,15 @@
 
 /* icons */
 
+.list-item .icons {
+    opacity: 20%;
+}
+
+.list-item:hover .icons {
+    opacity: 100%;
+}
+
 .icons {
-    display: none;
     position: absolute;
     right: 10px;
     top: 50%;
@@ -101,9 +108,12 @@
     cursor: pointer;
 }
 
+.tab:hover .tab-icons {
+    opacity: 100%;
+}
+
 .tab span {
-    visibility: hidden;
-    opacity: 0;
+    opacity: 50%;
     background-color: white;
 }
 
@@ -114,13 +124,12 @@
 
 .active-tab {
     flex: 1;
-    border-bottom: black solid 2px;
+    border-bottom: rgb(65, 22, 22) solid 2px;
     text-align: center;
 }
 
 .active-tab span {
-    visibility: hidden;
-    opacity: 0;
+    opacity: 50%;
 }
 
 .active-tab:hover span {
