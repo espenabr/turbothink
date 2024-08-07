@@ -1,11 +1,13 @@
 import { KeyboardEvent, useState } from "react";
 import { createListItemId, ListItem } from "../model";
+import IconPlaylistAdd from "../icons/IconPlaylistAdd";
 
 type Props = {
     onAdd: (item: ListItem) => void;
+    onExtendList: () => void;
 };
 
-const AddListItem = ({ onAdd }: Props) => {
+const AddListItem = ({ onAdd, onExtendList }: Props) => {
     const [itemInput, setItemInput] = useState<string>("");
 
     const onAddItem = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -16,13 +18,18 @@ const AddListItem = ({ onAdd }: Props) => {
     };
 
     return (
-        <input
-            value={itemInput}
-            style={{ width: "97%" }}
-            placeholder="New item"
-            onChange={(e) => setItemInput(e.currentTarget.value)}
-            onKeyUp={onAddItem}
-        />
+        <>
+            <span style={{ cursor: "pointer" }}
+                title="Extend list"
+                onClick={onExtendList}>
+                <IconPlaylistAdd />
+            </span>
+            <input value={itemInput}
+                style={{ width: "87%", marginLeft: "10px" }}
+                placeholder="New item"
+                onChange={(e) => setItemInput(e.currentTarget.value)}
+                onKeyUp={onAddItem} />
+        </>
     );
 };
 

@@ -1,25 +1,73 @@
 import CreateList from "./lists/CreateList";
 import ListElement from "./lists/ListElement";
-import { createListId, createListItemId, List, ListId, ListItem, ListItemId, WorkspaceId } from "./model";
+import { createListId, createListItemId, createWorkspaceId, List, ListId, ListItem, ListItemId, Workspace, WorkspaceId } from "./model";
 import { ItemGroup } from "./tangible-gpt/model";
-import { ActiveWorkspace } from "./RootPage";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
+import { useEffect, useRef } from "react";
+
+
+type ClipboardList = {
+    type: "List";
+    list: List;
+};
+
+type ClipboardWorkspace = {
+    type: "Workspace";
+    workspace: Workspace;
+};
+
+export type ClipboardItem = ClipboardList | ClipboardWorkspace;
 
 type Props = {
     openAiKey: string;
-    activeWorkspace: ActiveWorkspace;
+    activeWorkspace: Workspace;
     onUpdateLists: (workspaceId: WorkspaceId, lists: List[]) => void;
+    onAddWorkspace: (workspace: Workspace) => void;
 };
 
-const WorkspaceContainer = ({ openAiKey, activeWorkspace, onUpdateLists }: Props) => {
+const WorkspaceContainer = ({ openAiKey, activeWorkspace, onUpdateLists, onAddWorkspace }: Props) => {
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: { delay: 200, tolerance: 5 },
         }),
     );
+    const gridContainerRef = useRef<HTMLDivElement>(null);
 
-    const workspaceId = activeWorkspace.workspaceId;
+    const pasteItem = (data: string) => {
+        try {
+        const parsed = JSON.parse(data) as ClipboardItem;
+        if (parsed.type === "List") {
+            onUpdateLists(workspaceId, lists.concat({ ...parsed.list, id: createListId() }));
+        } else if (parsed.type === "Workspace") {
+            onAddWorkspace({ ...parsed.workspace, id: createWorkspaceId() });
+        }
+        } catch { /* ignnore */ }
+    };
+
+
+
+    // paste from clipboard
+    useEffect(() => {
+        const onPaste = (event: ClipboardEvent) => {
+            event.preventDefault();
+
+            const clipboardData = event.clipboardData?.getData("text");
+            if (clipboardData !== undefined) {
+                pasteItem(clipboardData);
+            }
+        };
+
+        const pasteHandler = (event: ClipboardEvent) => onPaste(event);
+        const gridContainer = gridContainerRef.current;
+        gridContainer?.addEventListener("paste", pasteHandler);
+
+        return () => {
+//            gridContainer?.removeEventListener("paste", pasteHandler);
+        };
+    });
+
+    const workspaceId = activeWorkspace.id;
     const lists = activeWorkspace.lists;
 
     const onUpdateItems = (listId: ListId, items: ListItem[]) => {
@@ -119,7 +167,7 @@ const WorkspaceContainer = ({ openAiKey, activeWorkspace, onUpdateLists }: Props
     };
 
     return (
-        <div className="grid-container">
+        <div className="grid-container" ref={gridContainerRef}>
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
                 <SortableContext items={lists} strategy={rectSortingStrategy}>
                     {lists.map((list) => (

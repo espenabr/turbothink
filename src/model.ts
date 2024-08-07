@@ -20,7 +20,13 @@ export type List = {
     items: ListItem[];
 };
 
+export type WorkspaceHeader = {
+    id: WorkspaceId;
+    name: string;
+};
+
 export type Workspace = {
     id: WorkspaceId;
     name: string;
+    lists: List[];
 };

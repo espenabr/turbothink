@@ -11,6 +11,7 @@ import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } 
 import { CSS } from "@dnd-kit/utilities";
 import ListHeaderIcons from "./ListHeaderIcons";
 import EditListName from "./EditListName";
+import { ClipboardItem } from "../WorkspaceContainer";
 
 type FilteredItems = {
     type: "filtered";
@@ -232,9 +233,9 @@ const ListElement = ({
                         const index = items.indexOf(item);
                         return suggestedItems[index] !== undefined
                             ? {
-                                  type: "reordered",
-                                  newText: suggestedItems[index].text,
-                              }
+                                type: "reordered",
+                                newText: suggestedItems[index].text,
+                            }
                             : null;
                     } else {
                         return null;
@@ -281,6 +282,14 @@ const ListElement = ({
         transition,
     };
 
+    const onCopyToClipboard = async () => {
+        const clipboardItem: ClipboardItem = {
+            type: "List",
+            list: list
+        };
+        await navigator.clipboard.writeText(JSON.stringify(clipboardItem));
+    };
+
     return (
         <ul className="list" style={style} ref={setNodeRef} {...attributes} {...listeners}>
             <li className="list-item" style={{ backgroundColor: "lightGray" }}>
@@ -312,7 +321,7 @@ const ListElement = ({
                                     onHighlight={onClickHighlight}
                                     onFilter={onClickFilter}
                                     onGroup={onClickGroup}
-                                    onExtendList={onExtendList}
+                                    onCopyToClipboard={onCopyToClipboard}
                                     onDelete={onDelete}
                                 />
                             </>
@@ -337,14 +346,15 @@ const ListElement = ({
 
             <li>
                 {suggestedModification === null ? (
-                    <AddListItem onAdd={(item) => addItem(list.id, item)} />
+                    <AddListItem onAdd={(item) => addItem(list.id, item)}
+                        onExtendList={onExtendList} />
                 ) : (
                     <AcceptOrRejectSuggestion
                         onReject={onReject}
                         onAccept={
                             suggestedModification?.type === "filtered" ||
-                            suggestedModification?.type === "sorted" ||
-                            suggestedModification?.type === "grouped"
+                                suggestedModification?.type === "sorted" ||
+                                suggestedModification?.type === "grouped"
                                 ? onAccept
                                 : undefined
                         }

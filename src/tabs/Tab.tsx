@@ -1,20 +1,21 @@
 import { CSSProperties, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Workspace, WorkspaceId } from "../model";
+import { WorkspaceHeader, WorkspaceId } from "../model";
 import EditTab from "./EditTab";
 import TabContent from "./TabContent";
 
 type Props = {
-    workspace: Workspace;
+    workspace: WorkspaceHeader;
     active: boolean;
     canBeDeleted: boolean;
     onDelete: (id: WorkspaceId) => void;
     onChangeTab: (id: WorkspaceId) => void;
     onRename: (id: WorkspaceId, newName: string) => void;
+    onCopyToClipboard: () => void;
 };
 
-const Tab = ({ workspace, active, canBeDeleted, onDelete, onChangeTab, onRename }: Props) => {
+const Tab = ({ workspace, active, canBeDeleted, onDelete, onChangeTab, onRename, onCopyToClipboard }: Props) => {
     const [editMode, setEditMode] = useState<boolean>(false);
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: workspace.id });
 
@@ -47,6 +48,7 @@ const Tab = ({ workspace, active, canBeDeleted, onDelete, onChangeTab, onRename 
                     canBeDeleted={canBeDeleted}
                     onEnableEdit={() => setEditMode(true)}
                     onDelete={() => onDelete(workspace.id)}
+                    onCopyToClipboard={onCopyToClipboard}
                 />
             )}
         </div>

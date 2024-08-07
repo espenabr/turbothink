@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { createWorkspaceId, List, Workspace, WorkspaceId } from "./model";
-import WorkspaceContainer from "./WorkspaceContainer";
+import { createWorkspaceId, List, Workspace, WorkspaceHeader, WorkspaceId } from "./model";
+import WorkspaceContainer, { ClipboardItem } from "./WorkspaceContainer";
 import IconPlus from "./icons/IconPlus";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import Tab from "./tabs/Tab";
 import InputOpenAiKey from "./InputOpenAiKey";
 
-const loadWorkspaces = (): Workspace[] => {
+const loadWorkspaces = (): WorkspaceHeader[] => {
     const workspaces = localStorage.getItem("workspaces");
     if (workspaces === null) {
-        const defaultWorkspace: Workspace = {
+        const defaultWorkspace: WorkspaceHeader = {
             id: createWorkspaceId(),
             name: "My workspace",
         };
@@ -22,7 +22,7 @@ const loadWorkspaces = (): Workspace[] => {
     }
 };
 
-const persistWorkspaces = (workspaces: Workspace[]) => {
+const persistWorkspaces = (workspaces: WorkspaceHeader[]) => {
     localStorage.setItem("workspaces", JSON.stringify(workspaces));
 };
 
@@ -45,17 +45,14 @@ const persistOpenAiKey = (s: string) => {
 
 const loadOpenAiKey = () => localStorage.getItem("openAiKey");
 
-export type ActiveWorkspace = {
-    workspaceId: WorkspaceId;
-    lists: List[];
-};
 
 const RootPage = () => {
     const [openAiKey, setOpenAiKey] = useState<string | null>(loadOpenAiKey());
 
-    const [workspaces, setWorkspaces] = useState<Workspace[]>(loadWorkspaces);
-    const [activeWorkspace, setActiveWorkspace] = useState<ActiveWorkspace>({
-        workspaceId: workspaces[0].id,
+    const [workspaces, setWorkspaces] = useState<WorkspaceHeader[]>(loadWorkspaces);
+    const [activeWorkspace, setActiveWorkspace] = useState<Workspace>({
+        id: workspaces[0].id,
+        name: workspaces[0].name,
         lists: loadLists(workspaces[0].id),
     });
 
@@ -66,19 +63,20 @@ const RootPage = () => {
     );
 
     const onAddTab = () => {
-        const newWorkspace: Workspace = {
+        const newWorkspace: WorkspaceHeader = {
             id: createWorkspaceId(),
             name: "New workspace",
         };
         const updatedWorkspaces = workspaces.slice().concat(newWorkspace);
         setWorkspaces(updatedWorkspaces);
-        setActiveWorkspace({ workspaceId: newWorkspace.id, lists: [] });
+        setActiveWorkspace({ id: newWorkspace.id, name: newWorkspace.name, lists: [] });
         persistWorkspaces(updatedWorkspaces);
     };
 
     const onChangeTab = (workspaceId: WorkspaceId) => {
         setActiveWorkspace({
-            workspaceId: workspaceId,
+            id: workspaceId,
+            name: workspaces.find(w => w.id === workspaceId)?.name || workspaceId,
             lists: loadLists(workspaceId),
         });
     };
@@ -92,13 +90,15 @@ const RootPage = () => {
             if (index > 0) {
                 const workspaceId = updatedWorkspaces[index - 1].id;
                 setActiveWorkspace({
-                    workspaceId: workspaceId,
+                    id: workspaceId,
+                    name: workspaces[index].name,
                     lists: loadLists(workspaceId),
                 });
             } else {
                 const workspaceId = updatedWorkspaces[0].id;
                 setActiveWorkspace({
-                    workspaceId: workspaceId,
+                    id: workspaceId,
+                    name: workspaces[index].name,
                     lists: loadLists(workspaceId),
                 });
             }
@@ -116,11 +116,11 @@ const RootPage = () => {
     };
 
     const onUpdateLists = (workspaceId: WorkspaceId, lists: List[]) => {
-        setActiveWorkspace({ workspaceId: workspaceId, lists: lists });
+        setActiveWorkspace({ id: workspaceId, name: activeWorkspace.name, lists: lists });
         persistLists(workspaceId, lists);
     };
 
-    const onUpdateWorkspaces = (workspaces: Workspace[]) => {
+    const onUpdateWorkspaces = (workspaces: WorkspaceHeader[]) => {
         setWorkspaces(workspaces);
         persistWorkspaces(workspaces);
     };
@@ -142,6 +142,22 @@ const RootPage = () => {
         persistOpenAiKey(k);
     };
 
+    const onCopyWorkspaceToClipboard = async () => {
+        const item: ClipboardItem = {
+            type: "Workspace",
+            workspace: activeWorkspace
+        };
+        await navigator.clipboard.writeText(JSON.stringify(item));
+    };
+
+    const onAddWorkspace = (workspace: Workspace) => {
+        const updatedWorkspaces = workspaces.concat(workspace);
+        setWorkspaces(updatedWorkspaces);
+        persistWorkspaces(updatedWorkspaces);
+        setActiveWorkspace(workspace);
+        persistLists(workspace.id, workspace.lists);
+    };
+
     return openAiKey === null ? (
         <InputOpenAiKey currentKey={openAiKey || ""} onInput={onInputKey} />
     ) : (
@@ -152,11 +168,12 @@ const RootPage = () => {
                         {workspaces.map((w) => (
                             <Tab
                                 workspace={w}
-                                active={activeWorkspace.workspaceId === w.id}
+                                active={activeWorkspace.id === w.id}
                                 canBeDeleted={workspaces.length > 1}
                                 onDelete={onDeleteWorkspace}
                                 onChangeTab={onChangeTab}
                                 onRename={onRenameWorkspace}
+                                onCopyToClipboard={onCopyWorkspaceToClipboard}
                                 key={w.id}
                             />
                         ))}
@@ -168,7 +185,10 @@ const RootPage = () => {
                     </strong>
                 </div>
             </div>
-            <WorkspaceContainer openAiKey={openAiKey} activeWorkspace={activeWorkspace} onUpdateLists={onUpdateLists} />
+            <WorkspaceContainer openAiKey={openAiKey}
+                activeWorkspace={activeWorkspace}
+                onUpdateLists={onUpdateLists}
+                onAddWorkspace={onAddWorkspace} />
 
             <button onClick={() => setOpenAiKey(null)}>Change OpenAI key</button>
         </div>
