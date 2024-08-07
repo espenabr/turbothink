@@ -1,13 +1,14 @@
-import { useState, KeyboardEvent } from "react";
+import { useState, KeyboardEvent, RefObject } from "react";
 import IconArrowBack from "../icons/IconArrowBack";
 
 type Props = {
     workspaceName: string;
+    inputRef: RefObject<HTMLInputElement>;
     onRename: (newName: string) => void;
     onCancel: () => void;
 };
 
-const EditTab = ({ workspaceName, onRename, onCancel }: Props) => {
+const EditTab = ({ workspaceName, inputRef, onRename, onCancel }: Props) => {
     const [nameInput, setNameInput] = useState<string>(workspaceName);
 
     const onInputName = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -18,7 +19,10 @@ const EditTab = ({ workspaceName, onRename, onCancel }: Props) => {
 
     return (
         <>
-            <input value={nameInput} onChange={(e) => setNameInput(e.currentTarget.value)} onKeyUp={onInputName} />
+            <input value={nameInput}
+                onChange={(e) => setNameInput(e.currentTarget.value)}
+                onKeyUp={onInputName}
+                ref={inputRef} />
             <span style={{ cursor: "pointer", color: "green" }} onClick={onCancel}>
                 <IconArrowBack />
             </span>

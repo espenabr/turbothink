@@ -1,4 +1,4 @@
-import { CSSProperties, useState } from "react";
+import { CSSProperties, useEffect, useRef, useState } from "react";
 import ListItemElement, { Modification } from "./ListItemElement";
 import InstructionInput from "./InsertuctionInput";
 import TangibleClient from "../tangible-gpt/TangibleClient";
@@ -108,6 +108,16 @@ const ListElement = ({
         }),
     );
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: list.id });
+
+    const inputNameRef = useRef<HTMLInputElement>(null);
+
+    // highlight name input on edit
+    useEffect(() => {
+        if (editNameMode && inputNameRef.current) {
+            inputNameRef.current.focus();
+            inputNameRef.current.select();
+        }
+    }, [editNameMode]);
 
     const onClickHighlight = () => setWaitingForInput("highlight");
     const onClickFilter = () => setWaitingForInput("filter");
@@ -300,7 +310,7 @@ const ListElement = ({
                         listName={list.name}
                         onRename={onRenameList}
                         onCancel={() => setEditNameMode(false)}
-                    />
+                        inputRef={inputNameRef} />
                 ) : (
                     <>
                         {waitingForInput !== null ? (

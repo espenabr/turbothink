@@ -1,4 +1,4 @@
-import { CSSProperties, useState } from "react";
+import { CSSProperties, useEffect, useRef, useState } from "react";
 import { CSS } from "@dnd-kit/utilities";
 import { ListItem, ListItemId } from "../model";
 import { useSortable } from "@dnd-kit/sortable";
@@ -53,6 +53,15 @@ type Props = {
 const ListItemElement = ({ item, modification, onEdit, onDelete }: Props) => {
     const [editMode, setEditMode] = useState<boolean>(false);
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: item.id });
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    // highlight input on edit
+    useEffect(() => {
+        if (editMode && inputRef.current) {
+            inputRef.current.focus();
+            inputRef.current.select();
+        }
+    }, [editMode]);
 
     const style: CSSProperties = {
         ...itemStyle(modification),
@@ -75,7 +84,10 @@ const ListItemElement = ({ item, modification, onEdit, onDelete }: Props) => {
             title={modification?.type === "grouped" ? modification.groupName : undefined}
         >
             {editMode ? (
-                <EditListItem text={item.text} onEdit={onEditItem} onCancel={() => setEditMode(false)} />
+                <EditListItem text={item.text}
+                    onEdit={onEditItem}
+                    onCancel={() => setEditMode(false)}
+                    inputRef={inputRef} />
             ) : (
                 <ListItemContent
                     text={item.text}

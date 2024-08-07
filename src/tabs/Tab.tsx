@@ -1,4 +1,4 @@
-import { CSSProperties, useState } from "react";
+import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { WorkspaceHeader, WorkspaceId } from "../model";
@@ -18,6 +18,15 @@ type Props = {
 const Tab = ({ workspace, active, canBeDeleted, onDelete, onChangeTab, onRename, onCopyToClipboard }: Props) => {
     const [editMode, setEditMode] = useState<boolean>(false);
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: workspace.id });
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    // highlight input on edit
+    useEffect(() => {
+        if (editMode && inputRef.current) {
+            inputRef.current.focus();
+            inputRef.current.select();
+        }
+    }, [editMode]);
 
     const tabClass = active ? "active-tab" : "tab";
 
@@ -41,7 +50,10 @@ const Tab = ({ workspace, active, canBeDeleted, onDelete, onChangeTab, onRename,
             {...listeners}
         >
             {editMode ? (
-                <EditTab workspaceName={workspace.name} onRename={onRenameTab} onCancel={() => setEditMode(false)} />
+                <EditTab workspaceName={workspace.name}
+                    onRename={onRenameTab}
+                    onCancel={() => setEditMode(false)}
+                    inputRef={inputRef} />
             ) : (
                 <TabContent
                     workspaceName={workspace.name}
