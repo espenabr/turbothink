@@ -831,7 +831,7 @@ ${itemsPrompt}`;
                 ? `Extend this list with the most obvious item: ${itemsPrompt}`
                 : `Extend this list with the most obvious ${noOfAddedItems} items: ${itemsPrompt}`;
 
-        const responseFormatDescription = `The response must be a sorted JSON array of strings (items), nothing else`;
+        const responseFormatDescription = `The added item must be last. The response must be a valid JSON array of strings (items), nothing else`;
 
         return this.interact(
             initialPrompt(reasoningStrategy, prompt, responseFormatDescription),
