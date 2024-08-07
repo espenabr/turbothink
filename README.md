@@ -10,7 +10,8 @@ This is a standalone client-side web application and does not submit any data to
 the OpenAI API. The `gpt-4` model is used by default, but other OpenAI chat completion APIs should
 work as well.
 
-All data is stored in your browser's local storage.
+All data is stored in your browser's local storage. If you want to be on the safe side and avoid
+losing your data, workspaces and lists can be copied as JSON to the clipboard and pasted later.
 
 ## Get started (run locally)
 
