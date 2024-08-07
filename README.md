@@ -33,9 +33,11 @@ npm run dev
 - AI-based grouping, sorting and filtering lists 
 - Get suggestions of criterias for grouping, sorting and filtering
 - Generate lists based on other lists
+- Copy & paste lists and workspaces
 
 ## Future improvements
 
 - More complex UI elements like tables and nested lists
-- Error handling 😀
-- A more ergonomic UI
+- Plain-text elements to add more context
+- Smoother user experience
+- Display errors when things go wrong

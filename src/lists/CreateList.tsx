@@ -128,14 +128,12 @@ const CreateList = ({ openAiKey, lists, onCreateList }: Props) => {
                         {lists.map((list) => (
                             <div>
                                 <label>
-                                    <input
-                                        type="checkbox"
+                                    <input type="checkbox"
                                         style={{ paddingRight: "10px" }}
                                         name={list.name}
                                         key={list.id}
                                         value={checkboxValue(list.id)}
-                                        onClick={() => onClickCheckbox(list.id)}
-                                    />
+                                        onClick={() => onClickCheckbox(list.id)} />
                                     {list.name}
                                 </label>
                             </div>
