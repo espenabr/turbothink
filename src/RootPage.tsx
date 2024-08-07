@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { createWorkspaceId, List, Workspace, WorkspaceHeader, WorkspaceId } from "./model";
+import { useEffect, useRef, useState } from "react";
+import { createListId, createWorkspaceId, List, Workspace, WorkspaceHeader, WorkspaceId } from "./model";
 import WorkspaceContainer, { ClipboardItem } from "./WorkspaceContainer";
 import IconPlus from "./icons/IconPlus";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
@@ -49,11 +49,11 @@ const loadOpenAiKey = () => localStorage.getItem("openAiKey");
 const RootPage = () => {
     const [openAiKey, setOpenAiKey] = useState<string | null>(loadOpenAiKey());
 
-    const [workspaces, setWorkspaces] = useState<WorkspaceHeader[]>(loadWorkspaces);
-    const [activeWorkspace, setActiveWorkspace] = useState<Workspace>({
-        id: workspaces[0].id,
-        name: workspaces[0].name,
-        lists: loadLists(workspaces[0].id),
+    const [workspaceHeaders, setWorkspaceHeaders] = useState<WorkspaceHeader[]>(loadWorkspaces);
+    const [workspace, setWorkspace] = useState<Workspace>({
+        id: workspaceHeaders[0].id,
+        name: workspaceHeaders[0].name,
+        lists: loadLists(workspaceHeaders[0].id),
     });
 
     const sensors = useSensors(
@@ -62,43 +62,77 @@ const RootPage = () => {
         }),
     );
 
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    const pasteItem = (data: string) => {
+        try {
+            const parsed = JSON.parse(data) as ClipboardItem;
+            if (parsed.type === "List") {
+                onUpdateLists(workspace.id, workspace.lists.concat({ ...parsed.list, id: createListId() }));
+            } else if (parsed.type === "Workspace") {
+                onAddWorkspace({ ...parsed.workspace, id: createWorkspaceId() });
+            }
+        } catch { /* ignnore */ }
+    };
+
+    // paste from clipboard
+    useEffect(() => {
+        const onPaste = (event: ClipboardEvent) => {
+            event.preventDefault();
+
+            const clipboardData = event.clipboardData?.getData("text");
+            if (clipboardData !== undefined) {
+                pasteItem(clipboardData);
+            }
+        };
+
+        const pasteHandler = (event: ClipboardEvent) => onPaste(event);
+        const container = containerRef.current;
+        container?.addEventListener("paste", pasteHandler);
+
+        return () => {
+            container?.removeEventListener("paste", pasteHandler);
+        };
+    }, [workspace]);
+
+
     const onAddTab = () => {
         const newWorkspace: WorkspaceHeader = {
             id: createWorkspaceId(),
             name: "New workspace",
         };
-        const updatedWorkspaces = workspaces.slice().concat(newWorkspace);
-        setWorkspaces(updatedWorkspaces);
-        setActiveWorkspace({ id: newWorkspace.id, name: newWorkspace.name, lists: [] });
+        const updatedWorkspaces = workspaceHeaders.slice().concat(newWorkspace);
+        setWorkspaceHeaders(updatedWorkspaces);
+        setWorkspace({ id: newWorkspace.id, name: newWorkspace.name, lists: [] });
         persistWorkspaces(updatedWorkspaces);
     };
 
     const onChangeTab = (workspaceId: WorkspaceId) => {
-        setActiveWorkspace({
+        setWorkspace({
             id: workspaceId,
-            name: workspaces.find(w => w.id === workspaceId)?.name || workspaceId,
+            name: workspaceHeaders.find(w => w.id === workspaceId)?.name || workspaceId,
             lists: loadLists(workspaceId),
         });
     };
 
     const onDeleteWorkspace = (workspaceId: WorkspaceId) => {
-        const index = workspaces.findIndex((w) => w.id === workspaceId);
+        const index = workspaceHeaders.findIndex((w) => w.id === workspaceId);
         if (index >= 0) {
-            const updatedWorkspaces = workspaces.slice().filter((w) => w.id !== workspaceId);
-            setWorkspaces(updatedWorkspaces);
+            const updatedWorkspaces = workspaceHeaders.slice().filter((w) => w.id !== workspaceId);
+            setWorkspaceHeaders(updatedWorkspaces);
             persistWorkspaces(updatedWorkspaces);
             if (index > 0) {
                 const workspaceId = updatedWorkspaces[index - 1].id;
-                setActiveWorkspace({
+                setWorkspace({
                     id: workspaceId,
-                    name: workspaces[index].name,
+                    name: workspaceHeaders[index].name,
                     lists: loadLists(workspaceId),
                 });
             } else {
                 const workspaceId = updatedWorkspaces[0].id;
-                setActiveWorkspace({
+                setWorkspace({
                     id: workspaceId,
-                    name: workspaces[index].name,
+                    name: workspaceHeaders[index].name,
                     lists: loadLists(workspaceId),
                 });
             }
@@ -106,22 +140,22 @@ const RootPage = () => {
     };
 
     const onRenameWorkspace = (workspaceId: WorkspaceId, newName: string) => {
-        const index = workspaces.findIndex((w) => w.id === workspaceId);
+        const index = workspaceHeaders.findIndex((w) => w.id === workspaceId);
         if (index >= 0) {
-            const updatedWorkspaces = workspaces.slice();
-            updatedWorkspaces[index] = { id: workspaces[index].id, name: newName };
-            setWorkspaces(updatedWorkspaces);
+            const updatedWorkspaces = workspaceHeaders.slice();
+            updatedWorkspaces[index] = { id: workspaceHeaders[index].id, name: newName };
+            setWorkspaceHeaders(updatedWorkspaces);
             persistWorkspaces(updatedWorkspaces);
         }
     };
 
     const onUpdateLists = (workspaceId: WorkspaceId, lists: List[]) => {
-        setActiveWorkspace({ id: workspaceId, name: activeWorkspace.name, lists: lists });
+        setWorkspace({ id: workspaceId, name: workspace.name, lists: lists });
         persistLists(workspaceId, lists);
     };
 
     const onUpdateWorkspaces = (workspaces: WorkspaceHeader[]) => {
-        setWorkspaces(workspaces);
+        setWorkspaceHeaders(workspaces);
         persistWorkspaces(workspaces);
     };
 
@@ -129,9 +163,9 @@ const RootPage = () => {
         if (event.over !== null) {
             const over = event.over;
             if (event.active.id !== event.over.id) {
-                const oldIndex = workspaces.findIndex((i) => i.id === event.active.id);
-                const newIndex = workspaces.findIndex((i) => i.id === over.id);
-                const updated = arrayMove(workspaces, oldIndex, newIndex);
+                const oldIndex = workspaceHeaders.findIndex((i) => i.id === event.active.id);
+                const newIndex = workspaceHeaders.findIndex((i) => i.id === over.id);
+                const updated = arrayMove(workspaceHeaders, oldIndex, newIndex);
                 onUpdateWorkspaces(updated);
             }
         }
@@ -145,31 +179,31 @@ const RootPage = () => {
     const onCopyWorkspaceToClipboard = async () => {
         const item: ClipboardItem = {
             type: "Workspace",
-            workspace: activeWorkspace
+            workspace: workspace
         };
         await navigator.clipboard.writeText(JSON.stringify(item));
     };
 
     const onAddWorkspace = (workspace: Workspace) => {
-        const updatedWorkspaces = workspaces.concat(workspace);
-        setWorkspaces(updatedWorkspaces);
+        const updatedWorkspaces = workspaceHeaders.concat(workspace);
+        setWorkspaceHeaders(updatedWorkspaces);
         persistWorkspaces(updatedWorkspaces);
-        setActiveWorkspace(workspace);
+        setWorkspace(workspace);
         persistLists(workspace.id, workspace.lists);
     };
 
     return openAiKey === null ? (
         <InputOpenAiKey currentKey={openAiKey || ""} onInput={onInputKey} />
     ) : (
-        <div>
+        <div ref={containerRef}>
             <div className="tabs-container">
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-                    <SortableContext items={workspaces} strategy={horizontalListSortingStrategy}>
-                        {workspaces.map((w) => (
+                    <SortableContext items={workspaceHeaders} strategy={horizontalListSortingStrategy}>
+                        {workspaceHeaders.map((w) => (
                             <Tab
                                 workspace={w}
-                                active={activeWorkspace.id === w.id}
-                                canBeDeleted={workspaces.length > 1}
+                                active={workspace.id === w.id}
+                                canBeDeleted={workspaceHeaders.length > 1}
                                 onDelete={onDeleteWorkspace}
                                 onChangeTab={onChangeTab}
                                 onRename={onRenameWorkspace}
@@ -186,9 +220,8 @@ const RootPage = () => {
                 </div>
             </div>
             <WorkspaceContainer openAiKey={openAiKey}
-                activeWorkspace={activeWorkspace}
-                onUpdateLists={onUpdateLists}
-                onAddWorkspace={onAddWorkspace} />
+                activeWorkspace={workspace}
+                onUpdateLists={onUpdateLists} />
 
             <button onClick={() => setOpenAiKey(null)}>Change OpenAI key</button>
         </div>
