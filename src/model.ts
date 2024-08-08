@@ -7,6 +7,7 @@ export type WorkspaceId = Brand<string, "WorkspaceId">;
 export type TextId = Brand<string, "TextId">;
 
 export const createListId = () => uuid() as ListId;
+export const createTextId = () => uuid() as TextId;
 export const createListItemId = () => uuid() as ListItemId;
 export const createWorkspaceId = () => uuid() as WorkspaceId;
 

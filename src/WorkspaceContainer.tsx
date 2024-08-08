@@ -1,9 +1,10 @@
 import CreateList from "./lists/CreateList";
 import ListElement from "./lists/ListElement";
-import { createListId, createListItemId, List, ListId, ListItem, ListItemId, Workspace, WorkspaceId, Block } from "./model";
+import { createListId, createListItemId, List, ListId, ListItem, ListItemId, Workspace, WorkspaceId, Block, Text, createTextId, TextId } from "./model";
 import { ItemGroup } from "./tangible-gpt/model";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
+import TextElement from "./texts/TextElement";
 
 type ClipboardList = {
     type: "List";
@@ -28,7 +29,7 @@ type Props = {
     onUpdateBlocks: (workspaceId: WorkspaceId, items: Block[]) => void;
 };
 
-const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks: onUpdateBlocks }: Props) => {
+const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks }: Props) => {
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: { delay: 200, tolerance: 5 },
@@ -38,7 +39,7 @@ const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks: o
     const workspaceId = workspace.id;
     const blocks = workspace.blocks;
 
-    
+
     const onUpdateListItems = (listId: ListId, items: ListItem[]) => {
         const index = workspace.blocks.findIndex((l) => l.id === listId);
         if (index >= 0) {
@@ -101,19 +102,21 @@ const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks: o
         onUpdateBlocks(workspaceId, blocks.slice().concat(newLists));
     };
 
+    // TODO List istf newTitle
+
     const onEditTitle = (listId: ListId, newTitle: string) => {
-        const list = blocks.find((l) => l.id === listId);
-        if (list !== undefined && list.type === "List") {
+        const found = blocks.find((l) => l.id === listId);
+        if (found !== undefined && found.type === "List") {
             const updatedList: List = {
                 type: "List",
-                id: list.id,
+                id: found.id,
                 name: newTitle,
-                items: list.items,
+                items: found.items,
             };
-            const index = blocks.indexOf(list);
-            const updatedLists = blocks.slice();
-            updatedLists[index] = updatedList;
-            onUpdateBlocks(workspaceId, updatedLists);
+            const index = blocks.indexOf(found);
+            const updatedBlocks = blocks.slice();
+            updatedBlocks[index] = updatedList;
+            onUpdateBlocks(workspaceId, updatedBlocks);
         }
     };
 
@@ -122,18 +125,45 @@ const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks: o
             id: createListItemId(),
             text: i,
         }));
-        const updatedLists: Block[] = blocks.slice().concat({
+        const updatedBlocks: Block[] = blocks.slice().concat({
             type: "List",
             id: createListId(),
             name: name,
             items: listItems,
         });
-        onUpdateBlocks(workspaceId, updatedLists);
+        onUpdateBlocks(workspaceId, updatedBlocks);
     };
 
+    const onCreateText = (name: string) => {
+        const text: Text = {
+            type: "Text",
+            id: createTextId(),
+            name: name,
+            content: ""
+        };
+        onUpdateBlocks(workspaceId, blocks.slice().concat(text));
+    };
+
+    const onUpdateText = (text: Text) => {
+        const found = blocks.find((b) => b.id === text.id);
+        if (found !== undefined && found.type === "Text") {
+            const updatedText: Text = {
+                type: "Text",
+                id: found.id,
+                name: text.name,
+                content: text.content
+            };
+            const index = blocks.indexOf(found);
+            const updatedBlocks = blocks.slice();
+            updatedBlocks[index] = updatedText;
+            onUpdateBlocks(workspaceId, updatedBlocks);
+        }
+    };
+
+
     const onDeleteList = (listId: ListId) => {
-        const updatedLists = blocks.slice().filter((l) => l.id !== listId);
-        onUpdateBlocks(workspaceId, updatedLists);
+        const updatedBlocks = blocks.slice().filter((l) => l.id !== listId);
+        onUpdateBlocks(workspaceId, updatedBlocks);
     };
 
     const onDragEnd = (event: DragEndEvent) => {
@@ -168,12 +198,16 @@ const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks: o
                             />
                         </div>
                     ) : (
-                        <div>text block</div>
+                        <div className="grid-item" key={block.id}>
+                            <TextElement text={block}
+                                onUpdate={onUpdateText}
+                                key={block.id} />
+                        </div>
                     ))}
                 </SortableContext>
             </DndContext>
 
-            <CreateList openAiKey={openAiKey} blocks={blocks} onCreateList={onCreateList} />
+            <CreateList openAiKey={openAiKey} blocks={blocks} onCreateList={onCreateList} onCreateText={onCreateText} />
         </div>
     );
 };

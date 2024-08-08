@@ -9,6 +9,32 @@
     border-radius: 5px;
 }
 
+/* texts */
+
+.text {
+    width: 300px;
+    margin-top: 17px;
+    border: 1px solid #ccc;
+    padding: 0;
+}
+
+.text-header {
+    background-color: lightgray;
+    padding-top: 9px;
+    padding-bottom: 9px;
+    padding-left: 10px;
+}
+
+.text-content {
+    height: 300px;
+}
+
+.text-display {
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
 /* lists */
 
 .list {

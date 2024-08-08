@@ -34,15 +34,16 @@ ${instruction}`;
 type Props = {
     openAiKey: string;
     blocks: Block[];
-    onCreateList: (title: string, items: string[]) => void;
+    onCreateList: (name: string, items: string[]) => void;
+    onCreateText: (name: string) => void;
 };
 
-const CreateList = ({ openAiKey, blocks, onCreateList }: Props) => {
+const CreateList = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) => {
     const [instruction, setInstruction] = useState<string>("");
     const [selectedLists, setSelectedLists] = useState<Set<ListId | TextId>>(new Set<ListId>());
     const [loading, setLoading] = useState<boolean>(false);
 
-    const onInput = async (instruction: string) => {
+    const onCreateListInput = async (instruction: string) => {
         const tc = new TangibleClient(openAiKey);
         const prompt = createPrompt(
             instruction,
@@ -74,7 +75,7 @@ const CreateList = ({ openAiKey, blocks, onCreateList }: Props) => {
 
     const onGenerateList = () => {
         if (instruction.length > 0) {
-            onInput(instruction);
+            onCreateListInput(instruction);
             setInstruction("");
         }
 
@@ -103,6 +104,10 @@ const CreateList = ({ openAiKey, blocks, onCreateList }: Props) => {
                         <button className="list-button" onClick={() => onCreateList("Draft list", [])}>
                             Create empty list
                         </button>
+                        <button className="list-button" style={{ marginLeft: "10px" }} onClick={() => onCreateText("Draft text")}>
+                            Create text
+                        </button>
+
                     </div>
 
                     <hr style={{ border: "none", borderTop: "1px dotted #000" }} />
@@ -114,21 +119,19 @@ const CreateList = ({ openAiKey, blocks, onCreateList }: Props) => {
                             paddingBottom: "20px",
                         }}
                     >
-                        <input
-                            value={instruction}
+                        <input value={instruction}
                             className="instruction-input"
                             onChange={(e) => setInstruction(e.currentTarget.value)}
                             onKeyUp={(e) => {
                                 if (e.key === "Enter" && instruction.length > 0) {
-                                    onInput(instruction);
+                                    onCreateListInput(instruction);
                                     setInstruction("");
                                 }
                             }}
                             placeholder="What do you want?"
                         />
                         <br />
-                        <button
-                            style={{ width: "150px" }}
+                        <button style={{ width: "150px" }}
                             disabled={instruction.length <= 0}
                             onClick={() => onGenerateList()}
                         >

@@ -2,13 +2,13 @@ import { useState, KeyboardEvent, RefObject } from "react";
 import IconArrowBack from "../icons/IconArrowBack";
 
 type Props = {
-    text: string;
+    name: string;
     inputRef: RefObject<HTMLInputElement>;
-    onEdit: (newText: string) => void;
+    onEdit: (newName: string) => void;
     onCancel: () => void;
 };
 
-const EditListItem = ({ text, inputRef, onEdit, onCancel }: Props) => {
+const EditListItem = ({ name: text, inputRef, onEdit, onCancel }: Props) => {
     const [editInput, setEditInput] = useState<string>(text);
 
     const onEditItem = (event: KeyboardEvent<HTMLInputElement>) => {
