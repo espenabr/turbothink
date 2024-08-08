@@ -55,7 +55,10 @@ const TextElement = ({ text, onUpdate, onDelete }: Props) => {
 
     return (
         <div className="text" style={style} ref={setNodeRef} {...attributes} {...listeners}>
-            <div className="list-item" style={{ background: "lightGray" }}>
+            <div className="list-item" style={{ background: "lightGray" }} onPaste={(event) => {
+                event.preventDefault();
+                console.log("paste handled by surrounding")
+            }}>
                 {editNameMode ? (
                     <EditTextName name={text.name}
                         onRename={onUpdateName}

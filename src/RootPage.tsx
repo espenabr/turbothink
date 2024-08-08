@@ -238,7 +238,8 @@ const RootPage = () => {
                 workspace={workspace}
                 onUpdateBlocks={onUpdateBlocks} />
 
-            <button onClick={() => setOpenAiKey(null)}>Change OpenAI key</button>
+            
+            <button style={{ marginTop: "100px" }} onClick={() => setOpenAiKey(null)}>Change OpenAI key</button>
         </div>
     );
 };

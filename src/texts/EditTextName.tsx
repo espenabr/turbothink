@@ -1,4 +1,4 @@
-import { KeyboardEvent, RefObject, useState } from "react";
+import { KeyboardEvent, RefObject, useState, ClipboardEvent } from "react";
 import IconArrowBack from "../icons/IconArrowBack";
 
 
@@ -16,7 +16,13 @@ const EditTextName = ({ name, inputRef, onRename, onCancel }: Props) => {
         if (event.key === "Enter" && editInput.length > 0) {
             onRename(editInput);
         }
-    }
+    };
+
+    const onPaste = (event: ClipboardEvent) => {
+        event.stopPropagation();
+        const pastedText = event.clipboardData.getData("text");
+        setEditInput(pastedText);
+    };
 
     return (
         <>
@@ -24,6 +30,7 @@ const EditTextName = ({ name, inputRef, onRename, onCancel }: Props) => {
                 style={{ width: "85%" }}
                 onChange={(e) => setEditInput(e.currentTarget.value)}
                 onKeyUp={onUpdateTextName}
+                onPaste={e => onPaste(e)}
                 ref={inputRef}
             />
             <span className="icon"
