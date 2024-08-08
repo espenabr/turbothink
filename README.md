@@ -13,6 +13,11 @@ work as well.
 All data is stored in your browser's local storage. If you want to be on the safe side and avoid
 losing your data, workspaces and lists can be copied as JSON to the clipboard and pasted later.
 
+## Demo
+
+![Demo](https://github.com/espenabr/turbothink/blob/main/demo.gif)
+
+
 ## Get started (run locally)
 
 ```
@@ -36,9 +41,6 @@ npm run dev
 - Generate lists based on other lists
 - Copy & paste lists and workspaces
 
-## Demo
-
-![Demo](https://github.com/espenabr/turbothink/demo.gif)
 
 
 ## Future improvements
