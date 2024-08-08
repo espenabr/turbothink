@@ -36,6 +36,11 @@ npm run dev
 - Generate lists based on other lists
 - Copy & paste lists and workspaces
 
+## Demo
+
+![Demo](https://github.com/espenabr/turbothink/demo.gif)
+
+
 ## Future improvements
 
 - More complex UI elements like tables and nested lists
