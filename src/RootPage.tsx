@@ -8,14 +8,14 @@ import Tab from "./tabs/Tab";
 import InputOpenAiKey from "./InputOpenAiKey";
 
 const loadWorkspaces = (): WorkspaceHeader[] => {
-    const workspaces = localStorage.getItem("workspaces2");
+    const workspaces = localStorage.getItem("workspaces");
     if (workspaces === null) {
         const defaultWorkspace: WorkspaceHeader = {
             id: createWorkspaceId(),
             name: "My workspace",
         };
 
-        localStorage.setItem("workspaces2", JSON.stringify([defaultWorkspace]));
+        localStorage.setItem("workspaces", JSON.stringify([defaultWorkspace]));
         return [defaultWorkspace];
     } else {
         return JSON.parse(workspaces);
@@ -23,7 +23,7 @@ const loadWorkspaces = (): WorkspaceHeader[] => {
 };
 
 const persistWorkspaces = (workspaces: WorkspaceHeader[]) => {
-    localStorage.setItem("workspaces2", JSON.stringify(workspaces));
+    localStorage.setItem("workspaces", JSON.stringify(workspaces));
 };
 
 const loadLists = (workspaceId: WorkspaceId): List[] => {
@@ -36,7 +36,7 @@ const loadLists = (workspaceId: WorkspaceId): List[] => {
 };
 
 const loadWorkspaceItems = (workspaceId: WorkspaceId): Block[] => {
-    const data = localStorage.getItem(`workspace2-${workspaceId}`);
+    const data = localStorage.getItem(`workspace-${workspaceId}`);
     if (data !== null) {
         return JSON.parse(data) as Block[];
     } else {
@@ -49,7 +49,7 @@ const persistLists = (workspaceId: WorkspaceId, lists: List[]) => {
 };
 
 const persistWorkspaceItems = (workspaceId: WorkspaceId, items: Block[]) => {
-    localStorage.setItem(`workspace2-${workspaceId}`, JSON.stringify(items));
+    localStorage.setItem(`workspace-${workspaceId}`, JSON.stringify(items));
 }
 
 const persistOpenAiKey = (s: string) => {
