@@ -1,6 +1,6 @@
 import CreateList from "./lists/CreateList";
 import ListElement from "./lists/ListElement";
-import { createListId, createListItemId, List, ListId, ListItem, ListItemId, Workspace, WorkspaceId, Block, Text, createTextId } from "./model";
+import { createListId, createListItemId, List, ListId, ListItem, ListItemId, Workspace, WorkspaceId, Block, Text, createTextId, TextId } from "./model";
 import { ItemGroup } from "./tangible-gpt/model";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
@@ -13,7 +13,7 @@ type ClipboardList = {
 
 type ClipboardText = {
     type: "Text";
-    content: string;
+    text: Text;
 };
 
 type ClipboardWorkspace = {
@@ -160,9 +160,8 @@ const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks }:
         }
     };
 
-
-    const onDeleteList = (listId: ListId) => {
-        const updatedBlocks = blocks.slice().filter((l) => l.id !== listId);
+    const onDeleteBlock = (id: ListId | TextId) => {
+        const updatedBlocks = blocks.slice().filter((b) => b.id !== id);
         onUpdateBlocks(workspaceId, updatedBlocks);
     };
 
@@ -191,7 +190,7 @@ const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks }:
                                 deleteItem={onDeleteItem}
                                 editItem={editItem}
                                 onGroup={onGroup}
-                                onDeleteList={onDeleteList}
+                                onDeleteList={onDeleteBlock}
                                 onUpdateItems={onUpdateListItems}
                                 onEditTitle={onEditTitle}
                                 key={block.id}
@@ -201,6 +200,7 @@ const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks }:
                         <div className="grid-item" key={block.id}>
                             <TextElement text={block}
                                 onUpdate={onUpdateText}
+                                onDelete={onDeleteBlock}
                                 key={block.id} />
                         </div>
                     ))}

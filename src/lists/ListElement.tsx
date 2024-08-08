@@ -323,17 +323,17 @@ const ListElement = ({
                             />
                         ) : (
                             <>
-                                <span onClick={() => setEditNameMode(true)}>
-                                    <strong>{list.name}</strong>
-                                </span>
-                                <ListHeaderIcons
-                                    onSort={onClickSort}
-                                    onHighlight={onClickHighlight}
-                                    onFilter={onClickFilter}
-                                    onGroup={onClickGroup}
-                                    onCopyToClipboard={onCopyToClipboard}
-                                    onDelete={onDelete}
-                                />
+                                    <span onClick={() => setEditNameMode(true)}>
+                                        <strong>{list.name}</strong>
+                                    </span>
+                                    <ListHeaderIcons
+                                        onSort={onClickSort}
+                                        onHighlight={onClickHighlight}
+                                        onFilter={onClickFilter}
+                                        onGroup={onClickGroup}
+                                        onCopyToClipboard={onCopyToClipboard}
+                                        onDelete={onDelete}
+                                    />
                             </>
                         )}
                     </>

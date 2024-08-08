@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { createListId, createWorkspaceId, List, Workspace, WorkspaceHeader, WorkspaceId, Block } from "./model";
+import { createListId, createWorkspaceId, List, Workspace, WorkspaceHeader, WorkspaceId, Block, createTextId } from "./model";
 import WorkspaceContainer, { ClipboardItem } from "./WorkspaceContainer";
 import IconPlus from "./icons/IconPlus";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
@@ -66,7 +66,6 @@ const RootPage = () => {
     const [workspace, setWorkspace] = useState<Workspace>({
         id: workspaceHeaders[0].id,
         name: workspaceHeaders[0].name,
-        //        lists: loadLists(workspaceHeaders[0].id),
         blocks: loadWorkspaceItems(workspaceHeaders[0].id)
     });
 
@@ -84,7 +83,7 @@ const RootPage = () => {
             if (parsed.type === "List") {
                 onUpdateBlocks(workspace.id, workspace.blocks.concat({ ...parsed.list, id: createListId() }));
             } else if (parsed.type === "Text") {
-                // TODO implement
+                onUpdateBlocks(workspace.id, workspace.blocks.concat({ ...parsed.text, id: createTextId() }));
             } else if (parsed.type === "Workspace") {
                 onAddWorkspace({ ...parsed.workspace, id: createWorkspaceId() });
             }

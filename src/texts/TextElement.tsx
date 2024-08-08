@@ -1,28 +1,25 @@
 import { CSSProperties, useEffect, useRef, useState } from "react";
-import { Text } from "../model";
+import { Text, TextId } from "../model";
 import EditTextContent from "./EditTextContent";
 import DisplayTextContent from "./DisplayTextContent";
 import EditTextName from "./EditTextName";
-import { PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { useSortable } from "@dnd-kit/sortable";
+import TextHeaderIcons from "./TextHeaderIcon";
+import { ClipboardItem } from "../WorkspaceContainer";
 
 
 type Props = {
     text: Text;
     onUpdate: (updatedText: Text) => void;
-}
+    onDelete: (textId: TextId) => void;
+};
 
-const TextElement = ({ text, onUpdate }: Props) => {
+const TextElement = ({ text, onUpdate, onDelete }: Props) => {
     const [editNameMode, setEditNameMode] = useState<boolean>(false);
     const [editContentMode, setEditContentMode] = useState<boolean>(false);
     const inputNameRef = useRef<HTMLInputElement>(null);
 
-    const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: { delay: 200, tolerance: 5 },
-        }),
-    );
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: text.id });
 
     const style: CSSProperties = {
@@ -37,7 +34,7 @@ const TextElement = ({ text, onUpdate }: Props) => {
             inputNameRef.current.select();
         }
     }, [editNameMode]);
-    
+
     const onUpdateContent = (content: string) => {
         setEditContentMode(false);
         onUpdate({ ...text, content: content });
@@ -48,18 +45,30 @@ const TextElement = ({ text, onUpdate }: Props) => {
         onUpdate({ ...text, name: name });
     };
 
+    const onCopyToClipboard = async () => {
+        const clipboardItem: ClipboardItem = {
+            type: "Text",
+            text: text
+        };
+        await navigator.clipboard.writeText(JSON.stringify(clipboardItem));
+    };
+
     return (
         <div className="text" style={style} ref={setNodeRef} {...attributes} {...listeners}>
-            <div className="text-header">
+            <div className="list-item" style={{ background: "lightGray" }}>
                 {editNameMode ? (
                     <EditTextName name={text.name}
                         onRename={onUpdateName}
                         onCancel={() => setEditNameMode(false)}
                         inputRef={inputNameRef} />
                 ) : (
-                    <span onClick={() => setEditNameMode(true)}>
-                        <strong>{text.name}</strong>
-                    </span>
+                    <>
+                        <span onClick={() => setEditNameMode(true)}>
+                            <strong>{text.name}</strong>
+                        </span>
+                        <TextHeaderIcons onDelete={() => onDelete(text.id)}
+                            onCopyToClipboard={onCopyToClipboard} />
+                    </>
                 )}
             </div>
             <div className="text-content">
