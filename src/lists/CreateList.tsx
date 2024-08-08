@@ -1,15 +1,29 @@
 import { useState } from "react";
 import TangibleClient from "../tangible-gpt/TangibleClient";
 import { withoutPrefix, withoutTrailingDot } from "../common";
-import { List, ListId } from "../model";
+import { Block, List, ListId, TextId } from "../model";
 
-const createPrompt = (instruction: string, lists: List[]) => {
-    if (lists.length > 0) {
-        const listsDescription = lists
-            .map((list) => `${list.name}: ${list.items.map((i) => i.text).join(", ")}`)
+
+
+
+
+const describeContent = (block: Block) => {
+    switch (block.type) {
+        case "List":
+            return block.items.map((i) => i.text).join(", ");
+        case "Text":
+            return block.content;
+    }
+
+};
+
+const createPrompt = (instruction: string, blocks: Block[]) => {
+    if (blocks.length > 0) {
+        const description = blocks
+            .map((block) => `${block.name}: ${describeContent(block)}`)
             .join("\n");
         return `The following lists of items are useful information:
-${listsDescription}
+${description}
 
 ${instruction}`;
     } else {
@@ -19,20 +33,20 @@ ${instruction}`;
 
 type Props = {
     openAiKey: string;
-    lists: List[];
+    blocks: Block[];
     onCreateList: (title: string, items: string[]) => void;
 };
 
-const CreateList = ({ openAiKey, lists, onCreateList }: Props) => {
+const CreateList = ({ openAiKey, blocks, onCreateList }: Props) => {
     const [instruction, setInstruction] = useState<string>("");
-    const [selectedLists, setSelectedLists] = useState<Set<ListId>>(new Set<ListId>());
+    const [selectedLists, setSelectedLists] = useState<Set<ListId | TextId>>(new Set<ListId>());
     const [loading, setLoading] = useState<boolean>(false);
 
     const onInput = async (instruction: string) => {
         const tc = new TangibleClient(openAiKey);
         const prompt = createPrompt(
             instruction,
-            lists.filter((l) => selectedLists.has(l.id)),
+            blocks.filter((l) => selectedLists.has(l.id)),
         );
 
         setLoading(true);
@@ -46,15 +60,15 @@ const CreateList = ({ openAiKey, lists, onCreateList }: Props) => {
         }
     };
 
-    const checkboxValue = (listId: ListId) => (selectedLists.has(listId) ? "checked" : undefined);
+    const checkboxValue = (id: ListId | TextId) => (selectedLists.has(id) ? "checked" : undefined);
 
-    const onClickCheckbox = (listId: ListId) => {
-        if (selectedLists.has(listId)) {
+    const onClickCheckbox = (id: ListId | TextId) => {
+        if (selectedLists.has(id)) {
             const updatedLists = new Set(selectedLists);
-            updatedLists.delete(listId);
+            updatedLists.delete(id);
             setSelectedLists(updatedLists);
         } else {
-            setSelectedLists(selectedLists.add(listId));
+            setSelectedLists(selectedLists.add(id));
         }
     };
 
@@ -63,6 +77,7 @@ const CreateList = ({ openAiKey, lists, onCreateList }: Props) => {
             onInput(instruction);
             setInstruction("");
         }
+
     };
 
     return (
@@ -122,19 +137,19 @@ const CreateList = ({ openAiKey, lists, onCreateList }: Props) => {
                     </div>
 
                     <div style={{ paddingLeft: "20px", paddingBottom: "20px" }}>
-                        {lists.length > 0 && (
+                        {blocks.length > 0 && (
                             <div style={{ paddingBottom: "5px", fontWeight: "bold" }}>Context (optional)</div>
                         )}
-                        {lists.map((list) => (
+                        {blocks.map((block) => (
                             <div>
                                 <label>
                                     <input type="checkbox"
                                         style={{ paddingRight: "10px" }}
-                                        name={list.name}
-                                        key={list.id}
-                                        value={checkboxValue(list.id)}
-                                        onClick={() => onClickCheckbox(list.id)} />
-                                    {list.name}
+                                        name={block.name}
+                                        key={block.id}
+                                        value={checkboxValue(block.id)}
+                                        onClick={() => onClickCheckbox(block.id)} />
+                                    {block.name}
                                 </label>
                             </div>
                         ))}

@@ -1,6 +1,6 @@
 import { CSSProperties } from "react";
 import IconX from "../icons/IconX";
-import { Modification } from "./ListItemElement";
+import { Modification } from "./ListItemContainer";
 
 type Props = {
     text: string;

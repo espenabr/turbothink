@@ -1,9 +1,10 @@
 import { Brand } from "./common";
 import { v4 as uuid } from "uuid";
 
-export type ListId = Brand<string, `ListId`>;
-export type ListItemId = Brand<string, `ListItemId`>;
-export type WorkspaceId = Brand<string, `WorkspaceId`>;
+export type ListId = Brand<string, "ListId">;
+export type ListItemId = Brand<string, "ListItemId">;
+export type WorkspaceId = Brand<string, "WorkspaceId">;
+export type TextId = Brand<string, "TextId">;
 
 export const createListId = () => uuid() as ListId;
 export const createListItemId = () => uuid() as ListItemId;
@@ -15,10 +16,20 @@ export type ListItem = {
 };
 
 export type List = {
+    type: "List";
     id: ListId;
     name: string;
     items: ListItem[];
 };
+
+export type Text = {
+    type: "Text";
+    id: TextId;
+    name: string;
+    content: string;
+};
+
+export type Block = List | Text;
 
 export type WorkspaceHeader = {
     id: WorkspaceId;
@@ -28,5 +39,5 @@ export type WorkspaceHeader = {
 export type Workspace = {
     id: WorkspaceId;
     name: string;
-    lists: List[];
+    blocks: Block[];
 };

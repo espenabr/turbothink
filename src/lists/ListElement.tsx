@@ -1,5 +1,5 @@
 import { CSSProperties, useEffect, useRef, useState } from "react";
-import ListItemElement, { Modification } from "./ListItemElement";
+import ListItemElement, { Modification } from "./ListItemContainer";
 import InstructionInput from "./InsertuctionInput";
 import TangibleClient from "../tangible-gpt/TangibleClient";
 import AddListItem from "./AddListItem";

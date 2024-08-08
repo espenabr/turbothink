@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { createListId, createWorkspaceId, List, Workspace, WorkspaceHeader, WorkspaceId } from "./model";
+import { createListId, createWorkspaceId, List, Workspace, WorkspaceHeader, WorkspaceId, Block } from "./model";
 import WorkspaceContainer, { ClipboardItem } from "./WorkspaceContainer";
 import IconPlus from "./icons/IconPlus";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
@@ -8,14 +8,14 @@ import Tab from "./tabs/Tab";
 import InputOpenAiKey from "./InputOpenAiKey";
 
 const loadWorkspaces = (): WorkspaceHeader[] => {
-    const workspaces = localStorage.getItem("workspaces");
+    const workspaces = localStorage.getItem("workspaces2");
     if (workspaces === null) {
         const defaultWorkspace: WorkspaceHeader = {
             id: createWorkspaceId(),
             name: "My workspace",
         };
 
-        localStorage.setItem("workspaces", JSON.stringify([defaultWorkspace]));
+        localStorage.setItem("workspaces2", JSON.stringify([defaultWorkspace]));
         return [defaultWorkspace];
     } else {
         return JSON.parse(workspaces);
@@ -23,7 +23,7 @@ const loadWorkspaces = (): WorkspaceHeader[] => {
 };
 
 const persistWorkspaces = (workspaces: WorkspaceHeader[]) => {
-    localStorage.setItem("workspaces", JSON.stringify(workspaces));
+    localStorage.setItem("workspaces2", JSON.stringify(workspaces));
 };
 
 const loadLists = (workspaceId: WorkspaceId): List[] => {
@@ -35,9 +35,22 @@ const loadLists = (workspaceId: WorkspaceId): List[] => {
     }
 };
 
+const loadWorkspaceItems = (workspaceId: WorkspaceId): Block[] => {
+    const data = localStorage.getItem(`workspace2-${workspaceId}`);
+    if (data !== null) {
+        return JSON.parse(data) as Block[];
+    } else {
+        return [];
+    }
+};
+
 const persistLists = (workspaceId: WorkspaceId, lists: List[]) => {
     localStorage.setItem(`workspace-${workspaceId}`, JSON.stringify(lists));
 };
+
+const persistWorkspaceItems = (workspaceId: WorkspaceId, items: Block[]) => {
+    localStorage.setItem(`workspace2-${workspaceId}`, JSON.stringify(items));
+}
 
 const persistOpenAiKey = (s: string) => {
     localStorage.setItem("openAiKey", s);
@@ -53,7 +66,8 @@ const RootPage = () => {
     const [workspace, setWorkspace] = useState<Workspace>({
         id: workspaceHeaders[0].id,
         name: workspaceHeaders[0].name,
-        lists: loadLists(workspaceHeaders[0].id),
+        //        lists: loadLists(workspaceHeaders[0].id),
+        blocks: loadWorkspaceItems(workspaceHeaders[0].id)
     });
 
     const sensors = useSensors(
@@ -68,7 +82,9 @@ const RootPage = () => {
         try {
             const parsed = JSON.parse(data) as ClipboardItem;
             if (parsed.type === "List") {
-                onUpdateLists(workspace.id, workspace.lists.concat({ ...parsed.list, id: createListId() }));
+                onUpdateBlocks(workspace.id, workspace.blocks.concat({ ...parsed.list, id: createListId() }));
+            } else if (parsed.type === "Text") {
+                // TODO implement
             } else if (parsed.type === "Workspace") {
                 onAddWorkspace({ ...parsed.workspace, id: createWorkspaceId() });
             }
@@ -103,7 +119,7 @@ const RootPage = () => {
         };
         const updatedWorkspaces = workspaceHeaders.slice().concat(newWorkspace);
         setWorkspaceHeaders(updatedWorkspaces);
-        setWorkspace({ id: newWorkspace.id, name: newWorkspace.name, lists: [] });
+        setWorkspace({ id: newWorkspace.id, name: newWorkspace.name, blocks: [] });
         persistWorkspaces(updatedWorkspaces);
     };
 
@@ -111,7 +127,7 @@ const RootPage = () => {
         setWorkspace({
             id: workspaceId,
             name: workspaceHeaders.find(w => w.id === workspaceId)?.name || workspaceId,
-            lists: loadLists(workspaceId),
+            blocks: loadWorkspaceItems(workspaceId),
         });
     };
 
@@ -126,14 +142,14 @@ const RootPage = () => {
                 setWorkspace({
                     id: workspaceId,
                     name: workspaceHeaders[index].name,
-                    lists: loadLists(workspaceId),
+                    blocks: loadWorkspaceItems(workspaceId),
                 });
             } else {
                 const workspaceId = updatedWorkspaces[0].id;
                 setWorkspace({
                     id: workspaceId,
                     name: workspaceHeaders[index].name,
-                    lists: loadLists(workspaceId),
+                    blocks: loadWorkspaceItems(workspaceId),
                 });
             }
         }
@@ -149,9 +165,9 @@ const RootPage = () => {
         }
     };
 
-    const onUpdateLists = (workspaceId: WorkspaceId, lists: List[]) => {
-        setWorkspace({ id: workspaceId, name: workspace.name, lists: lists });
-        persistLists(workspaceId, lists);
+    const onUpdateBlocks = (workspaceId: WorkspaceId, blocks: Block[]) => {
+        setWorkspace({ id: workspaceId, name: workspace.name, blocks: blocks });
+        persistWorkspaceItems(workspaceId, blocks);
     };
 
     const onUpdateWorkspaces = (workspaces: WorkspaceHeader[]) => {
@@ -189,7 +205,7 @@ const RootPage = () => {
         setWorkspaceHeaders(updatedWorkspaces);
         persistWorkspaces(updatedWorkspaces);
         setWorkspace(workspace);
-        persistLists(workspace.id, workspace.lists);
+        persistWorkspaceItems(workspace.id, workspace.blocks);
     };
 
     return openAiKey === null ? (
@@ -220,8 +236,8 @@ const RootPage = () => {
                 </div>
             </div>
             <WorkspaceContainer openAiKey={openAiKey}
-                activeWorkspace={workspace}
-                onUpdateLists={onUpdateLists} />
+                workspace={workspace}
+                onUpdateBlocks={onUpdateBlocks} />
 
             <button onClick={() => setOpenAiKey(null)}>Change OpenAI key</button>
         </div>
