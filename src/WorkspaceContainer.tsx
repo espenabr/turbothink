@@ -1,6 +1,6 @@
 import CreateList from "./lists/CreateList";
 import ListElement from "./lists/ListElement";
-import { createListId, createListItemId, List, ListId, ListItem, ListItemId, Workspace, WorkspaceId, Block, Text, createTextId, TextId } from "./model";
+import { createListId, createListItemId, List, ListId, ListItem, ListItemId, Workspace, WorkspaceId, Block, Text, createTextId } from "./model";
 import { ItemGroup } from "./tangible-gpt/model";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
