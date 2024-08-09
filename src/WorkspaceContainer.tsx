@@ -1,4 +1,4 @@
-import CreateList from "./lists/CreateList";
+import CreateBlock from "./CreateBlock";
 import ListElement from "./lists/ListElement";
 import {
     createListId,
@@ -158,7 +158,7 @@ const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks }:
                 </SortableContext>
             </DndContext>
 
-            <CreateList openAiKey={openAiKey} blocks={blocks} onCreateList={onCreateList} onCreateText={onCreateText} />
+            <CreateBlock openAiKey={openAiKey} blocks={blocks} onCreateList={onCreateList} onCreateText={onCreateText} />
         </div>
     );
 };

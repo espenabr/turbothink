@@ -1,7 +1,7 @@
 import { useState } from "react";
-import TangibleClient from "../tangible-gpt/TangibleClient";
-import { Block, List, ListId, Text, TextId } from "../model";
-import { withoutPrefix, withoutTrailingDot } from "../common";
+import TangibleClient from "./tangible-gpt/TangibleClient";
+import { Block, List, ListId, Text, TextId } from "./model";
+import { withoutPrefix, withoutTrailingDot } from "./common";
 
 const describeContent = (block: Block) => {
     switch (block.type) {
@@ -51,7 +51,7 @@ type Props = {
     onCreateText: (name: string, content: string) => void;
 };
 
-const CreateList = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) => {
+const CreateBlock = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) => {
     const [instruction, setInstruction] = useState<string>("");
 
     const [selectedBlocks, setSelectedBlocks] = useState<(TextId | ListId)[]>([]);
@@ -204,4 +204,4 @@ const CreateList = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) =>
     );
 };
 
-export default CreateList;
+export default CreateBlock;
