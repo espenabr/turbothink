@@ -30,7 +30,7 @@ const loadWorkspaces = (): WorkspaceHeader[] => {
     }
 };
 
-const persistWorkspaces = (workspaces: WorkspaceHeader[]) => {
+const persistWorkspaceHeaders = (workspaces: WorkspaceHeader[]) => {
     localStorage.setItem("workspaces", JSON.stringify(workspaces));
 };
 
@@ -57,7 +57,7 @@ const RootPage = () => {
     const [openAiKey, setOpenAiKey] = useState<string | null>(loadOpenAiKey());
 
     const [workspaceHeaders, setWorkspaceHeaders] = useState<WorkspaceHeader[]>(loadWorkspaces);
-    const [workspace, setWorkspace] = useState<Workspace>({
+    const [currentWorkspace, setCurrentWorkspace] = useState<Workspace>({
         id: workspaceHeaders[0].id,
         name: workspaceHeaders[0].name,
         blocks: loadWorkspaceItems(workspaceHeaders[0].id),
@@ -75,9 +75,9 @@ const RootPage = () => {
         try {
             const parsed = JSON.parse(data) as ClipboardItem;
             if (parsed.type === "List") {
-                onUpdateBlocks(workspace.id, workspace.blocks.concat({ ...parsed.list, id: createListId() }));
+                onUpdateBlocks(currentWorkspace.id, currentWorkspace.blocks.concat({ ...parsed.list, id: createListId() }));
             } else if (parsed.type === "Text") {
-                onUpdateBlocks(workspace.id, workspace.blocks.concat({ ...parsed.text, id: createTextId() }));
+                onUpdateBlocks(currentWorkspace.id, currentWorkspace.blocks.concat({ ...parsed.text, id: createTextId() }));
             } else if (parsed.type === "Workspace") {
                 onAddWorkspace({ ...parsed.workspace, id: createWorkspaceId() });
             }
@@ -104,7 +104,7 @@ const RootPage = () => {
         return () => {
             container?.removeEventListener("paste", pasteHandler);
         };
-    }, [workspace]);
+    }, [currentWorkspace]);
 
     const onAddTab = () => {
         const newWorkspace: WorkspaceHeader = {
@@ -113,39 +113,34 @@ const RootPage = () => {
         };
         const updatedWorkspaces = workspaceHeaders.slice().concat(newWorkspace);
         setWorkspaceHeaders(updatedWorkspaces);
-        setWorkspace({ id: newWorkspace.id, name: newWorkspace.name, blocks: [] });
-        persistWorkspaces(updatedWorkspaces);
+        setCurrentWorkspace({ id: newWorkspace.id, name: newWorkspace.name, blocks: [] });
+        persistWorkspaceHeaders(updatedWorkspaces);
     };
 
     const onChangeTab = (workspaceId: WorkspaceId) => {
-        setWorkspace({
+        setCurrentWorkspace({
             id: workspaceId,
             name: workspaceHeaders.find((w) => w.id === workspaceId)?.name || workspaceId,
             blocks: loadWorkspaceItems(workspaceId),
         });
     };
 
-    const onDeleteWorkspace = (workspaceId: WorkspaceId) => {
-        const index = workspaceHeaders.findIndex((w) => w.id === workspaceId);
-        if (index >= 0) {
-            const updatedWorkspaces = workspaceHeaders.slice().filter((w) => w.id !== workspaceId);
-            setWorkspaceHeaders(updatedWorkspaces);
-            persistWorkspaces(updatedWorkspaces);
-            if (index > 0) {
-                const workspaceId = updatedWorkspaces[index - 1].id;
-                setWorkspace({
-                    id: workspaceId,
-                    name: workspaceHeaders[index].name,
-                    blocks: loadWorkspaceItems(workspaceId),
-                });
-            } else {
-                const workspaceId = updatedWorkspaces[0].id;
-                setWorkspace({
-                    id: workspaceId,
-                    name: workspaceHeaders[index].name,
-                    blocks: loadWorkspaceItems(workspaceId),
-                });
-            }
+    const onDeleteWorkspace = (workspaceIdToDelete: WorkspaceId) => {
+        const replacementWorkspace = workspaceHeaders.find((w) => w.id !== workspaceIdToDelete);
+        const workspaceToDelete = workspaceHeaders.find((w) => w.id === workspaceIdToDelete);
+
+        if (replacementWorkspace !== undefined && workspaceToDelete !== undefined) {
+            const updatedWorkspaceHeaders = workspaceHeaders
+                .filter((h) => h.id !== workspaceIdToDelete)
+                .slice();
+
+            const loaded = loadWorkspaceItems(replacementWorkspace.id);
+            setCurrentWorkspace({ ...replacementWorkspace, blocks: loaded });
+            setWorkspaceHeaders(updatedWorkspaceHeaders);
+            persistWorkspaceHeaders(updatedWorkspaceHeaders);
+
+            // embarrasing hack, but need to figure out why the workspace isn't rerendered
+            location.reload();
         }
     };
 
@@ -155,18 +150,18 @@ const RootPage = () => {
             const updatedWorkspaces = workspaceHeaders.slice();
             updatedWorkspaces[index] = { id: workspaceHeaders[index].id, name: newName };
             setWorkspaceHeaders(updatedWorkspaces);
-            persistWorkspaces(updatedWorkspaces);
+            persistWorkspaceHeaders(updatedWorkspaces);
         }
     };
 
     const onUpdateBlocks = (workspaceId: WorkspaceId, blocks: Block[]) => {
-        setWorkspace({ id: workspaceId, name: workspace.name, blocks: blocks });
+        setCurrentWorkspace({ id: workspaceId, name: currentWorkspace.name, blocks: blocks });
         persistWorkspaceItems(workspaceId, blocks);
     };
 
     const onUpdateWorkspaces = (workspaces: WorkspaceHeader[]) => {
         setWorkspaceHeaders(workspaces);
-        persistWorkspaces(workspaces);
+        persistWorkspaceHeaders(workspaces);
     };
 
     const onDragEnd = (event: DragEndEvent) => {
@@ -189,7 +184,7 @@ const RootPage = () => {
     const onCopyWorkspaceToClipboard = async () => {
         const item: ClipboardItem = {
             type: "Workspace",
-            workspace: workspace,
+            workspace: currentWorkspace,
         };
         await navigator.clipboard.writeText(JSON.stringify(item));
     };
@@ -197,8 +192,8 @@ const RootPage = () => {
     const onAddWorkspace = (workspace: Workspace) => {
         const updatedWorkspaces = workspaceHeaders.concat(workspace);
         setWorkspaceHeaders(updatedWorkspaces);
-        persistWorkspaces(updatedWorkspaces);
-        setWorkspace(workspace);
+        persistWorkspaceHeaders(updatedWorkspaces);
+        setCurrentWorkspace(workspace);
         persistWorkspaceItems(workspace.id, workspace.blocks);
     };
 
@@ -212,9 +207,9 @@ const RootPage = () => {
                         {workspaceHeaders.map((w) => (
                             <Tab
                                 workspace={w}
-                                active={workspace.id === w.id}
+                                active={currentWorkspace.id === w.id}
                                 canBeDeleted={workspaceHeaders.length > 1}
-                                onDelete={onDeleteWorkspace}
+                                onDelete={() => onDeleteWorkspace(w.id)}
                                 onChangeTab={onChangeTab}
                                 onRename={onRenameWorkspace}
                                 onCopyToClipboard={onCopyWorkspaceToClipboard}
@@ -229,7 +224,11 @@ const RootPage = () => {
                     </strong>
                 </div>
             </div>
-            <WorkspaceContainer openAiKey={openAiKey} workspace={workspace} onUpdateBlocks={onUpdateBlocks} />
+            <WorkspaceContainer
+                openAiKey={openAiKey}
+                workspace={currentWorkspace}
+                onUpdateBlocks={onUpdateBlocks}
+                key={currentWorkspace.id} />
 
             <button style={{ marginTop: "100px" }} onClick={() => setOpenAiKey(null)}>
                 Change OpenAI key

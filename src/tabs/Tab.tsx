@@ -9,7 +9,7 @@ type Props = {
     workspace: WorkspaceHeader;
     active: boolean;
     canBeDeleted: boolean;
-    onDelete: (id: WorkspaceId) => void;
+    onDelete: () => void;
     onChangeTab: (id: WorkspaceId) => void;
     onRename: (id: WorkspaceId, newName: string) => void;
     onCopyToClipboard: () => void;
@@ -67,7 +67,7 @@ const Tab = ({ workspace, active, canBeDeleted, onDelete, onChangeTab, onRename,
                     workspaceName={workspace.name}
                     canBeDeleted={canBeDeleted}
                     onEnableEdit={onEnableEdit}
-                    onDelete={() => onDelete(workspace.id)}
+                    onDelete={onDelete}
                     onCopyToClipboard={onCopyToClipboard}
                 />
             )}
