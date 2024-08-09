@@ -40,6 +40,12 @@ const Tab = ({ workspace, active, canBeDeleted, onDelete, onChangeTab, onRename,
         setEditMode(false);
     };
 
+    const onEnableEdit = () => {
+        if (active) {
+            setEditMode(true);
+        }
+    };
+
     return (
         <div
             className={tabClass}
@@ -58,7 +64,7 @@ const Tab = ({ workspace, active, canBeDeleted, onDelete, onChangeTab, onRename,
                 <TabContent
                     workspaceName={workspace.name}
                     canBeDeleted={canBeDeleted}
-                    onEnableEdit={() => setEditMode(true)}
+                    onEnableEdit={onEnableEdit}
                     onDelete={() => onDelete(workspace.id)}
                     onCopyToClipboard={onCopyToClipboard}
                 />

@@ -87,7 +87,7 @@
 
 .list-item:hover .icons {
     opacity: 100%;
-}    
+}
 
 .icons {
     position: absolute;
@@ -128,52 +128,40 @@
     padding: 10px;
 }
 
+.tab-content {
+    display: flex;
+    position: relative;
+    padding: 10px 40px 10px 10px;
+}
+
 .tab {
     flex: 1;
+    padding: 10px;
     text-align: center;
     cursor: pointer;
+}
+
+.active-tab {
+    flex: 1;
+    padding: 10px;
+    border-bottom: rgb(65, 22, 22) solid 2px;
+    text-align: center;
+}
+
+.tab .tab-icons {
+    opacity: 25%;
+}
+
+.active-tab .tab-icons {
+    opacity: 25%;
 }
 
 .tab:hover .tab-icons {
     opacity: 100%;
 }
 
-.tab span {
-    opacity: 50%;
-    background-color: white;
-}
-
-.tab:hover span {
-    visibility: visible;
-    opacity: 1;
-}
-
-.active-tab {
-    flex: 1;
-    border-bottom: rgb(65, 22, 22) solid 2px;
-    text-align: center;
-}
-
-.active-tab span {
-    opacity: 50%;
-}
-
-.active-tab:hover span {
-    visibility: visible;
-    opacity: 1;
-}
-
-.tab a {
-    display: block;
-    padding: 10px;
-    color: white;
-    text-decoration: none;
-    font-size: 16px;
-    transition: background-color 0.3s;
-}
-
-.tab a:hover {
-    background-color: #575757;
+.active-tab:hover .tab-icons {
+    opacity: 100%;
 }
 
 /* clipboard */
