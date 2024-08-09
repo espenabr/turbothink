@@ -1,5 +1,6 @@
-import { useState, KeyboardEvent, RefObject } from "react";
+import { useState, KeyboardEvent, RefObject, ClipboardEvent } from "react";
 import IconArrowBack from "../icons/IconArrowBack";
+import { pasteToInput } from "../common";
 
 type Props = {
     listName: string;
@@ -17,12 +18,15 @@ const EditListName = ({ listName, inputRef, onRename, onCancel }: Props) => {
         }
     };
 
+    const onPaste = (event: ClipboardEvent) => pasteToInput(event, editInput, setEditInput);
+
     return (
         <>
             <input value={editInput}
                 style={{ width: "85%" }}
                 onChange={(e) => setEditInput(e.currentTarget.value)}
                 onKeyUp={onEditListName}
+                onPaste={onPaste}
                 ref={inputRef}
             />
             <span className="icon" onClick={onCancel}>

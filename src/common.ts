@@ -1,3 +1,5 @@
+import { ClipboardEvent } from "react";
+
 export type Brand<T, Brand extends string> = T & {
     readonly [B in Brand as `__${B}_brand`]: never;
 };
@@ -12,5 +14,19 @@ export const withoutTrailingDot = (s: string) => {
         return s.slice(0, -1);
     } else {
         return s;
+    }
+};
+
+export type InputOrTextArea = HTMLInputElement | HTMLTextAreaElement;
+
+// This is quite ugly, but I wasn't able to override paste with default behaviour :-(
+export const pasteToInput = (event: ClipboardEvent, value: string, set: (value: string) => void) => {
+    event.stopPropagation();
+    const pasted = event.clipboardData.getData("text");
+    const inputField = event.target as InputOrTextArea;
+    const start = inputField.selectionStart;
+    const end = inputField.selectionEnd;
+    if (start !== null && end !== null) {
+        set(value.slice(0, start) + pasted + value.slice(end));
     }
 };

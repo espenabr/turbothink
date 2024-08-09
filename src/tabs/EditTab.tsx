@@ -1,5 +1,6 @@
-import { useState, KeyboardEvent, RefObject } from "react";
+import { useState, KeyboardEvent, RefObject, ClipboardEvent } from "react";
 import IconArrowBack from "../icons/IconArrowBack";
+import { pasteToInput } from "../common";
 
 type Props = {
     workspaceName: string;
@@ -17,11 +18,14 @@ const EditTab = ({ workspaceName, inputRef, onRename, onCancel }: Props) => {
         }
     };
 
+    const onPaste = (event: ClipboardEvent) => pasteToInput(event, nameInput, setNameInput);
+
     return (
         <>
             <input value={nameInput}
                 onChange={(e) => setNameInput(e.currentTarget.value)}
                 onKeyUp={onInputName}
+                onPaste={onPaste}
                 ref={inputRef} />
             <span style={{ cursor: "pointer", color: "green" }} onClick={onCancel}>
                 <IconArrowBack />

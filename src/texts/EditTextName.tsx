@@ -1,5 +1,6 @@
 import { KeyboardEvent, RefObject, useState, ClipboardEvent } from "react";
 import IconArrowBack from "../icons/IconArrowBack";
+import { pasteToInput } from "../common";
 
 
 type Props = {
@@ -18,11 +19,7 @@ const EditTextName = ({ name, inputRef, onRename, onCancel }: Props) => {
         }
     };
 
-    const onPaste = (event: ClipboardEvent) => {
-        event.stopPropagation();
-        const pastedText = event.clipboardData.getData("text");
-        setEditInput(pastedText);
-    };
+    const onPaste = (event: ClipboardEvent) => pasteToInput(event, editInput, setEditInput);
 
     return (
         <>
@@ -30,7 +27,7 @@ const EditTextName = ({ name, inputRef, onRename, onCancel }: Props) => {
                 style={{ width: "85%" }}
                 onChange={(e) => setEditInput(e.currentTarget.value)}
                 onKeyUp={onUpdateTextName}
-                onPaste={e => onPaste(e)}
+                onPaste={onPaste}
                 ref={inputRef}
             />
             <span className="icon"
