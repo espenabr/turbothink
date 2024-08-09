@@ -73,12 +73,12 @@ const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks }:
         onUpdateBlocks(workspaceId, updatedBlocks);
     };
 
-    const onCreateText = (name: string) => {
+    const onCreateText = (name: string, content: string) => {
         const text: Text = {
             type: "Text",
             id: createTextId(),
             name: name,
-            content: ""
+            content: content
         };
         onUpdateBlocks(workspaceId, blocks.slice().concat(text));
     };

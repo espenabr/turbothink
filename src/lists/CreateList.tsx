@@ -1,31 +1,49 @@
 import { useState } from "react";
 import TangibleClient from "../tangible-gpt/TangibleClient";
-import { Block, ListId, TextId } from "../model";
+import { Block, List, ListId, Text, TextId } from "../model";
 import { withoutPrefix, withoutTrailingDot } from "../common";
-
-
-
 
 
 const describeContent = (block: Block) => {
     switch (block.type) {
         case "List":
-            return block.items.map((i) => i.text).join(", ");
+            return `${block.name}:\n` +
+                block.items.map((i) => i.text).join(", ");
         case "Text":
-            return block.content;
+            return `${block.name}:\n` +
+                block.content;
     }
 };
 
+const describeLists = (lists: List[]) =>
+    "The following lists of items are useful information:\n" +
+    lists.map(describeContent).join("\n") + "\n";
+
+const describeTexts = (texts: Text[]) =>
+    "The following is fulful information:\n" +
+    texts.map(describeContent).join("\n") + "\n";
+
 const createPrompt = (instruction: string, blocks: Block[]) => {
     if (blocks.length > 0) {
-        const description = blocks
-            .map((block) => `${block.name}: ${describeContent(block)}`)
-            .join("\n");
-        return `The following lists of items are useful information:
-${description}
+        const lists = blocks.filter(b => b.type === "List");
+        const texts = blocks.filter(b => b.type === "Text");
+    
+        if (lists.length > 0 && texts.length > 0) {
+            return `${describeLists(lists)}
+${describeTexts(texts)}
 
-Based on this information:
 ${instruction}`;
+        } else if (lists.length > 0) {
+            return `${describeLists(lists)}
+
+${instruction}`
+        } else if (texts.length > 0) {
+            return `${describeTexts(texts)}
+
+${instruction}`
+        } else {
+            return instruction;
+        }
     } else {
         return instruction;
     }
@@ -35,7 +53,7 @@ type Props = {
     openAiKey: string;
     blocks: Block[];
     onCreateList: (name: string, items: string[]) => void;
-    onCreateText: (name: string) => void;
+    onCreateText: (name: string, content: string) => void;
 };
 
 const CreateList = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) => {
@@ -61,6 +79,23 @@ const CreateList = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) =>
         }
     };
 
+    const onCreateTextInput = async (instruction: string) => {
+        const tc = new TangibleClient(openAiKey);
+        const prompt = createPrompt(
+            instruction,
+            blocks.filter((b) => selectedBlocks.includes(b.id)),
+        );
+        setLoading(true);
+        const response = await tc.expectPlainText(prompt);
+        setLoading(false);
+        if (response.outcome === "Success") {
+            onCreateText(
+                instruction,
+                response.value
+            )
+        }
+    };
+
     const checkboxValue = (id: ListId | TextId) => (selectedBlocks.includes(id) ? "checked" : undefined);
 
     const onClickCheckbox = (id: ListId | TextId) => {
@@ -70,14 +105,16 @@ const CreateList = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) =>
         } else {
             setSelectedBlocks(selectedBlocks.concat(id));
         }
-
     };
 
     const onGenerateList = () => {
-        if (instruction.length > 0) {
-            onCreateListInput(instruction);
-            setInstruction("");
-        }
+        onCreateListInput(instruction);
+        setInstruction("");
+    };
+
+    const onGenerateText = () => {
+        onCreateTextInput(instruction);
+        setInstruction("");
     };
 
     return (
@@ -103,10 +140,9 @@ const CreateList = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) =>
                         <button className="list-button" onClick={() => onCreateList("Draft list", [])}>
                             Create empty list
                         </button>
-                        <button className="list-button" style={{ marginLeft: "10px" }} onClick={() => onCreateText("Draft text")}>
+                        <button className="list-button" style={{ marginLeft: "10px" }} onClick={() => onCreateText("Draft text", "")}>
                             Create text
                         </button>
-
                     </div>
 
                     <hr style={{ border: "none", borderTop: "1px dotted #000" }} />
@@ -130,11 +166,17 @@ const CreateList = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) =>
                             placeholder="What do you want?"
                         />
                         <br />
-                        <button style={{ width: "150px" }}
+                        <button style={{ width: "100px" }}
                             disabled={instruction.length <= 0}
                             onClick={() => onGenerateList()}
                         >
                             Generate list
+                        </button>
+                        <button style={{ width: "100px", marginLeft: "10px" }}
+                            disabled={instruction.length <= 0}
+                            onClick={() => onGenerateText()}
+                        >
+                            Generate text
                         </button>
                     </div>
 
