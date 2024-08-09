@@ -9,7 +9,7 @@ const IconSquarePlus = () => (
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
-        class="icon icon-tabler icons-tabler-outline icon-tabler-square-plus"
+        className="icon icon-tabler icons-tabler-outline icon-tabler-square-plus"
     >
         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
         <path d="M9 12h6" />
