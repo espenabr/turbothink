@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import {
     createListId,
     createWorkspaceId,
-    List,
     Workspace,
     WorkspaceHeader,
     WorkspaceId,
@@ -35,15 +34,6 @@ const persistWorkspaces = (workspaces: WorkspaceHeader[]) => {
     localStorage.setItem("workspaces", JSON.stringify(workspaces));
 };
 
-const loadLists = (workspaceId: WorkspaceId): List[] => {
-    const data = localStorage.getItem(`workspace-${workspaceId}`);
-    if (data !== null) {
-        return JSON.parse(data) as List[];
-    } else {
-        return [];
-    }
-};
-
 const loadWorkspaceItems = (workspaceId: WorkspaceId): Block[] => {
     const data = localStorage.getItem(`workspace-${workspaceId}`);
     if (data !== null) {
@@ -51,10 +41,6 @@ const loadWorkspaceItems = (workspaceId: WorkspaceId): Block[] => {
     } else {
         return [];
     }
-};
-
-const persistLists = (workspaceId: WorkspaceId, lists: List[]) => {
-    localStorage.setItem(`workspace-${workspaceId}`, JSON.stringify(lists));
 };
 
 const persistWorkspaceItems = (workspaceId: WorkspaceId, items: Block[]) => {

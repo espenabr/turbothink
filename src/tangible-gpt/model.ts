@@ -1,4 +1,4 @@
-import { Message, Property } from "./GptApiClient.ts";
+import { Message } from "./GptApiClient.ts";
 
 type IntegerParam = {
     type: "integer";
@@ -124,17 +124,6 @@ export type Row = {
 export type Table = {
     columns: Column[];
     rows: Row[];
-};
-
-type RequestFunction = {
-    name: string;
-    description: string | null;
-    parameters: Parameters;
-};
-
-type Parameters = {
-    type: "object";
-    properties: { [k: string]: Property };
 };
 
 export type ItemGroup = {

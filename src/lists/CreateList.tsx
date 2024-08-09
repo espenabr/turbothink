@@ -184,13 +184,12 @@ const CreateList = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) =>
                             <div style={{ paddingBottom: "5px", fontWeight: "bold" }}>Context (optional)</div>
                         )}
                         {blocks.map((block) => (
-                            <div>
+                            <div key={block.id}>
                                 <label>
                                     <input
                                         type="checkbox"
                                         style={{ paddingRight: "10px" }}
                                         name={block.name}
-                                        key={block.id}
                                         value={checkboxValue(block.id)}
                                         onClick={() => onClickCheckbox(block.id)}
                                     />

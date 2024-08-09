@@ -134,7 +134,7 @@ const serializeCell = (cell: Cell): string => {
     }
 };
 
-const withoutQuotes = (s: string) => s.replaceAll(`"`, ``);
+const withoutQuotes = (s: string) => s.replace(/"/g, '');
 
 const renderTable = (table: Table) => {
     const columnNames = table.columns.map((c) => c.name).join(";");

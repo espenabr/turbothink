@@ -8,7 +8,7 @@ type Props = {
 const withLineBreaks = (s: string) => (
     <>
         {s.split("\n").map((line) => (
-            <React.Fragment>
+            <React.Fragment key={line}>
                 {line}
                 <br />
             </React.Fragment>

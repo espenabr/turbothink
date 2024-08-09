@@ -79,7 +79,9 @@ const TextElement = ({ text, onUpdate, onDelete }: Props) => {
                         onCancel={() => setEditContentMode(false)}
                     />
                 ) : (
-                    <DisplayTextContent content={text.content} onEdit={() => setEditContentMode(true)} />
+                    <DisplayTextContent content={text.content}
+                        onEdit={() => setEditContentMode(true)}
+                    />
                 )}
             </div>
         </div>
