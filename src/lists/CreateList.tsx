@@ -1,7 +1,7 @@
 import { useState } from "react";
 import TangibleClient from "../tangible-gpt/TangibleClient";
+import { Block, ListId, TextId } from "../model";
 import { withoutPrefix, withoutTrailingDot } from "../common";
-import { Block, List, ListId, TextId } from "../model";
 
 
 
@@ -14,7 +14,6 @@ const describeContent = (block: Block) => {
         case "Text":
             return block.content;
     }
-
 };
 
 const createPrompt = (instruction: string, blocks: Block[]) => {
@@ -25,6 +24,7 @@ const createPrompt = (instruction: string, blocks: Block[]) => {
         return `The following lists of items are useful information:
 ${description}
 
+Based on this information:
 ${instruction}`;
     } else {
         return instruction;
@@ -40,16 +40,16 @@ type Props = {
 
 const CreateList = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) => {
     const [instruction, setInstruction] = useState<string>("");
-    const [selectedLists, setSelectedLists] = useState<Set<ListId | TextId>>(new Set<ListId>());
+
+    const [selectedBlocks, setSelectedBlocks] = useState<(TextId | ListId)[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
     const onCreateListInput = async (instruction: string) => {
         const tc = new TangibleClient(openAiKey);
         const prompt = createPrompt(
             instruction,
-            blocks.filter((l) => selectedLists.has(l.id)),
+            blocks.filter((b) => selectedBlocks.includes(b.id)),
         );
-
         setLoading(true);
         const response = await tc.expectItems(prompt);
         setLoading(false);
@@ -61,16 +61,16 @@ const CreateList = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) =>
         }
     };
 
-    const checkboxValue = (id: ListId | TextId) => (selectedLists.has(id) ? "checked" : undefined);
+    const checkboxValue = (id: ListId | TextId) => (selectedBlocks.includes(id) ? "checked" : undefined);
 
     const onClickCheckbox = (id: ListId | TextId) => {
-        if (selectedLists.has(id)) {
-            const updatedLists = new Set(selectedLists);
-            updatedLists.delete(id);
-            setSelectedLists(updatedLists);
+        if (selectedBlocks.includes(id)) {
+            const updatedBlocks = selectedBlocks.slice().filter(b => b !== id);
+            setSelectedBlocks(updatedBlocks);
         } else {
-            setSelectedLists(selectedLists.add(id));
+            setSelectedBlocks(selectedBlocks.concat(id));
         }
+
     };
 
     const onGenerateList = () => {
@@ -78,7 +78,6 @@ const CreateList = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) =>
             onCreateListInput(instruction);
             setInstruction("");
         }
-
     };
 
     return (

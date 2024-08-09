@@ -46,7 +46,7 @@ const itemStyle = (mod: Modification | null): CSSProperties => {
 type Props = {
     item: ListItem;
     modification: Modification | null;
-    onEdit: (item: ListItem) => void;
+    onEdit: (newText: string) => void;
     onDelete: (id: ListItemId) => void;
 };
 
@@ -71,7 +71,7 @@ const ListItemElement = ({ item, modification, onEdit, onDelete }: Props) => {
 
     const onEditItem = (newText: string) => {
         setEditMode(false);
-        onEdit({ id: item.id, text: newText });
+        onEdit(newText);
     };
 
     return (

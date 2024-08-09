@@ -1,6 +1,6 @@
 import CreateList from "./lists/CreateList";
 import ListElement from "./lists/ListElement";
-import { createListId, createListItemId, List, ListId, ListItem, ListItemId, Workspace, WorkspaceId, Block, Text, createTextId, TextId } from "./model";
+import { createListId, createListItemId, List, ListId, ListItem, Workspace, WorkspaceId, Block, Text, createTextId, TextId } from "./model";
 import { ItemGroup } from "./tangible-gpt/model";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
@@ -39,59 +39,6 @@ const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks }:
     const workspaceId = workspace.id;
     const blocks = workspace.blocks;
 
-
-    const onUpdateListItems = (listId: ListId, items: ListItem[]) => {
-        const index = workspace.blocks.findIndex((l) => l.id === listId);
-        if (index >= 0) {
-
-            // finne lista
-            const list = workspace.blocks[index];
-
-            if (list.type === "List") {
-                const updatedBlocks = workspace.blocks.slice();
-                updatedBlocks[index] = {
-                    type: "List",
-                    id: list.id,
-                    name: list.name,
-                    items: items
-                };
-                onUpdateBlocks(workspaceId, updatedBlocks);
-            }
-        }
-    };
-
-    const listItems = (listId: ListId) => {
-        const lists: List[] = blocks.filter(b => b.type === "List");
-        return lists.find(b => b.id === listId)?.items;
-    };
-
-    const onAddItem = (listId: ListId, item: ListItem) => {
-        const items = listItems(listId);
-        if (items !== undefined) {
-            onUpdateListItems(listId, items.slice().concat(item));
-        }
-    };
-
-    const onDeleteItem = (listId: ListId, id: ListItemId) => {
-        const items = listItems(listId);
-        if (items !== undefined) {
-            onUpdateListItems(
-                listId,
-                items.slice().filter((i) => i.id !== id),
-            );
-        }
-    };
-
-    const editItem = (listId: ListId, item: ListItem) => {
-        const items = listItems(listId);
-        if (items !== undefined) {
-            onUpdateListItems(
-                listId,
-                items.slice().map((i) => (i.id === item.id ? { id: i.id, text: item.text } : i)),
-            );
-        }
-    };
-
     const onGroup = (groups: ItemGroup[]) => {
         const newLists: List[] = groups.map((g) => ({
             type: "List",
@@ -102,17 +49,9 @@ const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks }:
         onUpdateBlocks(workspaceId, blocks.slice().concat(newLists));
     };
 
-    // TODO List istf newTitle
-
-    const onEditTitle = (listId: ListId, newTitle: string) => {
-        const found = blocks.find((l) => l.id === listId);
+    const onUpdateList = (updatedList: List) => {
+        const found = blocks.find((l) => l.id === updatedList.id);
         if (found !== undefined && found.type === "List") {
-            const updatedList: List = {
-                type: "List",
-                id: found.id,
-                name: newTitle,
-                items: found.items,
-            };
             const index = blocks.indexOf(found);
             const updatedBlocks = blocks.slice();
             updatedBlocks[index] = updatedList;
@@ -186,13 +125,9 @@ const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks }:
                             <ListElement
                                 openAiKey={openAiKey}
                                 list={block}
-                                addItem={onAddItem}
-                                deleteItem={onDeleteItem}
-                                editItem={editItem}
                                 onGroup={onGroup}
                                 onDeleteList={onDeleteBlock}
-                                onUpdateItems={onUpdateListItems}
-                                onEditTitle={onEditTitle}
+                                onUpdateList={onUpdateList}
                                 key={block.id}
                             />
                         </div>
@@ -207,7 +142,10 @@ const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks }:
                 </SortableContext>
             </DndContext>
 
-            <CreateList openAiKey={openAiKey} blocks={blocks} onCreateList={onCreateList} onCreateText={onCreateText} />
+            <CreateList openAiKey={openAiKey}
+                blocks={blocks}
+                onCreateList={onCreateList}
+                onCreateText={onCreateText} />
         </div>
     );
 };

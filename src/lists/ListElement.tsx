@@ -77,25 +77,17 @@ const toSortedListItems = (sortedItems: string[], oldItems: ListItem[]): ListIte
 type Props = {
     openAiKey: string;
     list: List;
-    addItem: (listId: ListId, item: ListItem) => void;
-    deleteItem: (listId: ListId, id: ListItemId) => void;
-    editItem: (listId: ListId, item: ListItem) => void;
     onGroup: (groups: ItemGroup[]) => void;
     onDeleteList: (listId: ListId) => void;
-    onUpdateItems: (listId: ListId, items: ListItem[]) => void;
-    onEditTitle: (listId: ListId, newTitle: string) => void;
+    onUpdateList: (updatedList: List) => void;
 };
 
 const ListElement = ({
     openAiKey,
     list,
-    addItem,
-    deleteItem,
-    editItem,
     onGroup,
     onDeleteList,
-    onUpdateItems,
-    onEditTitle,
+    onUpdateList
 }: Props) => {
     const [suggestedModification, setSuggestedModification] = useState<SuggestedModification | null>(null);
     const [waitingForInput, setWaitingForInput] = useState<Action | null>(null);
@@ -193,16 +185,19 @@ const ListElement = ({
         }
     };
 
+    const onUpdateItems = (items: ListItem[]) => {
+        onUpdateList({ ...list, items: items });
+    };
+
     const onAccept = () => {
         switch (suggestedModification?.type) {
             case "filtered":
                 onUpdateItems(
-                    list.id,
                     list.items.filter((i) => suggestedModification.items.includes(i.text)),
                 );
                 break;
             case "sorted":
-                onUpdateItems(list.id, toSortedListItems(suggestedModification.items, list.items));
+                onUpdateItems(toSortedListItems(suggestedModification.items, list.items));
                 break;
             case "grouped":
                 onGroup(suggestedModification.groups);
@@ -221,7 +216,6 @@ const ListElement = ({
             setLoading(false);
             if (response.outcome === "Success") {
                 onUpdateItems(
-                    list.id,
                     response.value.map((i) => ({ id: createListItemId(), text: i })),
                 );
             }
@@ -277,15 +271,15 @@ const ListElement = ({
                 const oldIndex = list.items.findIndex((i) => i.id === event.active.id);
                 const newIndex = list.items.findIndex((i) => i.id === over.id);
                 const updated = arrayMove(list.items, oldIndex, newIndex);
-                onUpdateItems(list.id, updated);
+                onUpdateItems(updated);
             }
         }
     };
 
     const onRenameList = (newName: string) => {
         setEditNameMode(false);
-        onEditTitle(list.id, newName);
-    };
+        onUpdateList({ ...list, name: newName });
+   };
 
     const style: CSSProperties = {
         transform: CSS.Transform.toString(transform),
@@ -298,6 +292,25 @@ const ListElement = ({
             list: list
         };
         await navigator.clipboard.writeText(JSON.stringify(clipboardItem));
+    };
+
+    const onEditItemText = (itemId: ListItemId, newText: string) => {
+        const found = list.items.find(i => i.id === itemId);
+        if (found !== undefined) {
+            const index = list.items.indexOf(found);
+            const updatedItems = list.items.slice();
+            updatedItems[index] = { ...found, text: newText };
+            onUpdateList({...list, items: updatedItems});
+        }
+    };
+
+    const onAddItem = (newItemText: string) => {
+        const newItem: ListItem = { id: createListItemId(), text: newItemText };
+        onUpdateList({ ...list, items: list.items.concat(newItem)});
+    };
+
+    const onDeleteItem = (itemId: ListItemId) => {
+        onUpdateItems(list.items.filter((i) => i.id !== itemId))
     };
 
     return (
@@ -346,8 +359,8 @@ const ListElement = ({
                         <ListItemElement
                             item={item}
                             modification={itemModification(item)}
-                            onEdit={(item) => editItem(list.id, item)}
-                            onDelete={(id) => deleteItem(list.id, id)}
+                            onEdit={(newText) => onEditItemText(item.id, newText)}
+                            onDelete={onDeleteItem}
                             key={item.id}
                         />
                     ))}
@@ -356,7 +369,7 @@ const ListElement = ({
 
             <li>
                 {suggestedModification === null ? (
-                    <AddListItem onAdd={(item) => addItem(list.id, item)}
+                    <AddListItem onAdd={(newItemText) => onAddItem(newItemText)}
                         onExtendList={onExtendList} />
                 ) : (
                     <AcceptOrRejectSuggestion

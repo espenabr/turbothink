@@ -1,9 +1,8 @@
 import { KeyboardEvent, useState } from "react";
-import { createListItemId, ListItem } from "../model";
 import IconPlaylistAdd from "../icons/IconPlaylistAdd";
 
 type Props = {
-    onAdd: (item: ListItem) => void;
+    onAdd: (text: string) => void;
     onExtendList: () => void;
 };
 
@@ -12,7 +11,7 @@ const AddListItem = ({ onAdd, onExtendList }: Props) => {
 
     const onAddItem = (event: KeyboardEvent<HTMLInputElement>) => {
         if (event.key === "Enter" && itemInput.length > 0) {
-            onAdd({ id: createListItemId(), text: itemInput });
+            onAdd(itemInput);
             setItemInput("");
         }
     };
