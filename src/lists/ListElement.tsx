@@ -227,9 +227,9 @@ const ListElement = ({ openAiKey, list, onGroup, onDeleteList, onUpdateList }: P
                         const index = items.indexOf(item);
                         return suggestedItems[index] !== undefined
                             ? {
-                                  type: "reordered",
-                                  newText: suggestedItems[index].text,
-                              }
+                                type: "reordered",
+                                newText: suggestedItems[index].text,
+                            }
                             : null;
                     } else {
                         return null;
@@ -327,7 +327,8 @@ const ListElement = ({ openAiKey, list, onGroup, onDeleteList, onUpdateList }: P
                             />
                         ) : (
                             <>
-                                <span onClick={() => setEditNameMode(true)}>
+                                <span onClick={() => setEditNameMode(true)}
+                                    style={{ cursor: "pointer" }}>
                                     <strong>{list.name}</strong>
                                 </span>
                                 <ListHeaderIcons
@@ -366,8 +367,8 @@ const ListElement = ({ openAiKey, list, onGroup, onDeleteList, onUpdateList }: P
                         onReject={onReject}
                         onAccept={
                             suggestedModification?.type === "filtered" ||
-                            suggestedModification?.type === "sorted" ||
-                            suggestedModification?.type === "grouped"
+                                suggestedModification?.type === "sorted" ||
+                                suggestedModification?.type === "grouped"
                                 ? onAccept
                                 : undefined
                         }

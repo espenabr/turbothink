@@ -15,7 +15,7 @@ const ListItemContent = ({ text, modification, onEnableEdit, onDelete }: Props) 
         if (mod !== null && mod.type === "reordered") {
             return { color: "lightGray", textDecoration: "line-through" };
         } else {
-            return {};
+            return { cursor: "pointer" };
         }
     };
 
