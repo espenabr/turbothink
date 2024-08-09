@@ -1,6 +1,5 @@
 import React from "react";
 
-
 type Props = {
     content: string;
     onEdit: () => void;

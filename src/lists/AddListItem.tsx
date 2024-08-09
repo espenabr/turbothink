@@ -22,22 +22,19 @@ const AddListItem = ({ onAdd, onExtendList }: Props) => {
 
     return (
         <>
-            <span style={{ cursor: "pointer" }}
-                title="Extend list"
-                onClick={onExtendList}>
+            <span style={{ cursor: "pointer" }} title="Extend list" onClick={onExtendList}>
                 <IconPlaylistAdd />
             </span>
-            <input value={itemInput}
+            <input
+                value={itemInput}
                 style={{ width: "87%", marginLeft: "10px" }}
                 placeholder="New item"
                 onChange={(e) => setItemInput(e.currentTarget.value)}
                 onKeyUp={onAddItem}
-                onPaste={onPaste} />
+                onPaste={onPaste}
+            />
         </>
     );
 };
-
-
-
 
 export default AddListItem;

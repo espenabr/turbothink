@@ -101,7 +101,6 @@ const InstructionInput = ({ openAiKey, currentItems, action, onInput, onCancel }
                         }}
                     />
                     <span style={{ paddingLeft: "8px", cursor: "pointer" }}>
-
                         <span
                             className="icon"
                             onClick={() => {
@@ -115,7 +114,6 @@ const InstructionInput = ({ openAiKey, currentItems, action, onInput, onCancel }
                         <span className="icon" title="Suggest options" onClick={onSuggestOptions}>
                             <IconBubbleText />
                         </span>
-
                     </span>
                 </>
             )}

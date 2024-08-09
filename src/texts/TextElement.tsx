@@ -8,7 +8,6 @@ import { useSortable } from "@dnd-kit/sortable";
 import TextHeaderIcons from "./TextHeaderIcons";
 import { ClipboardItem } from "../WorkspaceContainer";
 
-
 type Props = {
     text: Text;
     onUpdate: (updatedText: Text) => void;
@@ -48,7 +47,7 @@ const TextElement = ({ text, onUpdate, onDelete }: Props) => {
     const onCopyToClipboard = async () => {
         const clipboardItem: ClipboardItem = {
             type: "Text",
-            text: text
+            text: text,
         };
         await navigator.clipboard.writeText(JSON.stringify(clipboardItem));
     };
@@ -57,28 +56,30 @@ const TextElement = ({ text, onUpdate, onDelete }: Props) => {
         <div className="text" style={style} ref={setNodeRef} {...attributes} {...listeners}>
             <div className="list-item" style={{ background: "lightGray" }}>
                 {editNameMode ? (
-                    <EditTextName name={text.name}
+                    <EditTextName
+                        name={text.name}
                         onRename={onUpdateName}
                         onCancel={() => setEditNameMode(false)}
-                        inputRef={inputNameRef} />
+                        inputRef={inputNameRef}
+                    />
                 ) : (
                     <>
                         <span onClick={() => setEditNameMode(true)}>
                             <strong>{text.name}</strong>
                         </span>
-                        <TextHeaderIcons onDelete={() => onDelete(text.id)}
-                            onCopyToClipboard={onCopyToClipboard} />
+                        <TextHeaderIcons onDelete={() => onDelete(text.id)} onCopyToClipboard={onCopyToClipboard} />
                     </>
                 )}
             </div>
             <div className="text-content">
                 {editContentMode ? (
-                    <EditTextContent content={text.content}
+                    <EditTextContent
+                        content={text.content}
                         onUpdate={onUpdateContent}
-                        onCancel={() => setEditContentMode(false)} />
+                        onCancel={() => setEditContentMode(false)}
+                    />
                 ) : (
-                    <DisplayTextContent content={text.content}
-                        onEdit={() => setEditContentMode(true)} />
+                    <DisplayTextContent content={text.content} onEdit={() => setEditContentMode(true)} />
                 )}
             </div>
         </div>

@@ -56,10 +56,12 @@ const Tab = ({ workspace, active, canBeDeleted, onDelete, onChangeTab, onRename,
             {...listeners}
         >
             {editMode ? (
-                <EditTab workspaceName={workspace.name}
+                <EditTab
+                    workspaceName={workspace.name}
                     onRename={onRenameTab}
                     onCancel={() => setEditMode(false)}
-                    inputRef={inputRef} />
+                    inputRef={inputRef}
+                />
             ) : (
                 <TabContent
                     workspaceName={workspace.name}

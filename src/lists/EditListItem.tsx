@@ -22,12 +22,14 @@ const EditListItem = ({ name: text, inputRef, onEdit, onCancel }: Props) => {
 
     return (
         <>
-            <input value={editInput}
+            <input
+                value={editInput}
                 style={{ width: "85%" }}
                 onChange={(e) => setEditInput(e.currentTarget.value)}
                 onKeyUp={onEditItem}
                 onPaste={onPaste}
-                ref={inputRef} />
+                ref={inputRef}
+            />
             <span className="icon" style={{ cursor: "pointer" }} onClick={() => onCancel()}>
                 <IconArrowBack />
             </span>

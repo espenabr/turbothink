@@ -1,7 +1,6 @@
 import { useState } from "react";
-import IconX from "../icons/IconX"
+import IconX from "../icons/IconX";
 import IconClipboard from "../icons/IconClipboard";
-
 
 type Props = {
     onDelete: () => void;
@@ -22,11 +21,7 @@ const TextHeaderIcons = ({ onDelete, onCopyToClipboard }: Props) => {
             <span className="icon" onClick={onCopy} title="Copy to clipboard">
                 <IconClipboard />
             </span>
-            {copied && (
-                <div className="copied">
-                    Copied!
-                </div>
-            )}
+            {copied && <div className="copied">Copied!</div>}
             <span className="icon" onClick={onDelete}>
                 <IconX />
             </span>

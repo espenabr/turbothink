@@ -82,13 +82,7 @@ type Props = {
     onUpdateList: (updatedList: List) => void;
 };
 
-const ListElement = ({
-    openAiKey,
-    list,
-    onGroup,
-    onDeleteList,
-    onUpdateList
-}: Props) => {
+const ListElement = ({ openAiKey, list, onGroup, onDeleteList, onUpdateList }: Props) => {
     const [suggestedModification, setSuggestedModification] = useState<SuggestedModification | null>(null);
     const [waitingForInput, setWaitingForInput] = useState<Action | null>(null);
     const [editNameMode, setEditNameMode] = useState<boolean>(false);
@@ -192,9 +186,7 @@ const ListElement = ({
     const onAccept = () => {
         switch (suggestedModification?.type) {
             case "filtered":
-                onUpdateItems(
-                    list.items.filter((i) => suggestedModification.items.includes(i.text)),
-                );
+                onUpdateItems(list.items.filter((i) => suggestedModification.items.includes(i.text)));
                 break;
             case "sorted":
                 onUpdateItems(toSortedListItems(suggestedModification.items, list.items));
@@ -215,9 +207,7 @@ const ListElement = ({
             const response = await tc.expectExtendedItems(list.items.map((i) => i.text));
             setLoading(false);
             if (response.outcome === "Success") {
-                onUpdateItems(
-                    response.value.map((i) => ({ id: createListItemId(), text: i })),
-                );
+                onUpdateItems(response.value.map((i) => ({ id: createListItemId(), text: i })));
             }
         }
     };
@@ -237,9 +227,9 @@ const ListElement = ({
                         const index = items.indexOf(item);
                         return suggestedItems[index] !== undefined
                             ? {
-                                type: "reordered",
-                                newText: suggestedItems[index].text,
-                            }
+                                  type: "reordered",
+                                  newText: suggestedItems[index].text,
+                              }
                             : null;
                     } else {
                         return null;
@@ -279,7 +269,7 @@ const ListElement = ({
     const onRenameList = (newName: string) => {
         setEditNameMode(false);
         onUpdateList({ ...list, name: newName });
-   };
+    };
 
     const style: CSSProperties = {
         transform: CSS.Transform.toString(transform),
@@ -289,28 +279,28 @@ const ListElement = ({
     const onCopyToClipboard = async () => {
         const clipboardItem: ClipboardItem = {
             type: "List",
-            list: list
+            list: list,
         };
         await navigator.clipboard.writeText(JSON.stringify(clipboardItem));
     };
 
     const onEditItemText = (itemId: ListItemId, newText: string) => {
-        const found = list.items.find(i => i.id === itemId);
+        const found = list.items.find((i) => i.id === itemId);
         if (found !== undefined) {
             const index = list.items.indexOf(found);
             const updatedItems = list.items.slice();
             updatedItems[index] = { ...found, text: newText };
-            onUpdateList({...list, items: updatedItems});
+            onUpdateList({ ...list, items: updatedItems });
         }
     };
 
     const onAddItem = (newItemText: string) => {
         const newItem: ListItem = { id: createListItemId(), text: newItemText };
-        onUpdateList({ ...list, items: list.items.concat(newItem)});
+        onUpdateList({ ...list, items: list.items.concat(newItem) });
     };
 
     const onDeleteItem = (itemId: ListItemId) => {
-        onUpdateItems(list.items.filter((i) => i.id !== itemId))
+        onUpdateItems(list.items.filter((i) => i.id !== itemId));
     };
 
     return (
@@ -323,7 +313,8 @@ const ListElement = ({
                         listName={list.name}
                         onRename={onRenameList}
                         onCancel={() => setEditNameMode(false)}
-                        inputRef={inputNameRef} />
+                        inputRef={inputNameRef}
+                    />
                 ) : (
                     <>
                         {waitingForInput !== null ? (
@@ -336,17 +327,17 @@ const ListElement = ({
                             />
                         ) : (
                             <>
-                                    <span onClick={() => setEditNameMode(true)}>
-                                        <strong>{list.name}</strong>
-                                    </span>
-                                    <ListHeaderIcons
-                                        onSort={onClickSort}
-                                        onHighlight={onClickHighlight}
-                                        onFilter={onClickFilter}
-                                        onGroup={onClickGroup}
-                                        onCopyToClipboard={onCopyToClipboard}
-                                        onDelete={onDelete}
-                                    />
+                                <span onClick={() => setEditNameMode(true)}>
+                                    <strong>{list.name}</strong>
+                                </span>
+                                <ListHeaderIcons
+                                    onSort={onClickSort}
+                                    onHighlight={onClickHighlight}
+                                    onFilter={onClickFilter}
+                                    onGroup={onClickGroup}
+                                    onCopyToClipboard={onCopyToClipboard}
+                                    onDelete={onDelete}
+                                />
                             </>
                         )}
                     </>
@@ -369,15 +360,14 @@ const ListElement = ({
 
             <li>
                 {suggestedModification === null ? (
-                    <AddListItem onAdd={(newItemText) => onAddItem(newItemText)}
-                        onExtendList={onExtendList} />
+                    <AddListItem onAdd={(newItemText) => onAddItem(newItemText)} onExtendList={onExtendList} />
                 ) : (
                     <AcceptOrRejectSuggestion
                         onReject={onReject}
                         onAccept={
                             suggestedModification?.type === "filtered" ||
-                                suggestedModification?.type === "sorted" ||
-                                suggestedModification?.type === "grouped"
+                            suggestedModification?.type === "sorted" ||
+                            suggestedModification?.type === "grouped"
                                 ? onAccept
                                 : undefined
                         }

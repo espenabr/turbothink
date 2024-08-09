@@ -1,5 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { createListId, createWorkspaceId, List, Workspace, WorkspaceHeader, WorkspaceId, Block, createTextId } from "./model";
+import {
+    createListId,
+    createWorkspaceId,
+    List,
+    Workspace,
+    WorkspaceHeader,
+    WorkspaceId,
+    Block,
+    createTextId,
+} from "./model";
 import WorkspaceContainer, { ClipboardItem } from "./WorkspaceContainer";
 import IconPlus from "./icons/IconPlus";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
@@ -50,14 +59,13 @@ const persistLists = (workspaceId: WorkspaceId, lists: List[]) => {
 
 const persistWorkspaceItems = (workspaceId: WorkspaceId, items: Block[]) => {
     localStorage.setItem(`workspace-${workspaceId}`, JSON.stringify(items));
-}
+};
 
 const persistOpenAiKey = (s: string) => {
     localStorage.setItem("openAiKey", s);
 };
 
 const loadOpenAiKey = () => localStorage.getItem("openAiKey");
-
 
 const RootPage = () => {
     const [openAiKey, setOpenAiKey] = useState<string | null>(loadOpenAiKey());
@@ -66,7 +74,7 @@ const RootPage = () => {
     const [workspace, setWorkspace] = useState<Workspace>({
         id: workspaceHeaders[0].id,
         name: workspaceHeaders[0].name,
-        blocks: loadWorkspaceItems(workspaceHeaders[0].id)
+        blocks: loadWorkspaceItems(workspaceHeaders[0].id),
     });
 
     const sensors = useSensors(
@@ -87,7 +95,9 @@ const RootPage = () => {
             } else if (parsed.type === "Workspace") {
                 onAddWorkspace({ ...parsed.workspace, id: createWorkspaceId() });
             }
-        } catch { /* ignnore */ }
+        } catch {
+            /* ignnore */
+        }
     };
 
     // paste from clipboard
@@ -110,7 +120,6 @@ const RootPage = () => {
         };
     }, [workspace]);
 
-
     const onAddTab = () => {
         const newWorkspace: WorkspaceHeader = {
             id: createWorkspaceId(),
@@ -125,7 +134,7 @@ const RootPage = () => {
     const onChangeTab = (workspaceId: WorkspaceId) => {
         setWorkspace({
             id: workspaceId,
-            name: workspaceHeaders.find(w => w.id === workspaceId)?.name || workspaceId,
+            name: workspaceHeaders.find((w) => w.id === workspaceId)?.name || workspaceId,
             blocks: loadWorkspaceItems(workspaceId),
         });
     };
@@ -194,7 +203,7 @@ const RootPage = () => {
     const onCopyWorkspaceToClipboard = async () => {
         const item: ClipboardItem = {
             type: "Workspace",
-            workspace: workspace
+            workspace: workspace,
         };
         await navigator.clipboard.writeText(JSON.stringify(item));
     };
@@ -234,11 +243,11 @@ const RootPage = () => {
                     </strong>
                 </div>
             </div>
-            <WorkspaceContainer openAiKey={openAiKey}
-                workspace={workspace}
-                onUpdateBlocks={onUpdateBlocks} />
+            <WorkspaceContainer openAiKey={openAiKey} workspace={workspace} onUpdateBlocks={onUpdateBlocks} />
 
-            <button style={{ marginTop: "100px" }} onClick={() => setOpenAiKey(null)}>Change OpenAI key</button>
+            <button style={{ marginTop: "100px" }} onClick={() => setOpenAiKey(null)}>
+                Change OpenAI key
+            </button>
         </div>
     );
 };

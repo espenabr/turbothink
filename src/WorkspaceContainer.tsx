@@ -1,6 +1,18 @@
 import CreateList from "./lists/CreateList";
 import ListElement from "./lists/ListElement";
-import { createListId, createListItemId, List, ListId, ListItem, Workspace, WorkspaceId, Block, Text, createTextId, TextId } from "./model";
+import {
+    createListId,
+    createListItemId,
+    List,
+    ListId,
+    ListItem,
+    Workspace,
+    WorkspaceId,
+    Block,
+    Text,
+    createTextId,
+    TextId,
+} from "./model";
 import { ItemGroup } from "./tangible-gpt/model";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
@@ -78,7 +90,7 @@ const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks }:
             type: "Text",
             id: createTextId(),
             name: name,
-            content: content
+            content: content,
         };
         onUpdateBlocks(workspaceId, blocks.slice().concat(text));
     };
@@ -90,7 +102,7 @@ const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks }:
                 type: "Text",
                 id: found.id,
                 name: text.name,
-                content: text.content
+                content: text.content,
             };
             const index = blocks.indexOf(found);
             const updatedBlocks = blocks.slice();
@@ -120,32 +132,33 @@ const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks }:
         <div className="grid-container">
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
                 <SortableContext items={blocks} strategy={rectSortingStrategy}>
-                    {blocks.map((block) => block.type === "List" ? (
-                        <div className="grid-item" key={block.id}>
-                            <ListElement
-                                openAiKey={openAiKey}
-                                list={block}
-                                onGroup={onGroup}
-                                onDeleteList={onDeleteBlock}
-                                onUpdateList={onUpdateList}
-                                key={block.id}
-                            />
-                        </div>
-                    ) : (
-                        <div className="grid-item" key={block.id}>
-                            <TextElement text={block}
-                                onUpdate={onUpdateText}
-                                onDelete={onDeleteBlock}
-                                key={block.id} />
-                        </div>
-                    ))}
+                    {blocks.map((block) =>
+                        block.type === "List" ? (
+                            <div className="grid-item" key={block.id}>
+                                <ListElement
+                                    openAiKey={openAiKey}
+                                    list={block}
+                                    onGroup={onGroup}
+                                    onDeleteList={onDeleteBlock}
+                                    onUpdateList={onUpdateList}
+                                    key={block.id}
+                                />
+                            </div>
+                        ) : (
+                            <div className="grid-item" key={block.id}>
+                                <TextElement
+                                    text={block}
+                                    onUpdate={onUpdateText}
+                                    onDelete={onDeleteBlock}
+                                    key={block.id}
+                                />
+                            </div>
+                        ),
+                    )}
                 </SortableContext>
             </DndContext>
 
-            <CreateList openAiKey={openAiKey}
-                blocks={blocks}
-                onCreateList={onCreateList}
-                onCreateText={onCreateText} />
+            <CreateList openAiKey={openAiKey} blocks={blocks} onCreateList={onCreateList} onCreateText={onCreateText} />
         </div>
     );
 };

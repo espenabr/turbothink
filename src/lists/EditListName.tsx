@@ -22,7 +22,8 @@ const EditListName = ({ listName, inputRef, onRename, onCancel }: Props) => {
 
     return (
         <>
-            <input value={editInput}
+            <input
+                value={editInput}
                 style={{ width: "85%" }}
                 onChange={(e) => setEditInput(e.currentTarget.value)}
                 onKeyUp={onEditListName}

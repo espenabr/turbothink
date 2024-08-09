@@ -2,7 +2,6 @@ import { KeyboardEvent, RefObject, useState, ClipboardEvent } from "react";
 import IconArrowBack from "../icons/IconArrowBack";
 import { pasteToInput } from "../common";
 
-
 type Props = {
     name: string;
     inputRef: RefObject<HTMLInputElement>;
@@ -23,16 +22,15 @@ const EditTextName = ({ name, inputRef, onRename, onCancel }: Props) => {
 
     return (
         <>
-            <input value={editInput}
+            <input
+                value={editInput}
                 style={{ width: "85%" }}
                 onChange={(e) => setEditInput(e.currentTarget.value)}
                 onKeyUp={onUpdateTextName}
                 onPaste={onPaste}
                 ref={inputRef}
             />
-            <span className="icon"
-                style={{ cursor: "pointer" }}
-                onClick={onCancel}>
+            <span className="icon" style={{ cursor: "pointer" }} onClick={onCancel}>
                 <IconArrowBack />
             </span>
         </>

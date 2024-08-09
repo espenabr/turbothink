@@ -84,10 +84,12 @@ const ListItemElement = ({ item, modification, onEdit, onDelete }: Props) => {
             title={modification?.type === "grouped" ? modification.groupName : undefined}
         >
             {editMode ? (
-                <EditListItem name={item.text}
+                <EditListItem
+                    name={item.text}
                     onEdit={onEditItem}
                     onCancel={() => setEditMode(false)}
-                    inputRef={inputRef} />
+                    inputRef={inputRef}
+                />
             ) : (
                 <ListItemContent
                     text={item.text}

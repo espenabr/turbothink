@@ -3,31 +3,26 @@ import TangibleClient from "../tangible-gpt/TangibleClient";
 import { Block, List, ListId, Text, TextId } from "../model";
 import { withoutPrefix, withoutTrailingDot } from "../common";
 
-
 const describeContent = (block: Block) => {
     switch (block.type) {
         case "List":
-            return `${block.name}:\n` +
-                block.items.map((i) => i.text).join(", ");
+            return `${block.name}:\n` + block.items.map((i) => i.text).join(", ");
         case "Text":
-            return `${block.name}:\n` +
-                block.content;
+            return `${block.name}:\n` + block.content;
     }
 };
 
 const describeLists = (lists: List[]) =>
-    "The following lists of items are useful information:\n" +
-    lists.map(describeContent).join("\n") + "\n";
+    "The following lists of items are useful information:\n" + lists.map(describeContent).join("\n") + "\n";
 
 const describeTexts = (texts: Text[]) =>
-    "The following is fulful information:\n" +
-    texts.map(describeContent).join("\n") + "\n";
+    "The following is fulful information:\n" + texts.map(describeContent).join("\n") + "\n";
 
 const createPrompt = (instruction: string, blocks: Block[]) => {
     if (blocks.length > 0) {
-        const lists = blocks.filter(b => b.type === "List");
-        const texts = blocks.filter(b => b.type === "Text");
-    
+        const lists = blocks.filter((b) => b.type === "List");
+        const texts = blocks.filter((b) => b.type === "Text");
+
         if (lists.length > 0 && texts.length > 0) {
             return `${describeLists(lists)}
 ${describeTexts(texts)}
@@ -36,11 +31,11 @@ ${instruction}`;
         } else if (lists.length > 0) {
             return `${describeLists(lists)}
 
-${instruction}`
+${instruction}`;
         } else if (texts.length > 0) {
             return `${describeTexts(texts)}
 
-${instruction}`
+${instruction}`;
         } else {
             return instruction;
         }
@@ -89,10 +84,7 @@ const CreateList = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) =>
         const response = await tc.expectPlainText(prompt);
         setLoading(false);
         if (response.outcome === "Success") {
-            onCreateText(
-                instruction,
-                response.value
-            )
+            onCreateText(instruction, response.value);
         }
     };
 
@@ -100,7 +92,7 @@ const CreateList = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) =>
 
     const onClickCheckbox = (id: ListId | TextId) => {
         if (selectedBlocks.includes(id)) {
-            const updatedBlocks = selectedBlocks.slice().filter(b => b !== id);
+            const updatedBlocks = selectedBlocks.slice().filter((b) => b !== id);
             setSelectedBlocks(updatedBlocks);
         } else {
             setSelectedBlocks(selectedBlocks.concat(id));
@@ -140,7 +132,11 @@ const CreateList = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) =>
                         <button className="list-button" onClick={() => onCreateList("Draft list", [])}>
                             Create empty list
                         </button>
-                        <button className="list-button" style={{ marginLeft: "10px" }} onClick={() => onCreateText("Draft text", "")}>
+                        <button
+                            className="list-button"
+                            style={{ marginLeft: "10px" }}
+                            onClick={() => onCreateText("Draft text", "")}
+                        >
                             Create text
                         </button>
                     </div>
@@ -154,7 +150,8 @@ const CreateList = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) =>
                             paddingBottom: "20px",
                         }}
                     >
-                        <input value={instruction}
+                        <input
+                            value={instruction}
                             className="instruction-input"
                             onChange={(e) => setInstruction(e.currentTarget.value)}
                             onKeyUp={(e) => {
@@ -166,13 +163,15 @@ const CreateList = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) =>
                             placeholder="What do you want?"
                         />
                         <br />
-                        <button style={{ width: "100px" }}
+                        <button
+                            style={{ width: "100px" }}
                             disabled={instruction.length <= 0}
                             onClick={() => onGenerateList()}
                         >
                             Generate list
                         </button>
-                        <button style={{ width: "100px", marginLeft: "10px" }}
+                        <button
+                            style={{ width: "100px", marginLeft: "10px" }}
                             disabled={instruction.length <= 0}
                             onClick={() => onGenerateText()}
                         >
@@ -187,12 +186,14 @@ const CreateList = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) =>
                         {blocks.map((block) => (
                             <div>
                                 <label>
-                                    <input type="checkbox"
+                                    <input
+                                        type="checkbox"
                                         style={{ paddingRight: "10px" }}
                                         name={block.name}
                                         key={block.id}
                                         value={checkboxValue(block.id)}
-                                        onClick={() => onClickCheckbox(block.id)} />
+                                        onClick={() => onClickCheckbox(block.id)}
+                                    />
                                     {block.name}
                                 </label>
                             </div>

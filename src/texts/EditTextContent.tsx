@@ -3,7 +3,6 @@ import IconCheck from "../icons/IconCheck";
 import IconX from "../icons/IconX";
 import { pasteToInput } from "../common";
 
-
 type Props = {
     content: string;
     onUpdate: (s: string) => void;
@@ -17,9 +16,10 @@ const EditTextContent = ({ content, onUpdate, onCancel }: Props) => {
 
     return (
         <>
-            <textarea style={{ width: "97%", height: "100%" }}
+            <textarea
+                style={{ width: "97%", height: "100%" }}
                 value={value}
-                onChange={e => setValue(e.currentTarget.value)}
+                onChange={(e) => setValue(e.currentTarget.value)}
                 onPaste={onPaste}
             />
             <span style={{ cursor: "pointer" }}>
@@ -31,7 +31,6 @@ const EditTextContent = ({ content, onUpdate, onCancel }: Props) => {
                 </span>
             </span>
         </>
-
     );
 };
 
