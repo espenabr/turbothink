@@ -22,7 +22,7 @@ const EditTextContent = ({ content, onUpdate, onCancel }: Props) => {
                 onChange={e => setValue(e.currentTarget.value)}
                 onPaste={onPaste}
             />
-            <span>
+            <span style={{ cursor: "pointer" }}>
                 <span onClick={() => onUpdate(value)}>
                     <IconCheck />
                 </span>

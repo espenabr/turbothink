@@ -100,19 +100,22 @@ const InstructionInput = ({ openAiKey, currentItems, action, onInput, onCancel }
                             }
                         }}
                     />
-                    &nbsp;
-                    <span
-                        className="icon"
-                        onClick={() => {
-                            setSuggestedGroupings(null);
-                            onCancel();
-                        }}
-                    >
-                        <IconArrowBack />
-                    </span>
-                    &nbsp;
-                    <span className="icon" title="Suggest options" onClick={onSuggestOptions}>
-                        <IconBubbleText />
+                    <span style={{ paddingLeft: "8px", cursor: "pointer" }}>
+
+                        <span
+                            className="icon"
+                            onClick={() => {
+                                setSuggestedGroupings(null);
+                                onCancel();
+                            }}
+                        >
+                            <IconArrowBack />
+                        </span>
+                        &nbsp;
+                        <span className="icon" title="Suggest options" onClick={onSuggestOptions}>
+                            <IconBubbleText />
+                        </span>
+
                     </span>
                 </>
             )}
