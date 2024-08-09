@@ -6,7 +6,6 @@ type Props = {
     onEdit: () => void;
 };
 
-
 const withLineBreaks = (s: string) => (
     <>
         {s.split("\n").map((line) => (

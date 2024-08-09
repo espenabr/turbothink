@@ -5,7 +5,7 @@ import DisplayTextContent from "./DisplayTextContent";
 import EditTextName from "./EditTextName";
 import { CSS } from "@dnd-kit/utilities";
 import { useSortable } from "@dnd-kit/sortable";
-import TextHeaderIcons from "./TextHeaderIcon";
+import TextHeaderIcons from "./TextHeaderIcons";
 import { ClipboardItem } from "../WorkspaceContainer";
 
 
@@ -57,7 +57,6 @@ const TextElement = ({ text, onUpdate, onDelete }: Props) => {
         <div className="text" style={style} ref={setNodeRef} {...attributes} {...listeners}>
             <div className="list-item" style={{ background: "lightGray" }} onPaste={(event) => {
                 event.preventDefault();
-                console.log("paste handled by surrounding")
             }}>
                 {editNameMode ? (
                     <EditTextName name={text.name}
