@@ -41,8 +41,23 @@ npm run dev
 - Generate lists based on other lists
 - Copy & paste lists and workspaces
 
+## Import website content (command-line)
 
+You can quickly grab the contents of a website and paste into TurboThink using the supplied
+`website_to_clipboard/w2c.py` script. It uses [Trafilatura](https://trafilatura.readthedocs.io)
+to extract the relevant content fra the URL provided.
 
+### Install and use (with virtual environment)
+
+```
+> cd website_to_clipboard
+> python -m venv ./venv
+> pip install -r requirements.txt
+> source venv/bin/activate
+> python w2c.py <url>
+```
+
+You can now paste this as a text block into the webapp!
 ## Future improvements
 
 - More complex UI elements like tables and nested lists
