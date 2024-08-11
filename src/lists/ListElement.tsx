@@ -1,6 +1,6 @@
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import ListItemElement, { Modification } from "./ListItemContainer";
-import InstructionInput from "./InsertuctionInput";
+import ListInstructionInput from "./ListInsertuctionInput";
 import TangibleClient from "../tangible-gpt/TangibleClient";
 import AddListItem from "./AddListItem";
 import AcceptOrRejectSuggestion from "./AcceptOrRejectSuggestion";
@@ -42,7 +42,7 @@ type GroupedItems = {
     groups: ItemGroup[];
 };
 
-type SuggestedModification = FilteredItems | SortedItems | HighlightedItems | GroupedItems;
+type SuggestedListModification = FilteredItems | SortedItems | HighlightedItems | GroupedItems;
 
 export type Action = "highlight" | "filter" | "sort" | "group";
 
@@ -83,7 +83,7 @@ type Props = {
 };
 
 const ListElement = ({ openAiKey, list, onGroup, onDeleteList, onUpdateList }: Props) => {
-    const [suggestedModification, setSuggestedModification] = useState<SuggestedModification | null>(null);
+    const [suggestedModification, setSuggestedModification] = useState<SuggestedListModification | null>(null);
     const [waitingForInput, setWaitingForInput] = useState<Action | null>(null);
     const [editNameMode, setEditNameMode] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
@@ -110,7 +110,7 @@ const ListElement = ({ openAiKey, list, onGroup, onDeleteList, onUpdateList }: P
     const onClickSort = () => setWaitingForInput("sort");
     const onClickGroup = () => setWaitingForInput("group");
 
-    const onHighlightInput = async (instruction: string) => {
+    const onAction = async (instruction: string) => {
         const tc = new TangibleClient(openAiKey);
         const items = list.items;
 
@@ -145,7 +145,7 @@ const ListElement = ({ openAiKey, list, onGroup, onDeleteList, onUpdateList }: P
                 instruction,
             );
             if (response.outcome === "Success") {
-                const suggested: SuggestedModification = {
+                const suggested: SuggestedListModification = {
                     type: "sorted",
                     orderBy: instruction,
                     items: response.value,
@@ -227,9 +227,9 @@ const ListElement = ({ openAiKey, list, onGroup, onDeleteList, onUpdateList }: P
                         const index = items.indexOf(item);
                         return suggestedItems[index] !== undefined
                             ? {
-                                type: "reordered",
-                                newText: suggestedItems[index].text,
-                            }
+                                  type: "reordered",
+                                  newText: suggestedItems[index].text,
+                              }
                             : null;
                     } else {
                         return null;
@@ -318,17 +318,16 @@ const ListElement = ({ openAiKey, list, onGroup, onDeleteList, onUpdateList }: P
                 ) : (
                     <>
                         {waitingForInput !== null ? (
-                            <InstructionInput
+                            <ListInstructionInput
                                 openAiKey={openAiKey}
                                 onCancel={() => setWaitingForInput(null)}
                                 currentItems={list.items}
-                                onInput={onHighlightInput}
+                                onInput={onAction}
                                 action={waitingForInput}
                             />
                         ) : (
                             <>
-                                <span onClick={() => setEditNameMode(true)}
-                                    style={{ cursor: "pointer" }}>
+                                <span onClick={() => setEditNameMode(true)} style={{ cursor: "pointer" }}>
                                     <strong>{list.name}</strong>
                                 </span>
                                 <ListHeaderIcons
@@ -367,8 +366,8 @@ const ListElement = ({ openAiKey, list, onGroup, onDeleteList, onUpdateList }: P
                         onReject={onReject}
                         onAccept={
                             suggestedModification?.type === "filtered" ||
-                                suggestedModification?.type === "sorted" ||
-                                suggestedModification?.type === "grouped"
+                            suggestedModification?.type === "sorted" ||
+                            suggestedModification?.type === "grouped"
                                 ? onAccept
                                 : undefined
                         }

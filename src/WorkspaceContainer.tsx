@@ -11,7 +11,7 @@ import {
     Block,
     Text,
     createTextId,
-    TextId,
+    TextId
 } from "./model";
 import { ItemGroup } from "./tangible-gpt/model";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
@@ -147,6 +147,7 @@ const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks }:
                         ) : (
                             <div className="grid-item" key={block.id}>
                                 <TextElement
+                                    openAiKey={openAiKey}
                                     text={block}
                                     onUpdate={onUpdateText}
                                     onDelete={onDeleteBlock}
@@ -158,7 +159,12 @@ const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks }:
                 </SortableContext>
             </DndContext>
 
-            <CreateBlock openAiKey={openAiKey} blocks={blocks} onCreateList={onCreateList} onCreateText={onCreateText} />
+            <CreateBlock
+                openAiKey={openAiKey}
+                blocks={blocks}
+                onCreateList={onCreateList}
+                onCreateText={onCreateText}
+            />
         </div>
     );
 };

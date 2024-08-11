@@ -1,13 +1,15 @@
 import { useState } from "react";
 import IconX from "../icons/IconX";
 import IconClipboard from "../icons/IconClipboard";
+import IconStatusChange from "../icons/IconStatusChange";
 
 type Props = {
+    onTransform: () => void;
     onDelete: () => void;
     onCopyToClipboard: () => void;
 };
 
-const TextHeaderIcons = ({ onDelete, onCopyToClipboard }: Props) => {
+const TextHeaderIcons = ({ onTransform, onDelete, onCopyToClipboard }: Props) => {
     const [copied, setCopied] = useState<boolean>(false);
 
     const onCopy = () => {
@@ -18,6 +20,9 @@ const TextHeaderIcons = ({ onDelete, onCopyToClipboard }: Props) => {
 
     return (
         <div className="icons">
+            <span className="icon" onClick={onTransform} title="Transform text">
+                <IconStatusChange />
+            </span>
             <span className="icon" onClick={onCopy} title="Copy to clipboard">
                 <IconClipboard />
             </span>

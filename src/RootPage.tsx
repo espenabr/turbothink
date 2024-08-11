@@ -1,13 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import {
-    createListId,
-    createWorkspaceId,
-    Workspace,
-    WorkspaceHeader,
-    WorkspaceId,
-    Block,
-    createTextId,
-} from "./model";
+import { createListId, createWorkspaceId, Workspace, WorkspaceHeader, WorkspaceId, Block, createTextId } from "./model";
 import WorkspaceContainer, { ClipboardItem } from "./WorkspaceContainer";
 import IconPlus from "./icons/IconPlus";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
@@ -75,9 +67,15 @@ const RootPage = () => {
         try {
             const parsed = JSON.parse(data) as ClipboardItem;
             if (parsed.type === "List") {
-                onUpdateBlocks(currentWorkspace.id, currentWorkspace.blocks.concat({ ...parsed.list, id: createListId() }));
+                onUpdateBlocks(
+                    currentWorkspace.id,
+                    currentWorkspace.blocks.concat({ ...parsed.list, id: createListId() }),
+                );
             } else if (parsed.type === "Text") {
-                onUpdateBlocks(currentWorkspace.id, currentWorkspace.blocks.concat({ ...parsed.text, id: createTextId() }));
+                onUpdateBlocks(
+                    currentWorkspace.id,
+                    currentWorkspace.blocks.concat({ ...parsed.text, id: createTextId() }),
+                );
             } else if (parsed.type === "Workspace") {
                 onAddWorkspace({ ...parsed.workspace, id: createWorkspaceId() });
             }
@@ -130,9 +128,7 @@ const RootPage = () => {
         const workspaceToDelete = workspaceHeaders.find((w) => w.id === workspaceIdToDelete);
 
         if (replacementWorkspace !== undefined && workspaceToDelete !== undefined) {
-            const updatedWorkspaceHeaders = workspaceHeaders
-                .filter((h) => h.id !== workspaceIdToDelete)
-                .slice();
+            const updatedWorkspaceHeaders = workspaceHeaders.filter((h) => h.id !== workspaceIdToDelete).slice();
 
             const loaded = loadWorkspaceItems(replacementWorkspace.id);
             setCurrentWorkspace({ ...replacementWorkspace, blocks: loaded });
@@ -228,7 +224,8 @@ const RootPage = () => {
                 openAiKey={openAiKey}
                 workspace={currentWorkspace}
                 onUpdateBlocks={onUpdateBlocks}
-                key={currentWorkspace.id} />
+                key={currentWorkspace.id}
+            />
 
             <button style={{ marginTop: "100px" }} onClick={() => setOpenAiKey(null)}>
                 Change OpenAI key

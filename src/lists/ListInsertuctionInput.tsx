@@ -38,9 +38,9 @@ The intention is to get suggestions so it's easier for a person to figure out ho
     }
 };
 
-const InstructionInput = ({ openAiKey, currentItems, action, onInput, onCancel }: Props) => {
+const ListInstructionInput = ({ openAiKey, currentItems, action, onInput, onCancel }: Props) => {
     const [content, setContent] = useState<string>("");
-    const [suggestedGroupings, setSuggestedGroupings] = useState<string[] | null>(null);
+    const [suggestions, setSuggestions] = useState<string[] | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
     const onSuggestOptions = async () => {
@@ -51,26 +51,24 @@ const InstructionInput = ({ openAiKey, currentItems, action, onInput, onCancel }
         const response = await tc.expectItems(prompt);
         setLoading(false);
         if (response.outcome === "Success") {
-            setSuggestedGroupings(response.value.map(withoutPrefix));
+            setSuggestions(response.value.map(withoutPrefix));
         }
     };
 
-    const onGroupBySuggestion = (suggestion: string) => {
-        onInput(suggestion);
-    };
+    const onGroupBySuggestion = (suggestion: string) => onInput(suggestion);
 
     return (
         <div>
             {loading ? (
                 <div className="spinner" />
-            ) : suggestedGroupings ? (
+            ) : suggestions ? (
                 <div>
                     <strong>Select grouping</strong>
                     &nbsp; &nbsp;
                     <span
                         style={{ cursor: "pointer", color: "#424242" }}
                         onClick={() => {
-                            setSuggestedGroupings(null);
+                            setSuggestions(null);
                             onCancel();
                         }}
                     >
@@ -81,7 +79,7 @@ const InstructionInput = ({ openAiKey, currentItems, action, onInput, onCancel }
                         <IconRefresh />
                     </span>
                     <ul style={{ paddingTop: "10px" }}>
-                        {suggestedGroupings.map((g) => (
+                        {suggestions.map((g) => (
                             <li className="suggestion" onClick={() => onGroupBySuggestion(g)}>
                                 {g}
                             </li>
@@ -104,7 +102,7 @@ const InstructionInput = ({ openAiKey, currentItems, action, onInput, onCancel }
                         <span
                             className="icon"
                             onClick={() => {
-                                setSuggestedGroupings(null);
+                                setSuggestions(null);
                                 onCancel();
                             }}
                         >
@@ -121,6 +119,4 @@ const InstructionInput = ({ openAiKey, currentItems, action, onInput, onCancel }
     );
 };
 
-/* Surprise me icon: 😮 */
-
-export default InstructionInput;
+export default ListInstructionInput;
