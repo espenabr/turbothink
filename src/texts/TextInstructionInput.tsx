@@ -21,7 +21,7 @@ const TextInstructionInput = ({ openAiKey, currentContent, onInput, onCancel }: 
         const prompt = `Given the following text:
 ${currentContent}
 
-Suggest 5 different ways that this text can be transformed`;
+Suggest 5 different ways that this text can be transformed (no language translation suggestions please)`;
         setLoading(true);
         const response = await tc.expectItems(prompt);
         setLoading(false);
@@ -38,7 +38,7 @@ Suggest 5 different ways that this text can be transformed`;
                 <div className="spinner" />
             ) : suggestions !== null ? (
                 <div>
-                    <strong>Select grouping</strong>
+                    <strong>Select suggestion</strong>
                     &nbsp; &nbsp;
                     <span
                         style={{ cursor: "pointer", color: "#424242" }}

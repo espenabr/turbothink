@@ -55,7 +55,7 @@ const ListInstructionInput = ({ openAiKey, currentItems, action, onInput, onCanc
         }
     };
 
-    const onGroupBySuggestion = (suggestion: string) => onInput(suggestion);
+    const onConfirmSuggestion = (suggestion: string) => onInput(suggestion);
 
     return (
         <div>
@@ -63,7 +63,7 @@ const ListInstructionInput = ({ openAiKey, currentItems, action, onInput, onCanc
                 <div className="spinner" />
             ) : suggestions ? (
                 <div>
-                    <strong>Select grouping</strong>
+                    <strong>Select suggestion</strong>
                     &nbsp; &nbsp;
                     <span
                         style={{ cursor: "pointer", color: "#424242" }}
@@ -80,7 +80,7 @@ const ListInstructionInput = ({ openAiKey, currentItems, action, onInput, onCanc
                     </span>
                     <ul style={{ paddingTop: "10px" }}>
                         {suggestions.map((g) => (
-                            <li className="suggestion" onClick={() => onGroupBySuggestion(g)}>
+                            <li className="suggestion" onClick={() => onConfirmSuggestion(g)}>
                                 {g}
                             </li>
                         ))}
