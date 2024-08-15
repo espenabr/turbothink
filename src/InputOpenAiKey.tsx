@@ -29,7 +29,6 @@ const InputOpenAiKey = ({ currentKey, onInput }: Props) => {
             </div>
             <div>OpenAI key</div>
 
-            
             <input value={keyInput} onKeyUp={onEdit} onChange={(e) => setKeyInput(e.currentTarget.value)} />
             <button onClick={onInputKey}>OK</button>
             {keyInput.length > 0 && !validKey(keyInput) && <span style={{ color: "red" }}>Invalid key!</span>}

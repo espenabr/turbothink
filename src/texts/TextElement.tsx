@@ -1,21 +1,20 @@
-import { CSSProperties, useRef, useState } from "react";
+import { CSSProperties, useState } from "react";
 import { Text, TextId } from "../model";
 import EditTextContent from "./EditTextContent";
 import DisplayTextContent from "./DisplayTextContent";
 import { CSS } from "@dnd-kit/utilities";
 import { useSortable } from "@dnd-kit/sortable";
 import { ClipboardItem } from "../WorkspaceContainer";
-import TextHeader from "./TextHeader";
-import TextInstructionInput from "./TextInstructionInput";
 import TangibleClient from "../tangible-gpt/TangibleClient";
 import AcceptOrRejectSuggestion from "../lists/AcceptOrRejectSuggestion";
+import TextHeader from "./TextHeader";
 
 type TransformedText = {
     instruction: string;
     newText: string;
 };
 
-type Action = "transform";
+export type Action = "transform";
 
 type Props = {
     openAiKey: string;
@@ -30,12 +29,10 @@ const TextElement = ({ openAiKey, text, onUpdate, onDelete }: Props) => {
     const [waitingForInput, setWaitingForInput] = useState<Action | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
-    const inputNameRef = useRef<HTMLInputElement>(null);
-
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: text.id });
 
     const style: CSSProperties = {
-        transform: CSS.Transform.toString(transform),
+        transform: CSS.Translate.toString(transform),
         transition,
     };
 
@@ -44,7 +41,7 @@ const TextElement = ({ openAiKey, text, onUpdate, onDelete }: Props) => {
         onUpdate({ ...text, content: content });
     };
 
-    const onUpdateName = (name: string) => onUpdate({ ...text, name: name });
+    const onRenameText = (newName: string) => onUpdate({ ...text, name: newName });
 
     const onCopyToClipboard = async () => {
         const clipboardItem: ClipboardItem = {
@@ -86,27 +83,18 @@ I only want the transformed text back, nothing else`);
 
     return (
         <div className="text" style={style} ref={setNodeRef} {...attributes} {...listeners}>
-            <div className="list-item" style={{ background: "lightGray" }}>
-                {loading ? (
-                    <div className="spinner" />
-                ) : waitingForInput ? (
-                    <TextInstructionInput
-                        openAiKey={openAiKey}
-                        currentContent={text.content}
-                        onInput={(instruction) => onAction(instruction)}
-                        onCancel={() => setWaitingForInput(null)}
-                    />
-                ) : (
-                    <TextHeader
-                        name={text.name}
-                        inputNameRef={inputNameRef}
-                        onUpdateName={(name) => onUpdateName(name)}
-                        onTransform={onTransform}
-                        onDelete={() => onDelete(text.id)}
-                        onCopyToClipboard={onCopyToClipboard}
-                    />
-                )}
-            </div>
+            <TextHeader
+                openAiKey={openAiKey}
+                text={text}
+                loading={loading}
+                waitingForInput={waitingForInput}
+                onAction={onAction}
+                onRename={onRenameText}
+                onCopyToClipboard={onCopyToClipboard}
+                onTransform={onTransform}
+                onDelete={() => onDelete(text.id)}
+                onCancel={() => setWaitingForInput(null)}
+            />
 
             <div className="text-content">
                 {editContentMode ? (

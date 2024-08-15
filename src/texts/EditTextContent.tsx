@@ -17,7 +17,7 @@ const EditTextContent = ({ content, onUpdate, onCancel }: Props) => {
     return (
         <>
             <textarea
-                style={{ width: "97%", height: "100%" }}
+                style={{ width: "100%", height: "91%" }}
                 value={value}
                 onChange={(e) => setValue(e.currentTarget.value)}
                 onPaste={onPaste}

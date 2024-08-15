@@ -1,41 +1,58 @@
-import { RefObject, useEffect, useState } from "react";
-import EditTextName from "./EditTextName";
-import TextHeaderIcons from "./TextHeaderIcons";
+import { useRef } from "react";
+import { Text } from "../model";
+import TextHeaderContent from "./TextHeaderContent";
+import TextInstructionInput from "./TextInstructionInput";
+import { Action } from "./TextElement";
 
 type Props = {
-    name: string;
-    inputNameRef: RefObject<HTMLInputElement>;
-    onUpdateName: (name: string) => void;
+    openAiKey: string;
+    text: Text;
+    loading: boolean;
+    waitingForInput: Action | null;
+    onAction: (instruction: string) => void;
+    onRename: (newName: string) => void;
+    onCopyToClipboard: () => void;
     onTransform: () => void;
     onDelete: () => void;
-    onCopyToClipboard: () => void;
+    onCancel: () => void;
 };
 
-const TextHeader = ({ name, inputNameRef, onTransform, onUpdateName, onDelete, onCopyToClipboard }: Props) => {
-    const [editMode, setEditMode] = useState<boolean>(false);
+const TextHeader = ({
+    openAiKey,
+    text,
+    loading,
+    waitingForInput,
+    onAction,
+    onRename,
+    onCopyToClipboard,
+    onTransform,
+    onDelete,
+    onCancel,
+}: Props) => {
+    const inputNameRef = useRef<HTMLInputElement>(null);
 
-    const onUpdate = (updated: string) => {
-        setEditMode(false);
-        onUpdateName(updated);
-    };
-
-    // highlight name input on edit
-    useEffect(() => {
-        if (editMode && inputNameRef.current) {
-            inputNameRef.current.focus();
-            inputNameRef.current.select();
-        }
-    }, [editMode]);
-
-    return editMode ? (
-        <EditTextName name={name} onRename={onUpdate} onCancel={() => setEditMode(false)} inputRef={inputNameRef} />
-    ) : (
-        <>
-            <span onClick={() => setEditMode(true)}>
-                <strong>{name}</strong>
-            </span>
-            <TextHeaderIcons onTransform={onTransform} onDelete={onDelete} onCopyToClipboard={onCopyToClipboard} />
-        </>
+    return (
+        <div className="text-header">
+            {loading ? (
+                <div className="spinner" />
+            ) : waitingForInput ? (
+                <TextInstructionInput
+                    openAiKey={openAiKey}
+                    currentContent={text.content}
+                    onInput={(instruction) => onAction(instruction)}
+                    onCancel={onCancel}
+                />
+            ) : (
+                <TextHeaderContent
+                    name={text.name}
+                    inputNameRef={inputNameRef}
+                    onUpdateName={(name) => onRename(name)}
+                    onTransform={onTransform}
+                    onDelete={onDelete}
+                    onCopyToClipboard={onCopyToClipboard}
+                />
+            )}
+        </div>
     );
 };
 

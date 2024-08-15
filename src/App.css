@@ -12,14 +12,14 @@
 /* texts */
 
 .text {
-    width: 300px;
-    margin-top: 17px;
     border: 1px solid #ccc;
+    margin-right: 10px;
     padding: 0;
 }
 
 .text-header {
-    background-color: lightgray;
+    position: relative;
+    background-color: #dfcfba;
     padding-top: 9px;
     padding-bottom: 12px;
     padding-left: 10px;
@@ -40,10 +40,19 @@
 /* lists */
 
 .list {
-    width: 300px;
     border: 1px solid #ccc;
+    margin-right: 10px;
+    margin-top: 0px;
     padding: 0;
     list-style: none;
+}
+
+.list-header {
+    position: relative;
+    padding: 10px 40px 10px 10px;
+    border-bottom: 1px solid #ddd;
+    margin-right: 10px;
+    background-color: #c8daeb;
 }
 
 .list-item {
@@ -56,13 +65,13 @@
     display: block;
 }
 
-.createList {
-    margin-top: 17px;
+.create-list {
     margin-left: 5px;
     margin-right: 5px;
     width: 300px;
+    margin-left: 40px;
     height: fit-content;
-    background-color: #e9e9f8;
+    background-color: #f5edf8;
 }
 
 .list-button {
@@ -87,7 +96,23 @@
     opacity: 20%;
 }
 
+.list-header .icons {
+    opacity: 20%;
+}
+
 .list-item:hover .icons {
+    opacity: 100%;
+}
+
+.list-header:hover .icons {
+    opacity: 100%;
+}
+
+.text-header .icons {
+    opacity: 20%;
+}
+
+.text-header:hover .icons {
     opacity: 100%;
 }
 
@@ -96,7 +121,6 @@
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
-    background-color: lightgray;
     cursor: pointer;
 }
 

@@ -110,7 +110,7 @@ const CreateBlock = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) =
     };
 
     return (
-        <div className="createList">
+        <div className="create-list">
             {loading ? (
                 <div
                     style={{
@@ -130,14 +130,14 @@ const CreateBlock = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) =
                         }}
                     >
                         <button className="list-button" onClick={() => onCreateList("Draft list", [])}>
-                            Create empty list
+                            Empty list
                         </button>
                         <button
                             className="list-button"
                             style={{ marginLeft: "10px" }}
                             onClick={() => onCreateText("Draft text", "")}
                         >
-                            Create text
+                            Empty text
                         </button>
                     </div>
 

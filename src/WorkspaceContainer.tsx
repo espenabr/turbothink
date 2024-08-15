@@ -11,7 +11,7 @@ import {
     Block,
     Text,
     createTextId,
-    TextId
+    TextId,
 } from "./model";
 import { ItemGroup } from "./tangible-gpt/model";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";

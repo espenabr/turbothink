@@ -1,6 +1,5 @@
-import { CSSProperties, useEffect, useRef, useState } from "react";
+import { CSSProperties, useState } from "react";
 import ListItemElement, { Modification } from "./ListItemContainer";
-import ListInstructionInput from "./ListInsertuctionInput";
 import TangibleClient from "../tangible-gpt/TangibleClient";
 import AddListItem from "./AddListItem";
 import AcceptOrRejectSuggestion from "./AcceptOrRejectSuggestion";
@@ -9,9 +8,8 @@ import { createListItemId, List, ListId, ListItem, ListItemId } from "../model";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import ListHeaderIcons from "./ListHeaderIcons";
-import EditListName from "./EditListName";
 import { ClipboardItem } from "../WorkspaceContainer";
+import ListHeader from "./ListHeader";
 
 type FilteredItems = {
     type: "filtered";
@@ -85,7 +83,7 @@ type Props = {
 const ListElement = ({ openAiKey, list, onGroup, onDeleteList, onUpdateList }: Props) => {
     const [suggestedModification, setSuggestedModification] = useState<SuggestedListModification | null>(null);
     const [waitingForInput, setWaitingForInput] = useState<Action | null>(null);
-    const [editNameMode, setEditNameMode] = useState<boolean>(false);
+
     const [loading, setLoading] = useState<boolean>(false);
 
     const sensors = useSensors(
@@ -93,22 +91,13 @@ const ListElement = ({ openAiKey, list, onGroup, onDeleteList, onUpdateList }: P
             activationConstraint: { delay: 200, tolerance: 5 },
         }),
     );
+
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: list.id });
 
-    const inputNameRef = useRef<HTMLInputElement>(null);
-
-    // highlight name input on edit
-    useEffect(() => {
-        if (editNameMode && inputNameRef.current) {
-            inputNameRef.current.focus();
-            inputNameRef.current.select();
-        }
-    }, [editNameMode]);
-
-    const onClickHighlight = () => setWaitingForInput("highlight");
-    const onClickFilter = () => setWaitingForInput("filter");
-    const onClickSort = () => setWaitingForInput("sort");
-    const onClickGroup = () => setWaitingForInput("group");
+    const style: CSSProperties = {
+        transform: CSS.Translate.toString(transform),
+        transition,
+    };
 
     const onAction = async (instruction: string) => {
         const tc = new TangibleClient(openAiKey);
@@ -267,13 +256,7 @@ const ListElement = ({ openAiKey, list, onGroup, onDeleteList, onUpdateList }: P
     };
 
     const onRenameList = (newName: string) => {
-        setEditNameMode(false);
         onUpdateList({ ...list, name: newName });
-    };
-
-    const style: CSSProperties = {
-        transform: CSS.Transform.toString(transform),
-        transition,
     };
 
     const onCopyToClipboard = async () => {
@@ -304,77 +287,51 @@ const ListElement = ({ openAiKey, list, onGroup, onDeleteList, onUpdateList }: P
     };
 
     return (
-        <ul className="list" style={style} ref={setNodeRef} {...attributes} {...listeners}>
-            <li className="list-item" style={{ backgroundColor: "lightGray" }}>
-                {loading ? (
-                    <div className="spinner" />
-                ) : editNameMode ? (
-                    <EditListName
-                        listName={list.name}
-                        onRename={onRenameList}
-                        onCancel={() => setEditNameMode(false)}
-                        inputRef={inputNameRef}
-                    />
-                ) : (
-                    <>
-                        {waitingForInput !== null ? (
-                            <ListInstructionInput
-                                openAiKey={openAiKey}
-                                onCancel={() => setWaitingForInput(null)}
-                                currentItems={list.items}
-                                onInput={onAction}
-                                action={waitingForInput}
+        <div style={style} ref={setNodeRef} {...attributes} {...listeners}>
+            <ListHeader
+                openAiKey={openAiKey}
+                list={list}
+                loading={loading}
+                onRenameList={onRenameList}
+                onAction={onAction}
+                onCopyToClipboard={onCopyToClipboard}
+                onDelete={onDelete}
+                key={list.id}
+            />
+
+            <ul className="list">
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+                    <SortableContext items={list.items} strategy={verticalListSortingStrategy}>
+                        {list.items.map((item) => (
+                            <ListItemElement
+                                item={item}
+                                modification={itemModification(item)}
+                                onEdit={(newText) => onEditItemText(item.id, newText)}
+                                onDelete={onDeleteItem}
+                                key={item.id}
                             />
-                        ) : (
-                            <>
-                                <span onClick={() => setEditNameMode(true)} style={{ cursor: "pointer" }}>
-                                    <strong>{list.name}</strong>
-                                </span>
-                                <ListHeaderIcons
-                                    onSort={onClickSort}
-                                    onHighlight={onClickHighlight}
-                                    onFilter={onClickFilter}
-                                    onGroup={onClickGroup}
-                                    onCopyToClipboard={onCopyToClipboard}
-                                    onDelete={onDelete}
-                                />
-                            </>
-                        )}
-                    </>
-                )}
-            </li>
+                        ))}
+                    </SortableContext>
+                </DndContext>
 
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-                <SortableContext items={list.items} strategy={verticalListSortingStrategy}>
-                    {list.items.map((item) => (
-                        <ListItemElement
-                            item={item}
-                            modification={itemModification(item)}
-                            onEdit={(newText) => onEditItemText(item.id, newText)}
-                            onDelete={onDeleteItem}
-                            key={item.id}
+                <li>
+                    {suggestedModification === null ? (
+                        <AddListItem onAdd={(newItemText) => onAddItem(newItemText)} onExtendList={onExtendList} />
+                    ) : (
+                        <AcceptOrRejectSuggestion
+                            onReject={onReject}
+                            onAccept={
+                                suggestedModification?.type === "filtered" ||
+                                suggestedModification?.type === "sorted" ||
+                                suggestedModification?.type === "grouped"
+                                    ? onAccept
+                                    : undefined
+                            }
                         />
-                    ))}
-                </SortableContext>
-            </DndContext>
-
-            <li>
-                {suggestedModification === null ? (
-                    <AddListItem onAdd={(newItemText) => onAddItem(newItemText)} onExtendList={onExtendList} />
-                ) : (
-                    <AcceptOrRejectSuggestion
-                        onReject={onReject}
-                        onAccept={
-                            suggestedModification?.type === "filtered" ||
-                            suggestedModification?.type === "sorted" ||
-                            suggestedModification?.type === "grouped"
-                                ? onAccept
-                                : undefined
-                        }
-                    />
-                )}
-            </li>
-        </ul>
+                    )}
+                </li>
+            </ul>
+        </div>
     );
 };
 
