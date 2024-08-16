@@ -64,7 +64,7 @@ const Settings = ({ openAiKey, gptModel, blockHeight, onUpdateKey, onUpdateGptMo
                             ))}
                         </select>
                     </span>
-                    <span style={{ marginLeft: "10px" }}>
+                    <span style={{ marginLeft: "40px" }}>
                         Element height:&nbsp;
                         <select value={blockHeight} onChange={onChangeBlockHeight}>
                             {blockHeightOptions.map((o) => (

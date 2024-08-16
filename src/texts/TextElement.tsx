@@ -98,7 +98,7 @@ I only want the transformed text back, nothing else`);
     };
 
     return (
-        <>
+        <div className="block">
             <div className="text" style={style} ref={setNodeRef} {...attributes} {...listeners}>
                 <TextHeader
                     openAiConfig={openAiConfig}
@@ -148,7 +148,7 @@ I only want the transformed text back, nothing else`);
                     </span>
                 </div>
             )}
-        </>
+        </div>
     );
 };
 
