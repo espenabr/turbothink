@@ -5,7 +5,7 @@ import IconFilter from "../icons/IconFilter";
 import SortDescendingIcon from "../icons/IconSortDescending";
 import IconSquares from "../icons/IconSquares";
 import IconX from "../icons/IconX";
-import { Tooltip } from 'react-tooltip'
+import { Tooltip } from "react-tooltip";
 
 type Props = {
     displayActions: boolean;
@@ -42,7 +42,12 @@ const ListHeaderIcons = ({
                     <a className="icon" onClick={onSort} data-tooltip-id="tooltip" data-tooltip-content="Sort">
                         <SortDescendingIcon />
                     </a>
-                    <a className="icon" onClick={onHighlight} data-tooltip-id="tooltip" data-tooltip-content="Highlight">
+                    <a
+                        className="icon"
+                        onClick={onHighlight}
+                        data-tooltip-id="tooltip"
+                        data-tooltip-content="Highlight"
+                    >
                         <IconEye />
                     </a>
                     <a className="icon" onClick={onFilter} data-tooltip-id="tooltip" data-tooltip-content="Filter">
