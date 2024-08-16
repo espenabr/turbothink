@@ -48,7 +48,7 @@ const ListInstructionInput = ({ openAiConfig, currentItems, action, onInput, onC
         const prompt = createPrompt(action, currentItems);
 
         setLoading(true);
-        const response = await tc.expectItems(prompt);
+        const response = await tc.expectItems(prompt, undefined, undefined, openAiConfig.reasoningStrategy);
         setLoading(false);
         if (response.outcome === "Success") {
             setSuggestions(response.value.map(withoutPrefix));

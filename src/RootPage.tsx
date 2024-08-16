@@ -16,7 +16,7 @@ import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useS
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import Tab from "./tabs/Tab";
 import Settings from "./Settings";
-import { GptModel } from "./tangible-gpt/model";
+import { GptModel, ReasoningStrategy } from "./tangible-gpt/model";
 
 const loadWorkspaces = (): WorkspaceHeader[] => {
     const workspaces = localStorage.getItem("workspaces");
@@ -60,6 +60,7 @@ const RootPage = () => {
     const [openAiKey, setOpenAiKey] = useState<string | null>(loadOpenAiKey());
     const [gptModel, setGptModel] = useState<GptModel>("gpt-4");
     const [blockHeight, setBlockHeight] = useState<BlockHeight>("Unlimited");
+    const [reasoningStrategy, setReasoningStrategy] = useState<ReasoningStrategy>("Simple");
 
     const [workspaceHeaders, setWorkspaceHeaders] = useState<WorkspaceHeader[]>(loadWorkspaces);
     const [currentWorkspace, setCurrentWorkspace] = useState<Workspace>({
@@ -209,6 +210,7 @@ const RootPage = () => {
     const openAiConfig: OpenAiConfig = {
         key: openAiKey || "",
         model: gptModel,
+        reasoningStrategy: reasoningStrategy,
     };
 
     return (
@@ -218,7 +220,9 @@ const RootPage = () => {
                     openAiKey={openAiKey || ""}
                     gptModel={gptModel}
                     blockHeight={blockHeight}
+                    reasoningStrategy={reasoningStrategy}
                     onUpdateBlockHeight={setBlockHeight}
+                    onUpdateReasoningStrategy={setReasoningStrategy}
                     onUpdateKey={(key) => onInputKey(key)}
                     onUpdateGptModel={setGptModel}
                 />

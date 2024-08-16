@@ -1,6 +1,6 @@
 import { Brand } from "./common";
 import { v4 as uuid } from "uuid";
-import { GptModel } from "./tangible-gpt/model";
+import { GptModel, ReasoningStrategy } from "./tangible-gpt/model";
 
 export type ListId = Brand<string, "ListId">;
 export type ListItemId = Brand<string, "ListItemId">;
@@ -49,6 +49,7 @@ export type Workspace = {
 export type OpenAiConfig = {
     key: string;
     model: GptModel;
+    reasoningStrategy: ReasoningStrategy;
 };
 
 export type BlockHeight = "Unlimited" | "Short" | "Medium" | "Tall";

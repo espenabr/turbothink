@@ -24,7 +24,7 @@ ${currentContent}
 
 Suggest 5 different ways that this text can be transformed (no language translation suggestions please)`;
         setLoading(true);
-        const response = await tc.expectItems(prompt);
+        const response = await tc.expectItems(prompt, undefined, undefined, openAiConfig.reasoningStrategy);
         setLoading(false);
         if (response.outcome === "Success") {
             setSuggestions(response.value);

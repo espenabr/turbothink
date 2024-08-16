@@ -122,6 +122,9 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
             const response = await tc.expectFiltered(
                 items.map((i) => i.text),
                 instruction,
+                undefined,
+                undefined,
+                openAiConfig.reasoningStrategy,
             );
             if (response.outcome === "Success") {
                 setSuggestedModification({
@@ -134,6 +137,9 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
             const response = await tc.expectFiltered(
                 items.map((i) => i.text),
                 instruction,
+                undefined,
+                undefined,
+                openAiConfig.reasoningStrategy,
             );
             if (response.outcome === "Success") {
                 setSuggestedModification({
@@ -146,6 +152,9 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
             const response = await tc.expectSorted(
                 items.map((i) => i.text),
                 instruction,
+                undefined,
+                undefined,
+                openAiConfig.reasoningStrategy,
             );
             if (response.outcome === "Success") {
                 const suggested: SuggestedListModification = {
@@ -160,6 +169,9 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
                 items.map((i) => i.text),
                 undefined,
                 instruction,
+                undefined,
+                undefined,
+                openAiConfig.reasoningStrategy,
             );
             if (response.outcome === "Success") {
                 setSuggestedModification({
@@ -207,7 +219,13 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
         const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
         if (list.items.length > 0) {
             setLoading(true);
-            const response = await tc.expectExtendedItems(list.items.map((i) => i.text));
+            const response = await tc.expectExtendedItems(
+                list.items.map((i) => i.text),
+                undefined,
+                undefined,
+                undefined,
+                openAiConfig.reasoningStrategy,
+            );
             setLoading(false);
             if (response.outcome === "Success") {
                 onUpdateItems(response.value.map((i) => ({ id: createListItemId(), text: i })));

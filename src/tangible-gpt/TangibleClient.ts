@@ -287,7 +287,7 @@ const parseTable = (columns: Column[], s: string): Table | null => {
 class TangibleClient {
     private gptApiClient: GptApiClient;
 
-    public constructor(openAiKey: string, model: GptModel) {
+    public constructor(openAiKey: string, model: GptModel = "gpt-4") {
         this.gptApiClient = new GptApiClient(openAiKey, model);
     }
 

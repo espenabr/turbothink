@@ -64,7 +64,7 @@ const CreateBlock = ({ openAiConfig, blocks, onCreateList, onCreateText }: Props
             blocks.filter((b) => selectedBlocks.includes(b.id)),
         );
         setLoading(true);
-        const response = await tc.expectItems(prompt);
+        const response = await tc.expectItems(prompt, undefined, undefined, openAiConfig.reasoningStrategy);
         setLoading(false);
         if (response.outcome === "Success") {
             onCreateList(

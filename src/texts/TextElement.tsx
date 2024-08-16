@@ -76,12 +76,17 @@ const TextElement = ({ openAiConfig, text, blockHeight, onUpdate, onDelete }: Pr
             const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
 
             setLoading(true);
-            const response = await tc.expectPlainText(`Given the following text:
+            const response = await tc.expectPlainText(
+                `Given the following text:
 ${text.content}
 ---end of text---
 
 Transform it given the following instruction: ${instruction}
-I only want the transformed text back, nothing else`);
+I only want the transformed text back, nothing else`,
+                undefined,
+                undefined,
+                openAiConfig.reasoningStrategy,
+            );
             if (response.outcome === "Success") {
                 setTransformedText({ instruction: instruction, newText: response.value });
             }
