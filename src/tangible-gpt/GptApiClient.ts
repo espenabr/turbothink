@@ -1,3 +1,5 @@
+import { GptModel } from "./model";
+
 type Role = "system" | "user" | "assistant" | "tool" | "function";
 
 type ToolCallFunction = {
@@ -92,9 +94,11 @@ export type CompletionResponse = {
 
 class GptApiClient {
     private openAiKey: string;
+    private model: GptModel;
 
-    constructor(openAiKey: string) {
+    constructor(openAiKey: string, model: GptModel) {
         this.openAiKey = openAiKey;
+        this.model = model;
     }
 
     public chatCompletion = (
@@ -102,7 +106,7 @@ class GptApiClient {
         tools: Tool[] | undefined = undefined,
     ): Promise<CompletionResponse> => {
         const body: CompletionRequest = {
-            model: "gpt-4",
+            model: this.model,
             messages: messages,
             tools: tools ?? null,
         };

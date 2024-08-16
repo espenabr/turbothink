@@ -12,6 +12,7 @@ import {
     Text,
     createTextId,
     TextId,
+    OpenAiConfig,
 } from "./model";
 import { ItemGroup } from "./tangible-gpt/model";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
@@ -36,12 +37,12 @@ type ClipboardWorkspace = {
 export type ClipboardItem = ClipboardList | ClipboardText | ClipboardWorkspace;
 
 type Props = {
-    openAiKey: string;
+    openAiConfig: OpenAiConfig;
     workspace: Workspace;
     onUpdateBlocks: (workspaceId: WorkspaceId, items: Block[]) => void;
 };
 
-const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks }: Props) => {
+const WorkspaceContainer = ({ openAiConfig, workspace: workspace, onUpdateBlocks }: Props) => {
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: { delay: 200, tolerance: 5 },
@@ -136,7 +137,7 @@ const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks }:
                         block.type === "List" ? (
                             <div className="grid-item" key={block.id}>
                                 <ListElement
-                                    openAiKey={openAiKey}
+                                    openAiConfig={openAiConfig}
                                     list={block}
                                     onGroup={onGroup}
                                     onDeleteList={onDeleteBlock}
@@ -147,7 +148,7 @@ const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks }:
                         ) : (
                             <div className="grid-item" key={block.id}>
                                 <TextElement
-                                    openAiKey={openAiKey}
+                                    openAiConfig={openAiConfig}
                                     text={block}
                                     onUpdate={onUpdateText}
                                     onDelete={onDeleteBlock}
@@ -160,7 +161,7 @@ const WorkspaceContainer = ({ openAiKey, workspace: workspace, onUpdateBlocks }:
             </DndContext>
 
             <CreateBlock
-                openAiKey={openAiKey}
+                openAiConfig={openAiConfig}
                 blocks={blocks}
                 onCreateList={onCreateList}
                 onCreateText={onCreateText}

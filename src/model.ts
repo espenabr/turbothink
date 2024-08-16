@@ -1,5 +1,6 @@
 import { Brand } from "./common";
 import { v4 as uuid } from "uuid";
+import { GptModel } from "./tangible-gpt/model";
 
 export type ListId = Brand<string, "ListId">;
 export type ListItemId = Brand<string, "ListItemId">;
@@ -41,4 +42,9 @@ export type Workspace = {
     id: WorkspaceId;
     name: string;
     blocks: Block[];
+};
+
+export type OpenAiConfig = {
+    key: string;
+    model: GptModel;
 };

@@ -1,11 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-import { createListId, createWorkspaceId, Workspace, WorkspaceHeader, WorkspaceId, Block, createTextId } from "./model";
+import {
+    createListId,
+    createWorkspaceId,
+    Workspace,
+    WorkspaceHeader,
+    WorkspaceId,
+    Block,
+    createTextId,
+    OpenAiConfig,
+} from "./model";
 import WorkspaceContainer, { ClipboardItem } from "./WorkspaceContainer";
 import IconPlus from "./icons/IconPlus";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import Tab from "./tabs/Tab";
 import Settings from "./Settings";
+import { GptModel } from "./tangible-gpt/model";
 
 const loadWorkspaces = (): WorkspaceHeader[] => {
     const workspaces = localStorage.getItem("workspaces");
@@ -47,6 +57,7 @@ const loadOpenAiKey = () => localStorage.getItem("openAiKey");
 
 const RootPage = () => {
     const [openAiKey, setOpenAiKey] = useState<string | null>(loadOpenAiKey());
+    const [gptModel, setGptModel] = useState<GptModel>("gpt-4");
 
     const [workspaceHeaders, setWorkspaceHeaders] = useState<WorkspaceHeader[]>(loadWorkspaces);
     const [currentWorkspace, setCurrentWorkspace] = useState<Workspace>({
@@ -193,10 +204,20 @@ const RootPage = () => {
         persistWorkspaceItems(workspace.id, workspace.blocks);
     };
 
+    const openAiConfig: OpenAiConfig = {
+        key: openAiKey || "",
+        model: gptModel,
+    };
+
     return (
         <div ref={containerRef}>
             <div className="header">
-                <Settings openAiKey={openAiKey || ""} onUpdateKey={(key) => onInputKey(key)} />
+                <Settings
+                    openAiKey={openAiKey || ""}
+                    gptModel={gptModel}
+                    onUpdateKey={(key) => onInputKey(key)}
+                    onUpdateGptModel={setGptModel}
+                />
             </div>
 
             <div className="tabs-container">
@@ -223,7 +244,7 @@ const RootPage = () => {
                 </div>
             </div>
             <WorkspaceContainer
-                openAiKey={openAiKey || ""}
+                openAiConfig={openAiConfig}
                 workspace={currentWorkspace}
                 onUpdateBlocks={onUpdateBlocks}
                 key={currentWorkspace.id}

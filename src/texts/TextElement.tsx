@@ -1,5 +1,5 @@
 import { CSSProperties, useState } from "react";
-import { Text, TextId } from "../model";
+import { OpenAiConfig, Text, TextId } from "../model";
 import EditTextContent from "./EditTextContent";
 import DisplayTextContent from "./DisplayTextContent";
 import { CSS } from "@dnd-kit/utilities";
@@ -17,13 +17,13 @@ type TransformedText = {
 export type Action = "transform";
 
 type Props = {
-    openAiKey: string;
+    openAiConfig: OpenAiConfig;
     text: Text;
     onUpdate: (updatedText: Text) => void;
     onDelete: (textId: TextId) => void;
 };
 
-const TextElement = ({ openAiKey, text, onUpdate, onDelete }: Props) => {
+const TextElement = ({ openAiConfig, text, onUpdate, onDelete }: Props) => {
     const [editContentMode, setEditContentMode] = useState<boolean>(false);
     const [transformedText, setTransformedText] = useState<TransformedText | null>(null);
     const [waitingForInput, setWaitingForInput] = useState<Action | null>(null);
@@ -57,7 +57,7 @@ const TextElement = ({ openAiKey, text, onUpdate, onDelete }: Props) => {
         console.log(waitingForInput);
 
         if (waitingForInput === "transform") {
-            const tc = new TangibleClient(openAiKey);
+            const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
 
             setLoading(true);
             const response = await tc.expectPlainText(`Given the following text:
@@ -84,7 +84,7 @@ I only want the transformed text back, nothing else`);
     return (
         <div className="text" style={style} ref={setNodeRef} {...attributes} {...listeners}>
             <TextHeader
-                openAiKey={openAiKey}
+                openAiConfig={openAiConfig}
                 text={text}
                 loading={loading}
                 waitingForInput={waitingForInput}

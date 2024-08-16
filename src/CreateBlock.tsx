@@ -1,6 +1,6 @@
 import { useState } from "react";
 import TangibleClient from "./tangible-gpt/TangibleClient";
-import { Block, List, ListId, Text, TextId } from "./model";
+import { Block, List, ListId, OpenAiConfig, Text, TextId } from "./model";
 import { withoutPrefix, withoutTrailingDot } from "./common";
 
 const describeContent = (block: Block) => {
@@ -45,20 +45,20 @@ ${instruction}`;
 };
 
 type Props = {
-    openAiKey: string;
+    openAiConfig: OpenAiConfig;
     blocks: Block[];
     onCreateList: (name: string, items: string[]) => void;
     onCreateText: (name: string, content: string) => void;
 };
 
-const CreateBlock = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) => {
+const CreateBlock = ({ openAiConfig, blocks, onCreateList, onCreateText }: Props) => {
     const [instruction, setInstruction] = useState<string>("");
 
     const [selectedBlocks, setSelectedBlocks] = useState<(TextId | ListId)[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
     const onCreateListInput = async (instruction: string) => {
-        const tc = new TangibleClient(openAiKey);
+        const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
         const prompt = createPrompt(
             instruction,
             blocks.filter((b) => selectedBlocks.includes(b.id)),
@@ -75,7 +75,7 @@ const CreateBlock = ({ openAiKey, blocks, onCreateList, onCreateText }: Props) =
     };
 
     const onCreateTextInput = async (instruction: string) => {
-        const tc = new TangibleClient(openAiKey);
+        const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
         const prompt = createPrompt(
             instruction,
             blocks.filter((b) => selectedBlocks.includes(b.id)),

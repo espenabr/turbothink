@@ -1,5 +1,7 @@
 import { Message } from "./GptApiClient.ts";
 
+export type GptModel = "gpt-4" | "gpt-4-turbo" | "gpt-4o" | "gpt-4o-mini" | "gpt-3.5" | "gpt-3.5-turbo";
+
 type IntegerParam = {
     type: "integer";
     name: string;

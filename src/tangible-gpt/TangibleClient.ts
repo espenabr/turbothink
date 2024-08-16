@@ -14,6 +14,7 @@ import {
     Column,
     EnumCell,
     FunctionCall,
+    GptModel,
     ItemGroup,
     JSONSerializable,
     NumberCell,
@@ -286,8 +287,8 @@ const parseTable = (columns: Column[], s: string): Table | null => {
 class TangibleClient {
     private gptApiClient: GptApiClient;
 
-    public constructor(openAiKey: string) {
-        this.gptApiClient = new GptApiClient(openAiKey);
+    public constructor(openAiKey: string, model: GptModel) {
+        this.gptApiClient = new GptApiClient(openAiKey, model);
     }
 
     public expectJson = <

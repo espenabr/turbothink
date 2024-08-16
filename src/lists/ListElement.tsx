@@ -4,7 +4,7 @@ import TangibleClient from "../tangible-gpt/TangibleClient";
 import AddListItem from "./AddListItem";
 import AcceptOrRejectSuggestion from "./AcceptOrRejectSuggestion";
 import { withoutTrailingDot } from "../common";
-import { createListItemId, List, ListId, ListItem, ListItemId } from "../model";
+import { createListItemId, List, ListId, ListItem, ListItemId, OpenAiConfig } from "../model";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -73,14 +73,14 @@ const toSortedListItems = (sortedItems: string[], oldItems: ListItem[]): ListIte
 };
 
 type Props = {
-    openAiKey: string;
+    openAiConfig: OpenAiConfig;
     list: List;
     onGroup: (groups: ItemGroup[]) => void;
     onDeleteList: (listId: ListId) => void;
     onUpdateList: (updatedList: List) => void;
 };
 
-const ListElement = ({ openAiKey, list, onGroup, onDeleteList, onUpdateList }: Props) => {
+const ListElement = ({ openAiConfig, list, onGroup, onDeleteList, onUpdateList }: Props) => {
     const [suggestedModification, setSuggestedModification] = useState<SuggestedListModification | null>(null);
     const [waitingForInput, setWaitingForInput] = useState<Action | null>(null);
 
@@ -100,7 +100,7 @@ const ListElement = ({ openAiKey, list, onGroup, onDeleteList, onUpdateList }: P
     };
 
     const onAction = async (instruction: string) => {
-        const tc = new TangibleClient(openAiKey);
+        const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
         const items = list.items;
 
         setLoading(true);
@@ -190,7 +190,7 @@ const ListElement = ({ openAiKey, list, onGroup, onDeleteList, onUpdateList }: P
     const onDelete = () => onDeleteList(list.id);
 
     const onExtendList = async () => {
-        const tc = new TangibleClient(openAiKey);
+        const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
         if (list.items.length > 0) {
             setLoading(true);
             const response = await tc.expectExtendedItems(list.items.map((i) => i.text));
@@ -289,11 +289,13 @@ const ListElement = ({ openAiKey, list, onGroup, onDeleteList, onUpdateList }: P
     return (
         <div style={style} ref={setNodeRef} {...attributes} {...listeners}>
             <ListHeader
-                openAiKey={openAiKey}
+                openAiConfig={openAiConfig}
                 list={list}
                 loading={loading}
+                waitingForInput={waitingForInput}
                 onRenameList={onRenameList}
                 onAction={onAction}
+                onWaitingForInput={(action) => setWaitingForInput(action)}
                 onCopyToClipboard={onCopyToClipboard}
                 onDelete={onDelete}
                 key={list.id}

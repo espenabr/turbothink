@@ -1,11 +1,11 @@
 import { useRef } from "react";
-import { Text } from "../model";
+import { OpenAiConfig, Text } from "../model";
 import TextHeaderContent from "./TextHeaderContent";
 import TextInstructionInput from "./TextInstructionInput";
 import { Action } from "./TextElement";
 
 type Props = {
-    openAiKey: string;
+    openAiConfig: OpenAiConfig;
     text: Text;
     loading: boolean;
     waitingForInput: Action | null;
@@ -18,7 +18,7 @@ type Props = {
 };
 
 const TextHeader = ({
-    openAiKey,
+    openAiConfig,
     text,
     loading,
     waitingForInput,
@@ -37,7 +37,7 @@ const TextHeader = ({
                 <div className="spinner" />
             ) : waitingForInput ? (
                 <TextInstructionInput
-                    openAiKey={openAiKey}
+                    openAiConfig={openAiConfig}
                     currentContent={text.content}
                     onInput={(instruction) => onAction(instruction)}
                     onCancel={onCancel}

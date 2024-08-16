@@ -1,14 +1,13 @@
 import { useState } from "react";
 import InputOpenAiKey from "./InputOpenAiKey";
-
-type GptModel = "gpt-4" | "gpt-4-turbo" | "gpt-4o" | "gpt-4o-mini" | "gpt-3.5" | "gpt-3.5-turbo";
+import { GptModel } from "./tangible-gpt/model";
 
 type ModelOption = {
     value: GptModel;
     label: string;
 };
 
-type BlockHeight = "Unlimited" | "Short" | "Medium" | "Tall";
+export type BlockHeight = "Unlimited" | "Short" | "Medium" | "Tall";
 
 type BlockHeightOption = {
     value: BlockHeight;
@@ -17,11 +16,12 @@ type BlockHeightOption = {
 
 type Props = {
     openAiKey: string;
+    gptModel: GptModel;
+    onUpdateGptModel: (model: GptModel) => void;
     onUpdateKey: (key: string) => void;
 };
 
-const Settings = ({ openAiKey, onUpdateKey }: Props) => {
-    const [selecteModel, setSelectedModel] = useState<GptModel>("gpt-4");
+const Settings = ({ openAiKey, gptModel, onUpdateKey, onUpdateGptModel }: Props) => {
     const [selectedBlockHeight, setSelectedBlockHeight] = useState<BlockHeight>("Unlimited");
 
     const validKey = (s: string) => s.length === 56 && s.substring(0, 3) === "sk-";
@@ -37,7 +37,7 @@ const Settings = ({ openAiKey, onUpdateKey }: Props) => {
 
     const onChangeModel = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const value = event.currentTarget.value as GptModel;
-        setSelectedModel(value);
+        onUpdateGptModel(value);
     };
 
     const onChangeBlockHeight = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -56,20 +56,20 @@ const Settings = ({ openAiKey, onUpdateKey }: Props) => {
         <div>
             {validKey(openAiKey) ? (
                 <>
-                    <span style={{ marginLeft: "10px" }}>
-                        Element height:&nbsp;
-                        <select value={selecteModel} onChange={onChangeModel}>
-                            {blockHeightOptions.map((o) => (
+                    <span style={{ marginLeft: "40px" }}>
+                        Model:&nbsp;
+                        <select value={gptModel} onChange={onChangeModel}>
+                            {modelOptions.map((o) => (
                                 <option key={o.value} value={o.value}>
                                     {o.label}
                                 </option>
                             ))}
                         </select>
                     </span>
-                    <span style={{ marginLeft: "40px" }}>
-                        Model:&nbsp;
+                    <span style={{ marginLeft: "10px", visibility: "hidden" }}>
+                        Element height:&nbsp;
                         <select value={selectedBlockHeight} onChange={onChangeBlockHeight}>
-                            {modelOptions.map((o) => (
+                            {blockHeightOptions.map((o) => (
                                 <option key={o.value} value={o.value}>
                                     {o.label}
                                 </option>

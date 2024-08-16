@@ -3,21 +3,22 @@ import TangibleClient from "../tangible-gpt/TangibleClient";
 import IconArrowBack from "../icons/IconArrowBack";
 import IconRefresh from "../icons/IconRefresh";
 import IconBubbleText from "../icons/IconBubbleText";
+import { OpenAiConfig } from "../model";
 
 type Props = {
-    openAiKey: string;
+    openAiConfig: OpenAiConfig;
     currentContent: string;
     onInput: (s: string) => void;
     onCancel: () => void;
 };
 
-const TextInstructionInput = ({ openAiKey, currentContent, onInput, onCancel }: Props) => {
+const TextInstructionInput = ({ openAiConfig, currentContent, onInput, onCancel }: Props) => {
     const [instruction, setInstruction] = useState<string>("");
     const [suggestions, setSuggestions] = useState<string[] | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
     const onSuggestOptions = async () => {
-        const tc = new TangibleClient(openAiKey);
+        const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
         const prompt = `Given the following text:
 ${currentContent}
 

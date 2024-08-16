@@ -1,4 +1,4 @@
-import { List } from "../model";
+import { List, OpenAiConfig } from "../model";
 import { useEffect, useRef, useState } from "react";
 import EditListName from "./EditListName";
 import ListInstructionInput from "./ListInsertuctionInput";
@@ -6,18 +6,29 @@ import ListHeaderIcons from "./ListHeaderIcons";
 import { Action } from "./ListElement";
 
 type Props = {
-    openAiKey: string;
+    openAiConfig: OpenAiConfig;
     list: List;
     loading: boolean;
+    waitingForInput: Action | null;
     onRenameList: (newName: string) => void;
     onAction: (instruction: string) => void;
+    onWaitingForInput: (action: Action | null) => void;
     onCopyToClipboard: () => void;
     onDelete: () => void;
 };
 
-const ListHeader = ({ openAiKey, list, loading, onRenameList, onAction, onCopyToClipboard, onDelete }: Props) => {
+const ListHeader = ({
+    openAiConfig,
+    list,
+    loading,
+    waitingForInput,
+    onRenameList,
+    onAction,
+    onWaitingForInput,
+    onCopyToClipboard,
+    onDelete,
+}: Props) => {
     const [editNameMode, setEditNameMode] = useState<boolean>(false);
-    const [waitingForInput, setWaitingForInput] = useState<Action | null>(null);
 
     const inputNameRef = useRef<HTMLInputElement>(null);
 
@@ -29,10 +40,10 @@ const ListHeader = ({ openAiKey, list, loading, onRenameList, onAction, onCopyTo
         }
     }, [editNameMode]);
 
-    const onClickHighlight = () => setWaitingForInput("highlight");
-    const onClickFilter = () => setWaitingForInput("filter");
-    const onClickSort = () => setWaitingForInput("sort");
-    const onClickGroup = () => setWaitingForInput("group");
+    const onClickHighlight = () => onWaitingForInput("highlight");
+    const onClickFilter = () => onWaitingForInput("filter");
+    const onClickSort = () => onWaitingForInput("sort");
+    const onClickGroup = () => onWaitingForInput("group");
 
     return (
         <div className="list-header">
@@ -52,8 +63,8 @@ const ListHeader = ({ openAiKey, list, loading, onRenameList, onAction, onCopyTo
                 <>
                     {waitingForInput !== null ? (
                         <ListInstructionInput
-                            openAiKey={openAiKey}
-                            onCancel={() => setWaitingForInput(null)}
+                            openAiConfig={openAiConfig}
+                            onCancel={() => onWaitingForInput(null)}
                             currentItems={list.items}
                             onInput={onAction}
                             action={waitingForInput}

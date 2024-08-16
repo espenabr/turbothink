@@ -2,13 +2,13 @@ import { useState } from "react";
 import TangibleClient from "../tangible-gpt/TangibleClient";
 import { withoutPrefix } from "../common";
 import { Action } from "./ListElement";
-import { ListItem } from "../model";
+import { ListItem, OpenAiConfig } from "../model";
 import IconArrowBack from "../icons/IconArrowBack";
 import IconRefresh from "../icons/IconRefresh";
 import IconBubbleText from "../icons/IconBubbleText";
 
 type Props = {
-    openAiKey: string;
+    openAiConfig: OpenAiConfig;
     currentItems: ListItem[];
     action: Action;
     onInput: (s: string) => void;
@@ -38,13 +38,13 @@ The intention is to get suggestions so it's easier for a person to figure out ho
     }
 };
 
-const ListInstructionInput = ({ openAiKey, currentItems, action, onInput, onCancel }: Props) => {
+const ListInstructionInput = ({ openAiConfig, currentItems, action, onInput, onCancel }: Props) => {
     const [content, setContent] = useState<string>("");
     const [suggestions, setSuggestions] = useState<string[] | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
     const onSuggestOptions = async () => {
-        const tc = new TangibleClient(openAiKey);
+        const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
         const prompt = createPrompt(action, currentItems);
 
         setLoading(true);
@@ -80,7 +80,7 @@ const ListInstructionInput = ({ openAiKey, currentItems, action, onInput, onCanc
                     </span>
                     <ul style={{ paddingTop: "10px" }}>
                         {suggestions.map((g) => (
-                            <li className="suggestion" onClick={() => onConfirmSuggestion(g)}>
+                            <li className="suggestion" onClick={() => onConfirmSuggestion(g)} key={g}>
                                 {g}
                             </li>
                         ))}
