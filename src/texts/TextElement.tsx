@@ -1,4 +1,4 @@
-import { CSSProperties, useState } from "react";
+import { CSSProperties, useEffect, useState, useRef } from "react";
 import { BlockHeight, OpenAiConfig, Text, TextId } from "../model";
 import EditTextContent from "./EditTextContent";
 import DisplayTextContent from "./DisplayTextContent";
@@ -46,6 +46,16 @@ const TextElement = ({ openAiConfig, text, blockHeight, onUpdate, onDelete }: Pr
     const [textContentInput, setTextContentInput] = useState<string>(text.content);
 
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: text.id });
+
+    const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+    // highlight name input on edit
+    useEffect(() => {
+        if (editContentMode && textAreaRef.current) {
+            textAreaRef.current.focus();
+            textAreaRef.current.select();
+        }
+    }, [editContentMode]);
 
     const style: CSSProperties = {
         transform: CSS.Translate.toString(transform),
@@ -123,6 +133,7 @@ I only want the transformed text back, nothing else`,
                         <EditTextContent
                             content={text.content}
                             textContentInput={textContentInput}
+                            textAreaRef={textAreaRef}
                             setTextContentInput={setTextContentInput}
                         />
                     ) : (
