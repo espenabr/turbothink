@@ -82,7 +82,7 @@ I only want the transformed text back, nothing else`);
     };
 
     return (
-        <div className="text" style={style} ref={setNodeRef} {...attributes} {...listeners}>
+        <div className="text block" style={style} ref={setNodeRef} {...attributes} {...listeners}>
             <TextHeader
                 openAiConfig={openAiConfig}
                 text={text}

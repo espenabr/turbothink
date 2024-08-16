@@ -8,6 +8,7 @@ import {
     Block,
     createTextId,
     OpenAiConfig,
+    BlockHeight,
 } from "./model";
 import WorkspaceContainer, { ClipboardItem } from "./WorkspaceContainer";
 import IconPlus from "./icons/IconPlus";
@@ -58,6 +59,7 @@ const loadOpenAiKey = () => localStorage.getItem("openAiKey");
 const RootPage = () => {
     const [openAiKey, setOpenAiKey] = useState<string | null>(loadOpenAiKey());
     const [gptModel, setGptModel] = useState<GptModel>("gpt-4");
+    const [blockHeight, setBlockHeight] = useState<BlockHeight>("Unlimited");
 
     const [workspaceHeaders, setWorkspaceHeaders] = useState<WorkspaceHeader[]>(loadWorkspaces);
     const [currentWorkspace, setCurrentWorkspace] = useState<Workspace>({
@@ -215,6 +217,8 @@ const RootPage = () => {
                 <Settings
                     openAiKey={openAiKey || ""}
                     gptModel={gptModel}
+                    blockHeight={blockHeight}
+                    onUpdateBlockHeight={setBlockHeight}
                     onUpdateKey={(key) => onInputKey(key)}
                     onUpdateGptModel={setGptModel}
                 />
@@ -246,6 +250,7 @@ const RootPage = () => {
             <WorkspaceContainer
                 openAiConfig={openAiConfig}
                 workspace={currentWorkspace}
+                blockHeight={blockHeight}
                 onUpdateBlocks={onUpdateBlocks}
                 key={currentWorkspace.id}
             />

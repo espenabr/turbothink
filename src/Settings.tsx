@@ -1,13 +1,11 @@
-import { useState } from "react";
 import InputOpenAiKey from "./InputOpenAiKey";
 import { GptModel } from "./tangible-gpt/model";
+import { BlockHeight } from "./model";
 
 type ModelOption = {
     value: GptModel;
     label: string;
 };
-
-export type BlockHeight = "Unlimited" | "Short" | "Medium" | "Tall";
 
 type BlockHeightOption = {
     value: BlockHeight;
@@ -17,13 +15,13 @@ type BlockHeightOption = {
 type Props = {
     openAiKey: string;
     gptModel: GptModel;
+    blockHeight: BlockHeight;
+    onUpdateBlockHeight: (blockHeight: BlockHeight) => void;
     onUpdateGptModel: (model: GptModel) => void;
     onUpdateKey: (key: string) => void;
 };
 
-const Settings = ({ openAiKey, gptModel, onUpdateKey, onUpdateGptModel }: Props) => {
-    const [selectedBlockHeight, setSelectedBlockHeight] = useState<BlockHeight>("Unlimited");
-
+const Settings = ({ openAiKey, gptModel, blockHeight, onUpdateKey, onUpdateGptModel, onUpdateBlockHeight }: Props) => {
     const validKey = (s: string) => s.length === 56 && s.substring(0, 3) === "sk-";
 
     const modelOptions: ModelOption[] = [
@@ -42,7 +40,7 @@ const Settings = ({ openAiKey, gptModel, onUpdateKey, onUpdateGptModel }: Props)
 
     const onChangeBlockHeight = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const value = event.currentTarget.value as BlockHeight;
-        setSelectedBlockHeight(value);
+        onUpdateBlockHeight(value);
     };
 
     const blockHeightOptions: BlockHeightOption[] = [
@@ -66,9 +64,9 @@ const Settings = ({ openAiKey, gptModel, onUpdateKey, onUpdateGptModel }: Props)
                             ))}
                         </select>
                     </span>
-                    <span style={{ marginLeft: "10px", visibility: "hidden" }}>
+                    <span style={{ marginLeft: "10px" }}>
                         Element height:&nbsp;
-                        <select value={selectedBlockHeight} onChange={onChangeBlockHeight}>
+                        <select value={blockHeight} onChange={onChangeBlockHeight}>
                             {blockHeightOptions.map((o) => (
                                 <option key={o.value} value={o.value}>
                                     {o.label}

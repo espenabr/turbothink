@@ -4,7 +4,7 @@ import TangibleClient from "../tangible-gpt/TangibleClient";
 import AddListItem from "./AddListItem";
 import AcceptOrRejectSuggestion from "./AcceptOrRejectSuggestion";
 import { withoutTrailingDot } from "../common";
-import { createListItemId, List, ListId, ListItem, ListItemId, OpenAiConfig } from "../model";
+import { BlockHeight, createListItemId, List, ListId, ListItem, ListItemId, OpenAiConfig } from "../model";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -72,15 +72,29 @@ const toSortedListItems = (sortedItems: string[], oldItems: ListItem[]): ListIte
     });
 };
 
+const itemsClass = (blockHeight: BlockHeight) => {
+    switch (blockHeight) {
+        case "Unlimited":
+            return "";
+        case "Short":
+            return "scrollable-list short-list";
+        case "Medium":
+            return "scrollable-list medium-list";
+        case "Tall":
+            return "scrollable-list tall-list";
+    }
+};
+
 type Props = {
     openAiConfig: OpenAiConfig;
     list: List;
+    blockHeight: BlockHeight;
     onGroup: (groups: ItemGroup[]) => void;
     onDeleteList: (listId: ListId) => void;
     onUpdateList: (updatedList: List) => void;
 };
 
-const ListElement = ({ openAiConfig, list, onGroup, onDeleteList, onUpdateList }: Props) => {
+const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, onUpdateList }: Props) => {
     const [suggestedModification, setSuggestedModification] = useState<SuggestedListModification | null>(null);
     const [waitingForInput, setWaitingForInput] = useState<Action | null>(null);
 
@@ -287,7 +301,7 @@ const ListElement = ({ openAiConfig, list, onGroup, onDeleteList, onUpdateList }
     };
 
     return (
-        <div style={style} ref={setNodeRef} {...attributes} {...listeners}>
+        <div className="block" style={style} ref={setNodeRef} {...attributes} {...listeners}>
             <ListHeader
                 openAiConfig={openAiConfig}
                 list={list}
@@ -301,38 +315,39 @@ const ListElement = ({ openAiConfig, list, onGroup, onDeleteList, onUpdateList }
                 key={list.id}
             />
 
-            <ul className="list">
-                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-                    <SortableContext items={list.items} strategy={verticalListSortingStrategy}>
-                        {list.items.map((item) => (
-                            <ListItemElement
-                                item={item}
-                                modification={itemModification(item)}
-                                onEdit={(newText) => onEditItemText(item.id, newText)}
-                                onDelete={onDeleteItem}
-                                key={item.id}
-                            />
-                        ))}
-                    </SortableContext>
-                </DndContext>
-
-                <li>
-                    {suggestedModification === null ? (
-                        <AddListItem onAdd={(newItemText) => onAddItem(newItemText)} onExtendList={onExtendList} />
-                    ) : (
-                        <AcceptOrRejectSuggestion
-                            onReject={onReject}
-                            onAccept={
-                                suggestedModification?.type === "filtered" ||
-                                suggestedModification?.type === "sorted" ||
-                                suggestedModification?.type === "grouped"
-                                    ? onAccept
-                                    : undefined
-                            }
-                        />
-                    )}
-                </li>
-            </ul>
+            <div className={itemsClass(blockHeight)}>
+                <ul className="list">
+                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+                        <SortableContext items={list.items} strategy={verticalListSortingStrategy}>
+                            {list.items.map((item) => (
+                                <ListItemElement
+                                    item={item}
+                                    modification={itemModification(item)}
+                                    onEdit={(newText) => onEditItemText(item.id, newText)}
+                                    onDelete={onDeleteItem}
+                                    key={item.id}
+                                />
+                            ))}
+                        </SortableContext>
+                    </DndContext>
+                </ul>
+            </div>
+            <div>
+                {suggestedModification === null ? (
+                    <AddListItem onAdd={(newItemText) => onAddItem(newItemText)} onExtendList={onExtendList} />
+                ) : (
+                    <AcceptOrRejectSuggestion
+                        onReject={onReject}
+                        onAccept={
+                            suggestedModification?.type === "filtered" ||
+                            suggestedModification?.type === "sorted" ||
+                            suggestedModification?.type === "grouped"
+                                ? onAccept
+                                : undefined
+                        }
+                    />
+                )}
+            </div>
         </div>
     );
 };

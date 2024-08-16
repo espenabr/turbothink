@@ -13,6 +13,7 @@ import {
     createTextId,
     TextId,
     OpenAiConfig,
+    BlockHeight,
 } from "./model";
 import { ItemGroup } from "./tangible-gpt/model";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
@@ -39,10 +40,11 @@ export type ClipboardItem = ClipboardList | ClipboardText | ClipboardWorkspace;
 type Props = {
     openAiConfig: OpenAiConfig;
     workspace: Workspace;
+    blockHeight: BlockHeight;
     onUpdateBlocks: (workspaceId: WorkspaceId, items: Block[]) => void;
 };
 
-const WorkspaceContainer = ({ openAiConfig, workspace: workspace, onUpdateBlocks }: Props) => {
+const WorkspaceContainer = ({ openAiConfig, workspace, blockHeight, onUpdateBlocks }: Props) => {
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: { delay: 200, tolerance: 5 },
@@ -139,6 +141,7 @@ const WorkspaceContainer = ({ openAiConfig, workspace: workspace, onUpdateBlocks
                                 <ListElement
                                     openAiConfig={openAiConfig}
                                     list={block}
+                                    blockHeight={blockHeight}
                                     onGroup={onGroup}
                                     onDeleteList={onDeleteBlock}
                                     onUpdateList={onUpdateList}

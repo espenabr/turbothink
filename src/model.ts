@@ -44,7 +44,11 @@ export type Workspace = {
     blocks: Block[];
 };
 
+/* Config */
+
 export type OpenAiConfig = {
     key: string;
     model: GptModel;
 };
+
+export type BlockHeight = "Unlimited" | "Short" | "Medium" | "Tall";
