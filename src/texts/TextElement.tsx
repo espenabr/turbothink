@@ -1,5 +1,5 @@
 import { CSSProperties, useState } from "react";
-import { OpenAiConfig, Text, TextId } from "../model";
+import { BlockHeight, OpenAiConfig, Text, TextId } from "../model";
 import EditTextContent from "./EditTextContent";
 import DisplayTextContent from "./DisplayTextContent";
 import { CSS } from "@dnd-kit/utilities";
@@ -8,6 +8,8 @@ import { ClipboardItem } from "../WorkspaceContainer";
 import TangibleClient from "../tangible-gpt/TangibleClient";
 import AcceptOrRejectSuggestion from "../lists/AcceptOrRejectSuggestion";
 import TextHeader from "./TextHeader";
+import IconCheck from "../icons/IconCheck";
+import IconX from "../icons/IconX";
 
 type TransformedText = {
     instruction: string;
@@ -16,18 +18,32 @@ type TransformedText = {
 
 export type Action = "transform";
 
+const textContentClass = (blockHeight: BlockHeight) => {
+    switch (blockHeight) {
+        case "Unlimited":
+        case "Medium":
+            return "text-content scrollable-block medium-block";
+        case "Short":
+            return "text-content scrollable-block short-block";
+        case "Tall":
+            return "text-content scrollable-block tall-block";
+    }
+};
+
 type Props = {
     openAiConfig: OpenAiConfig;
     text: Text;
+    blockHeight: BlockHeight;
     onUpdate: (updatedText: Text) => void;
     onDelete: (textId: TextId) => void;
 };
 
-const TextElement = ({ openAiConfig, text, onUpdate, onDelete }: Props) => {
+const TextElement = ({ openAiConfig, text, blockHeight, onUpdate, onDelete }: Props) => {
     const [editContentMode, setEditContentMode] = useState<boolean>(false);
     const [transformedText, setTransformedText] = useState<TransformedText | null>(null);
     const [waitingForInput, setWaitingForInput] = useState<Action | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
+    const [textContentInput, setTextContentInput] = useState<string>(text.content);
 
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: text.id });
 
@@ -36,9 +52,9 @@ const TextElement = ({ openAiConfig, text, onUpdate, onDelete }: Props) => {
         transition,
     };
 
-    const onUpdateContent = (content: string) => {
+    const onUpdateContent = () => {
         setEditContentMode(false);
-        onUpdate({ ...text, content: content });
+        onUpdate({ ...text, content: textContentInput });
     };
 
     const onRenameText = (newName: string) => onUpdate({ ...text, name: newName });
@@ -82,43 +98,57 @@ I only want the transformed text back, nothing else`);
     };
 
     return (
-        <div className="text block" style={style} ref={setNodeRef} {...attributes} {...listeners}>
-            <TextHeader
-                openAiConfig={openAiConfig}
-                text={text}
-                loading={loading}
-                waitingForInput={waitingForInput}
-                onAction={onAction}
-                onRename={onRenameText}
-                onCopyToClipboard={onCopyToClipboard}
-                onTransform={onTransform}
-                onDelete={() => onDelete(text.id)}
-                onCancel={() => setWaitingForInput(null)}
-            />
+        <>
+            <div className="text" style={style} ref={setNodeRef} {...attributes} {...listeners}>
+                <TextHeader
+                    openAiConfig={openAiConfig}
+                    text={text}
+                    loading={loading}
+                    waitingForInput={waitingForInput}
+                    onAction={onAction}
+                    onRename={onRenameText}
+                    onCopyToClipboard={onCopyToClipboard}
+                    onTransform={onTransform}
+                    onDelete={() => onDelete(text.id)}
+                    onCancel={() => setWaitingForInput(null)}
+                />
 
-            <div className="text-content">
-                {editContentMode ? (
-                    <EditTextContent
-                        content={text.content}
-                        onUpdate={onUpdateContent}
-                        onCancel={() => setEditContentMode(false)}
-                    />
-                ) : (
-                    <>
-                        <DisplayTextContent content={content} onEdit={onEditContent} />
-                        {transformedText !== null && (
-                            <AcceptOrRejectSuggestion
-                                onReject={() => setTransformedText(null)}
-                                onAccept={() => {
-                                    onUpdate({ ...text, content: transformedText.newText });
-                                    setTransformedText(null);
-                                }}
+                <div className={textContentClass(blockHeight)}>
+                    {editContentMode ? (
+                            <EditTextContent
+                                content={text.content}
+                                textContentInput={textContentInput}
+                                setTextContentInput={setTextContentInput}
                             />
-                        )}
-                    </>
-                )}
+                    ) : (
+                        <>
+                            <DisplayTextContent content={content} onEdit={onEditContent} />
+                            {transformedText !== null && (
+                                <AcceptOrRejectSuggestion
+                                    onReject={() => setTransformedText(null)}
+                                    onAccept={() => {
+                                        onUpdate({ ...text, content: transformedText.newText });
+                                        setTransformedText(null);
+                                    }}
+                                />
+                            )}
+                        </>
+                    )}
+                </div>
             </div>
-        </div>
+            {editContentMode && (
+                <div>
+                    <span style={{ cursor: "pointer" }}>
+                        <span onClick={() => onUpdateContent()}>
+                            <IconCheck />
+                        </span>
+                        <span onClick={() => setEditContentMode(false)}>
+                            <IconX />
+                        </span>
+                    </span>
+                </div>
+            )}
+        </>
     );
 };
 

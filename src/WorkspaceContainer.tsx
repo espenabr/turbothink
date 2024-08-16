@@ -153,6 +153,7 @@ const WorkspaceContainer = ({ openAiConfig, workspace, blockHeight, onUpdateBloc
                                 <TextElement
                                     openAiConfig={openAiConfig}
                                     text={block}
+                                    blockHeight={blockHeight}
                                     onUpdate={onUpdateText}
                                     onDelete={onDeleteBlock}
                                     key={block.id}

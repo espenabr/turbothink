@@ -1,35 +1,23 @@
-import { useState, ClipboardEvent } from "react";
-import IconCheck from "../icons/IconCheck";
-import IconX from "../icons/IconX";
+import { ClipboardEvent } from "react";
 import { pasteToInput } from "../common";
 
 type Props = {
     content: string;
-    onUpdate: (s: string) => void;
-    onCancel: () => void;
+    textContentInput: string;
+    setTextContentInput: (value: string) => void;
 };
 
-const EditTextContent = ({ content, onUpdate, onCancel }: Props) => {
-    const [value, setValue] = useState<string>(content);
-
-    const onPaste = (event: ClipboardEvent) => pasteToInput(event, value, setValue);
+const EditTextContent = ({ textContentInput, setTextContentInput }: Props) => {
+    const onPaste = (event: ClipboardEvent) => pasteToInput(event, textContentInput, setTextContentInput);
 
     return (
         <>
             <textarea
-                style={{ width: "100%", height: "91%" }}
-                value={value}
-                onChange={(e) => setValue(e.currentTarget.value)}
+                className="text-area"
+                value={textContentInput}
+                onChange={(e) => setTextContentInput(e.currentTarget.value)}
                 onPaste={onPaste}
             />
-            <span style={{ cursor: "pointer" }}>
-                <span onClick={() => onUpdate(value)}>
-                    <IconCheck />
-                </span>
-                <span onClick={() => onCancel()}>
-                    <IconX />
-                </span>
-            </span>
         </>
     );
 };

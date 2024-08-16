@@ -77,11 +77,11 @@ const itemsClass = (blockHeight: BlockHeight) => {
         case "Unlimited":
             return "";
         case "Short":
-            return "scrollable-list short-list";
+            return "scrollable-block short-block";
         case "Medium":
-            return "scrollable-list medium-list";
+            return "scrollable-block medium-block";
         case "Tall":
-            return "scrollable-list tall-list";
+            return "scrollable-block tall-block";
     }
 };
 
