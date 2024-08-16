@@ -18,15 +18,15 @@ type TransformedText = {
 
 export type Action = "transform";
 
-const textContentClass = (blockHeight: BlockHeight) => {
+const textContentClass = (blockHeight: BlockHeight, editContentMode: boolean) => {
     switch (blockHeight) {
         case "Unlimited":
         case "Medium":
-            return "text-content scrollable-block medium-block";
+            return editContentMode ? "medium-block" : "text-content scrollable-block medium-block";
         case "Short":
-            return "text-content scrollable-block short-block";
+            return editContentMode ? "medium-block" : "text-content scrollable-block short-block";
         case "Tall":
-            return "text-content scrollable-block tall-block";
+            return editContentMode ? "medium-block" : "text-content scrollable-block tall-block";
     }
 };
 
@@ -113,13 +113,13 @@ I only want the transformed text back, nothing else`);
                     onCancel={() => setWaitingForInput(null)}
                 />
 
-                <div className={textContentClass(blockHeight)}>
+                <div className={textContentClass(blockHeight, editContentMode)}>
                     {editContentMode ? (
-                            <EditTextContent
-                                content={text.content}
-                                textContentInput={textContentInput}
-                                setTextContentInput={setTextContentInput}
-                            />
+                        <EditTextContent
+                            content={text.content}
+                            textContentInput={textContentInput}
+                            setTextContentInput={setTextContentInput}
+                        />
                     ) : (
                         <>
                             <DisplayTextContent content={content} onEdit={onEditContent} />
