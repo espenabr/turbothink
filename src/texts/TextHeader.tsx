@@ -3,12 +3,14 @@ import { OpenAiConfig, Text } from "../model";
 import TextHeaderContent from "./TextHeaderContent";
 import TextInstructionInput from "./TextInstructionInput";
 import { Action } from "./TextElement";
+import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 
 type Props = {
     openAiConfig: OpenAiConfig;
     text: Text;
     loading: boolean;
     waitingForInput: Action | null;
+    listeners: SyntheticListenerMap | undefined;
     onAction: (instruction: string) => void;
     onRename: (newName: string) => void;
     onCopyToClipboard: () => void;
@@ -22,6 +24,7 @@ const TextHeader = ({
     text,
     loading,
     waitingForInput,
+    listeners,
     onAction,
     onRename,
     onCopyToClipboard,
@@ -32,7 +35,7 @@ const TextHeader = ({
     const inputNameRef = useRef<HTMLInputElement>(null);
 
     return (
-        <div className="text-header">
+        <div className="text-header" {...listeners}>
             {loading ? (
                 <div className="spinner" />
             ) : waitingForInput ? (

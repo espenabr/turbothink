@@ -114,12 +114,13 @@ I only want the transformed text back, nothing else`,
 
     return (
         <div className="block">
-            <div className="text" style={style} ref={setNodeRef} {...attributes} {...listeners}>
+            <div className="text" style={style} ref={setNodeRef} {...attributes}>
                 <TextHeader
                     openAiConfig={openAiConfig}
                     text={text}
                     loading={loading}
                     waitingForInput={waitingForInput}
+                    listeners={listeners}
                     onAction={onAction}
                     onRename={onRenameText}
                     onCopyToClipboard={onCopyToClipboard}
