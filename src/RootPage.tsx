@@ -6,6 +6,7 @@ import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useS
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import Tab from "./tabs/Tab";
 import InputOpenAiKey from "./InputOpenAiKey";
+import Settings from "./Settings";
 
 const loadWorkspaces = (): WorkspaceHeader[] => {
     const workspaces = localStorage.getItem("workspaces");
@@ -193,10 +194,19 @@ const RootPage = () => {
         persistWorkspaceItems(workspace.id, workspace.blocks);
     };
 
-    return openAiKey === null ? (
-        <InputOpenAiKey currentKey={openAiKey || ""} onInput={onInputKey} />
-    ) : (
+    /*
+        openAiKey: string;
+    onUpdateKey: (key: string) => void;
+
+    */
+
+    return (
         <div ref={containerRef}>
+
+            <div className="header">
+                <Settings openAiKey={openAiKey || ""} onUpdateKey={key => setOpenAiKey(key)} />
+            </div>
+
             <div className="tabs-container">
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
                     <SortableContext items={workspaceHeaders} strategy={horizontalListSortingStrategy}>
@@ -221,16 +231,13 @@ const RootPage = () => {
                 </div>
             </div>
             <WorkspaceContainer
-                openAiKey={openAiKey}
+                openAiKey={openAiKey || ""}
                 workspace={currentWorkspace}
                 onUpdateBlocks={onUpdateBlocks}
                 key={currentWorkspace.id}
             />
-
-            <button style={{ marginTop: "100px" }} onClick={() => setOpenAiKey(null)}>
-                Change OpenAI key
-            </button>
         </div>
+
     );
 };
 

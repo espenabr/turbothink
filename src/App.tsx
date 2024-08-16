@@ -3,9 +3,7 @@ import RootPage from "./RootPage";
 
 function App() {
     return (
-        <div>
-            <RootPage />
-        </div>
+        <RootPage />
     );
 }
 

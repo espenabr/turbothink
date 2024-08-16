@@ -30,3 +30,5 @@ export const pasteToInput = (event: ClipboardEvent, value: string, set: (value: 
         set(value.slice(0, start) + pasted + value.slice(end));
     }
 };
+
+export const validKey = (s: string) => s.length === 56 && s.substring(0, 3) === "sk-";

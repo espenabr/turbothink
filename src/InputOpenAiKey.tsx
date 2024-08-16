@@ -1,4 +1,5 @@
-import { useState, KeyboardEvent } from "react";
+import { useState, KeyboardEvent, ClipboardEvent } from "react";
+import { pasteToInput, validKey } from "./common";
 
 type Props = {
     currentKey: string;
@@ -8,7 +9,8 @@ type Props = {
 const InputOpenAiKey = ({ currentKey, onInput }: Props) => {
     const [keyInput, setKeyInput] = useState<string>(currentKey);
 
-    const validKey = (s: string) => s.length === 56 && s.substring(0, 3) === "sk-";
+    // This is quite ugly, but I wasn't able to override paste with default behaviour :-(
+    const onPaste = (event: ClipboardEvent) => pasteToInput(event, keyInput, setKeyInput);
 
     const onInputKey = () => {
         if (validKey(keyInput)) {
@@ -27,9 +29,12 @@ const InputOpenAiKey = ({ currentKey, onInput }: Props) => {
             <div style={{ paddingBottom: "20px" }}>
                 Your OpenAI key and all your data is only stored locally in your browser and not shared with anyone!
             </div>
-            <div>OpenAI key</div>
 
-            <input value={keyInput} onKeyUp={onEdit} onChange={(e) => setKeyInput(e.currentTarget.value)} />
+            <input value={keyInput}
+                onKeyUp={onEdit}
+                onChange={(e) => setKeyInput(e.currentTarget.value)}
+                placeholder="OpenAI key"
+                onPaste={onPaste} />
             <button onClick={onInputKey}>OK</button>
             {keyInput.length > 0 && !validKey(keyInput) && <span style={{ color: "red" }}>Invalid key!</span>}
         </div>
