@@ -1,6 +1,7 @@
 import { useState } from "react";
 import IconClipboard from "../icons/IconClipboard";
 import IconX from "../icons/IconX";
+import { Tooltip } from "react-tooltip";
 
 type Props = {
     workspaceName: string;
@@ -22,22 +23,27 @@ const TabContent = ({ workspaceName, canBeDeleted, active, onEnableEdit, onCopyT
 
     return (
         <div className="tab-item">
-            <span onClick={onEnableEdit} style={{ cursor: "pointer" }}>
+            <Tooltip place="top" id="tooltip" />
+            <a onClick={onEnableEdit} style={{ cursor: "pointer" }}>
                 {active ? <strong>{workspaceName}</strong> : workspaceName}
-            </span>
+            </a>
             <span className="tab-icons" style={{ paddingLeft: "10px" }}>
-                <span
+                <a
                     style={{ cursor: "pointer", color: "#424242" }}
                     onClick={onCopy}
-                    title="Copy workspace to clipboard"
+                    data-tooltip-id="tooltip"
+                    data-tooltip-content="Copy workspace to clipboard"
                 >
                     <IconClipboard />
-                </span>
+                </a>
                 {copied && <div className="copied">Copied!</div>}
                 {canBeDeleted && (
-                    <span style={{ cursor: "pointer", color: "#424242" }} onClick={() => onDelete()} title="Delete">
+                    <a style={{ cursor: "pointer", color: "#424242" }} 
+                    onClick={() => onDelete()} 
+                    data-tooltip-id="tooltip"
+                    data-tooltip-content="Close">
                         <IconX />
-                    </span>
+                    </a>
                 )}
             </span>
         </div>

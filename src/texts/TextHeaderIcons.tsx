@@ -2,6 +2,7 @@ import { useState } from "react";
 import IconX from "../icons/IconX";
 import IconClipboard from "../icons/IconClipboard";
 import IconStatusChange from "../icons/IconStatusChange";
+import { Tooltip } from "react-tooltip";
 
 type Props = {
     onTransform: () => void;
@@ -20,16 +21,17 @@ const TextHeaderIcons = ({ onTransform, onDelete, onCopyToClipboard }: Props) =>
 
     return (
         <div className="icons">
-            <span className="icon" onClick={onTransform} title="Transform text">
+            <Tooltip place="top" id="tooltip" />
+            <a className="icon" onClick={onTransform} data-tooltip-id="tooltip" data-tooltip-content="Transform text">
                 <IconStatusChange />
-            </span>
-            <span className="icon" onClick={onCopy} title="Copy to clipboard">
+            </a>
+            <a className="icon" onClick={onCopy} data-tooltip-id="tooltip" data-tooltip-content="Copy to clipboard">
                 <IconClipboard />
-            </span>
+            </a>
             {copied && <div className="copied">Copied!</div>}
-            <span className="icon" onClick={onDelete}>
+            <a className="icon" onClick={onDelete} data-tooltip-id="tooltip" data-tooltip-content="Close">
                 <IconX />
-            </span>
+            </a>
         </div>
     );
 };

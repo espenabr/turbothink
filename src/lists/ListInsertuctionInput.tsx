@@ -28,7 +28,7 @@ The intention is to get suggestions so it's easier for a person to figure out ho
         case "filter":
             return `Given the following items: ${itemsDescription}
         
-            What are the most obvious criterias for highlighting certain items? For example in a list of products, a criteria could be "very expensive"`;
+            What are the 5 most obvious criterias for highlighting certain items? For example in a list of products, a criteria could be "very expensive"`;
         case "group":
             return `Given the following items: ${items.map((i) => i.text).join(", ")}
 

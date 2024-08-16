@@ -5,6 +5,7 @@ import IconFilter from "../icons/IconFilter";
 import SortDescendingIcon from "../icons/IconSortDescending";
 import IconSquares from "../icons/IconSquares";
 import IconX from "../icons/IconX";
+import { Tooltip } from 'react-tooltip'
 
 type Props = {
     displayActions: boolean;
@@ -35,29 +36,30 @@ const ListHeaderIcons = ({
 
     return (
         <div className="icons">
+            <Tooltip place="top" id="tooltip" />
             {displayActions && (
                 <>
-                    <span className="icon" onClick={onSort} title="Sort">
+                    <a className="icon" onClick={onSort} data-tooltip-id="tooltip" data-tooltip-content="Sort">
                         <SortDescendingIcon />
-                    </span>
-                    <span className="icon" onClick={onHighlight} title="Highlight">
+                    </a>
+                    <a className="icon" onClick={onHighlight} data-tooltip-id="tooltip" data-tooltip-content="Highlight">
                         <IconEye />
-                    </span>
-                    <span className="icon" onClick={onFilter} title="Filter">
+                    </a>
+                    <a className="icon" onClick={onFilter} data-tooltip-id="tooltip" data-tooltip-content="Filter">
                         <IconFilter />
-                    </span>
-                    <span className="icon" onClick={onGroup} title="Group">
+                    </a>
+                    <a className="icon" onClick={onGroup} data-tooltip-id="tooltip" data-tooltip-content="Group">
                         <IconSquares />
-                    </span>
+                    </a>
                 </>
             )}
-            <span className="icon" onClick={onCopy} title="Copy to clipboard">
+            <a className="icon" onClick={onCopy} data-tooltip-id="tooltip" data-tooltip-content="Copy to clipboard">
                 <IconClipboard />
-            </span>
+            </a>
             {copied && <div className="copied">Copied!</div>}
-            <span className="icon" onClick={onDelete} title="Delete">
+            <a className="icon" onClick={onDelete} data-tooltip-id="tooltip" data-tooltip-content="Close">
                 <IconX />
-            </span>
+            </a>
         </div>
     );
 };
