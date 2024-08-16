@@ -5,7 +5,6 @@ import IconPlus from "./icons/IconPlus";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import Tab from "./tabs/Tab";
-import InputOpenAiKey from "./InputOpenAiKey";
 import Settings from "./Settings";
 
 const loadWorkspaces = (): WorkspaceHeader[] => {
@@ -194,17 +193,10 @@ const RootPage = () => {
         persistWorkspaceItems(workspace.id, workspace.blocks);
     };
 
-    /*
-        openAiKey: string;
-    onUpdateKey: (key: string) => void;
-
-    */
-
     return (
         <div ref={containerRef}>
-
             <div className="header">
-                <Settings openAiKey={openAiKey || ""} onUpdateKey={key => setOpenAiKey(key)} />
+                <Settings openAiKey={openAiKey || ""} onUpdateKey={(key) => onInputKey(key)} />
             </div>
 
             <div className="tabs-container">
@@ -237,7 +229,6 @@ const RootPage = () => {
                 key={currentWorkspace.id}
             />
         </div>
-
     );
 };
 
