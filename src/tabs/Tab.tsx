@@ -66,6 +66,7 @@ const Tab = ({ workspace, active, canBeDeleted, onDelete, onChangeTab, onRename,
                 <TabContent
                     workspaceName={workspace.name}
                     canBeDeleted={canBeDeleted}
+                    active={active}
                     onEnableEdit={onEnableEdit}
                     onDelete={onDelete}
                     onCopyToClipboard={onCopyToClipboard}

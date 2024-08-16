@@ -2,5 +2,5 @@ body {
     font-family: "Arial", sans-serif;
     display: flex;
     flex-direction: column;
-    background-color: rgb(236, 236, 250);
+    background-color: white;
 }

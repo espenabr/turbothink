@@ -7,6 +7,7 @@ import IconSquares from "../icons/IconSquares";
 import IconX from "../icons/IconX";
 
 type Props = {
+    displayActions: boolean;
     onSort: () => void;
     onHighlight: () => void;
     onFilter: () => void;
@@ -16,10 +17,11 @@ type Props = {
 };
 
 const ListHeaderIcons = ({
-    onSort: onClickSort,
-    onHighlight: onClickHighlight,
-    onFilter: onClickFilter,
-    onGroup: onClickGroup,
+    displayActions,
+    onSort,
+    onHighlight,
+    onFilter,
+    onGroup,
     onCopyToClipboard,
     onDelete,
 }: Props) => {
@@ -33,18 +35,22 @@ const ListHeaderIcons = ({
 
     return (
         <div className="icons">
-            <span className="icon" onClick={onClickSort} title="Sort">
-                <SortDescendingIcon />
-            </span>
-            <span className="icon" onClick={onClickHighlight} title="Highlight">
-                <IconEye />
-            </span>
-            <span className="icon" onClick={onClickFilter} title="Filter">
-                <IconFilter />
-            </span>
-            <span className="icon" onClick={onClickGroup} title="Group">
-                <IconSquares />
-            </span>
+            {displayActions && (
+                <>
+                    <span className="icon" onClick={onSort} title="Sort">
+                        <SortDescendingIcon />
+                    </span>
+                    <span className="icon" onClick={onHighlight} title="Highlight">
+                        <IconEye />
+                    </span>
+                    <span className="icon" onClick={onFilter} title="Filter">
+                        <IconFilter />
+                    </span>
+                    <span className="icon" onClick={onGroup} title="Group">
+                        <IconSquares />
+                    </span>
+                </>
+            )}
             <span className="icon" onClick={onCopy} title="Copy to clipboard">
                 <IconClipboard />
             </span>

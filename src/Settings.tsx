@@ -83,7 +83,7 @@ const Settings = ({
     return (
         <div>
             {validKey(openAiKey) ? (
-                <div style={{ textAlign: "right"}}>
+                <div style={{ textAlign: "right" }}>
                     <span className="settings-element">
                         Model:&nbsp;
                         <select value={gptModel} onChange={onChangeModel}>

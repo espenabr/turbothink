@@ -3,6 +3,7 @@
 .grid-container {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
+    background-color: rgb(236, 236, 250);
 }
 
 .grid-item {
@@ -17,7 +18,7 @@
 
 .text-area {
     flex: 1;
-    width: 100%; /* Full width of the div */
+    width: 100%;
     height: 100%;
     min-height: 300px;
     box-sizing: border-box;
@@ -48,7 +49,7 @@
 /* blocks */
 
 .block {
-    margin-bottom: 20px;
+    margin-top: 20px;
 }
 
 .scrollable-block {
@@ -184,12 +185,7 @@
     display: flex;
     justify-content: space-around;
     padding: 10px;
-}
-
-.tab-content {
-    display: flex;
-    position: relative;
-    padding: 10px 40px 10px 10px;
+    padding-bottom: 0px;
 }
 
 .tab {
@@ -197,13 +193,18 @@
     padding: 10px;
     text-align: center;
     cursor: pointer;
+    border-bottom: #c2c1c1 solid 1px;
 }
 
 .active-tab {
     flex: 1;
     padding: 10px;
-    border-bottom: rgb(65, 22, 22) solid 2px;
+    border-top: #c2c1c1 solid 1px;
+    border-left: #c2c1c1 solid 1px;
+    border-right: #c2c1c1 solid 1px;
     text-align: center;
+    background-color: rgb(236, 236, 250);
+    font-weight: bold;
 }
 
 .tab .tab-icons {
@@ -240,8 +241,8 @@
 
 .header {
     background-color: rgb(238, 238, 238);
-    border-top: solid lightgray 2px;
-    border-bottom: solid lightgray 2px;
+    border-top: #c2c1c1 solid 1px;
+    border-bottom: #c2c1c1 solid 1px;
     padding-top: 8px;
     padding-bottom: 8px;
     padding-left: 10px;

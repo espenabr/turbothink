@@ -5,12 +5,13 @@ import IconX from "../icons/IconX";
 type Props = {
     workspaceName: string;
     canBeDeleted: boolean;
+    active: boolean;
     onEnableEdit: () => void;
     onCopyToClipboard: () => void;
     onDelete: () => void;
 };
 
-const TabContent = ({ workspaceName, canBeDeleted, onEnableEdit, onCopyToClipboard, onDelete }: Props) => {
+const TabContent = ({ workspaceName, canBeDeleted, active, onEnableEdit, onCopyToClipboard, onDelete }: Props) => {
     const [copied, setCopied] = useState<boolean>(false);
 
     const onCopy = () => {
@@ -22,7 +23,7 @@ const TabContent = ({ workspaceName, canBeDeleted, onEnableEdit, onCopyToClipboa
     return (
         <div className="tab-item">
             <span onClick={onEnableEdit} style={{ cursor: "pointer" }}>
-                {workspaceName}
+                {active ? <strong>{workspaceName}</strong> : workspaceName}
             </span>
             <span className="tab-icons" style={{ paddingLeft: "10px" }}>
                 <span

@@ -109,6 +109,8 @@ const CreateBlock = ({ openAiConfig, blocks, onCreateList, onCreateText }: Props
         setInstruction("");
     };
 
+    const allowIncludeContext = blocks.length > 0;
+
     return (
         <div className="create-list">
             {loading ? (
@@ -179,25 +181,27 @@ const CreateBlock = ({ openAiConfig, blocks, onCreateList, onCreateText }: Props
                         </button>
                     </div>
 
-                    <div style={{ paddingLeft: "20px", paddingBottom: "20px" }}>
-                        {blocks.length > 0 && (
-                            <div style={{ paddingBottom: "5px", fontWeight: "bold" }}>Context (optional)</div>
-                        )}
-                        {blocks.map((block) => (
-                            <div key={block.id}>
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        style={{ paddingRight: "10px" }}
-                                        name={block.name}
-                                        value={checkboxValue(block.id)}
-                                        onClick={() => onClickCheckbox(block.id)}
-                                    />
-                                    {block.name}
-                                </label>
-                            </div>
-                        ))}
-                    </div>
+                    {allowIncludeContext && (
+                        <div style={{ paddingLeft: "20px", paddingBottom: "20px" }}>
+                            {blocks.length > 0 && (
+                                <div style={{ paddingBottom: "5px", fontWeight: "bold" }}>Based on...</div>
+                            )}
+                            {blocks.map((block) => (
+                                <div key={block.id}>
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            style={{ paddingRight: "10px" }}
+                                            name={block.name}
+                                            value={checkboxValue(block.id)}
+                                            onClick={() => onClickCheckbox(block.id)}
+                                        />
+                                        {block.name}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </>
             )}
         </div>

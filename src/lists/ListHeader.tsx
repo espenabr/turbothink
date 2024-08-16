@@ -45,6 +45,8 @@ const ListHeader = ({
     const onClickSort = () => onWaitingForInput("sort");
     const onClickGroup = () => onWaitingForInput("group");
 
+    const displayActions = list.items.length > 1;
+
     return (
         <div className="list-header">
             {loading ? (
@@ -75,6 +77,7 @@ const ListHeader = ({
                                 <strong>{list.name}</strong>
                             </span>
                             <ListHeaderIcons
+                                displayActions={displayActions}
                                 onSort={onClickSort}
                                 onHighlight={onClickHighlight}
                                 onFilter={onClickFilter}
