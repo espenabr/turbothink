@@ -1,6 +1,7 @@
 import InputOpenAiKey from "./InputOpenAiKey";
 import { GptModel } from "./tangible-gpt/model";
 import { BlockHeight } from "./model";
+import IconBrandGithub from "./icons/IconBrandGithub";
 
 type ModelOption = {
     value: GptModel;
@@ -50,6 +51,8 @@ const Settings = ({ openAiKey, gptModel, blockHeight, onUpdateKey, onUpdateGptMo
         { value: "Tall", label: "Tall" },
     ];
 
+    const onOpenGithubRepo = () => window.open("https://github.com/espenabr/turbothink", "_blank");
+
     return (
         <div>
             {validKey(openAiKey) ? (
@@ -78,6 +81,10 @@ const Settings = ({ openAiKey, gptModel, blockHeight, onUpdateKey, onUpdateGptMo
             ) : (
                 <InputOpenAiKey currentKey={openAiKey} onInput={onUpdateKey} />
             )}
+            <span className="github-reference" onClick={onOpenGithubRepo}>
+                <IconBrandGithub />
+                <span style={{ marginLeft: "5px" }}>Github</span>
+            </span>
         </div>
     );
 };

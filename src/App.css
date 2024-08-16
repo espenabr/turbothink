@@ -246,3 +246,11 @@
     padding-bottom: 8px;
     padding-left: 10px;
 }
+
+.github-reference {
+    margin-left: 40px;
+    cursor: pointer;
+    opacity: 80%;
+    color: rgb(70, 70, 95);
+    text-decoration: underline;
+}
