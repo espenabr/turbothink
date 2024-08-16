@@ -253,8 +253,9 @@
     opacity: 80%;
     color: rgb(70, 70, 95);
     text-decoration: underline;
+    margin-right: 20px;
 }
 
 .settings-element {
-    margin-left: 40px;
+    margin-left: 25px;
 }

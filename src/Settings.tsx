@@ -83,7 +83,7 @@ const Settings = ({
     return (
         <div>
             {validKey(openAiKey) ? (
-                <>
+                <div style={{ textAlign: "right"}}>
                     <span className="settings-element">
                         Model:&nbsp;
                         <select value={gptModel} onChange={onChangeModel}>
@@ -95,7 +95,7 @@ const Settings = ({
                         </select>
                     </span>
                     <span className="settings-element">
-                        Element height:&nbsp;
+                        Height&nbsp;
                         <select value={blockHeight} onChange={onChangeBlockHeight}>
                             {blockHeightOptions.map((o) => (
                                 <option key={o.value} value={o.value}>
@@ -106,7 +106,7 @@ const Settings = ({
                     </span>
 
                     <span className="settings-element">
-                        Reasoning strategy:&nbsp;
+                        Reasoning&nbsp;
                         <select value={reasoningStrategy} onChange={onChangeReasoningStrategy}>
                             {reasoningStrategyOptions.map((o) => (
                                 <option key={o.value} value={o.value}>
@@ -115,14 +115,15 @@ const Settings = ({
                             ))}
                         </select>
                     </span>
-                </>
+
+                    <span className="settings-element github-reference" onClick={onOpenGithubRepo}>
+                        <IconBrandGithub />
+                        <span style={{ marginLeft: "5px" }}>Github</span>
+                    </span>
+                </div>
             ) : (
                 <InputOpenAiKey currentKey={openAiKey} onInput={onUpdateKey} />
             )}
-            <span className="settings-element github-reference" onClick={onOpenGithubRepo}>
-                <IconBrandGithub />
-                <span style={{ marginLeft: "5px" }}>Github</span>
-            </span>
         </div>
     );
 };
