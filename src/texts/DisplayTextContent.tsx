@@ -17,9 +17,11 @@ const withLineBreaks = (s: string) => (
 );
 
 const DisplayTextContent = ({ content, onEdit }: Props) => {
+    const empty = content.length === 0;
+
     return (
         <div onClick={onEdit} className="text-display">
-            {withLineBreaks(content)}
+            {empty ? <span style={{ fontStyle: "italic" }}>Click to edit</span> : withLineBreaks(content)}
         </div>
     );
 };

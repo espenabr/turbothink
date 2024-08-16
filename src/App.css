@@ -4,6 +4,7 @@
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     background-color: rgb(236, 236, 250);
+    padding-bottom: 1000px;
 }
 
 .grid-item {
