@@ -319,12 +319,13 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
     };
 
     return (
-        <div className="block" style={style} ref={setNodeRef} {...attributes} {...listeners}>
+        <div className="block" style={style} ref={setNodeRef} {...attributes}>
             <ListHeader
                 openAiConfig={openAiConfig}
                 list={list}
                 loading={loading}
                 waitingForInput={waitingForInput}
+                listeners={listeners}
                 onRenameList={onRenameList}
                 onAction={onAction}
                 onWaitingForInput={(action) => setWaitingForInput(action)}

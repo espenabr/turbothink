@@ -4,12 +4,14 @@ import EditListName from "./EditListName";
 import ListInstructionInput from "./ListInsertuctionInput";
 import ListHeaderIcons from "./ListHeaderIcons";
 import { Action } from "./ListElement";
+import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 
 type Props = {
     openAiConfig: OpenAiConfig;
     list: List;
     loading: boolean;
     waitingForInput: Action | null;
+    listeners: SyntheticListenerMap | undefined;
     onRenameList: (newName: string) => void;
     onAction: (instruction: string) => void;
     onWaitingForInput: (action: Action | null) => void;
@@ -22,6 +24,7 @@ const ListHeader = ({
     list,
     loading,
     waitingForInput,
+    listeners,
     onRenameList,
     onAction,
     onWaitingForInput,
@@ -48,7 +51,7 @@ const ListHeader = ({
     const displayActions = list.items.length > 1;
 
     return (
-        <div className="list-header">
+        <div className="list-header" {...listeners}>
             {loading ? (
                 <div className="spinner" />
             ) : editNameMode ? (
