@@ -11,17 +11,11 @@ const AcceptOrRejectSuggestion = ({ onReject, onAccept }: Props) => (
     <span style={{ cursor: "pointer" }}>
         <Tooltip id="tooltip" />
         {onAccept !== undefined && (
-            <a className="icon"
-                onClick={onAccept}
-                data-tooltip-id="tooltip"
-                data-tooltip-content="Accept">
+            <a className="icon" onClick={onAccept} data-tooltip-id="tooltip" data-tooltip-content="Accept">
                 <IconCheck />
             </a>
         )}
-        <a className="icon"
-            onClick={() => onReject()}
-            data-tooltip-id="tooltip"
-            data-tooltip-content="Reject">
+        <a className="icon" onClick={() => onReject()} data-tooltip-id="tooltip" data-tooltip-content="Reject">
             <IconArrowBack />
         </a>
     </span>
