@@ -1,3 +1,4 @@
 node_modules/
 website_to_clipboard/venv/
 dist/
+dist/index.html
