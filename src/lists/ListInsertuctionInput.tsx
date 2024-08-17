@@ -6,6 +6,7 @@ import { ListItem, OpenAiConfig } from "../model";
 import IconArrowBack from "../icons/IconArrowBack";
 import IconRefresh from "../icons/IconRefresh";
 import IconBubbleText from "../icons/IconBubbleText";
+import { Tooltip } from "react-tooltip";
 
 type Props = {
     openAiConfig: OpenAiConfig;
@@ -35,6 +36,19 @@ The intention is to get suggestions so it's easier for a person to figure out ho
             What are the 5 most obvious ways to group these items? In ways, I mean things like "by severity", "by color", "by intention", "by age", etc
             Ideally the items should be grouped into more than two groups.
             The intention is to get suggestions so it's easier for a person to figure out a way to group them`;
+    }
+};
+
+const instructionPlaceholder = (action: Action) => {
+    switch (action) {
+        case "filter":
+            return "Expensive items (example)";
+        case "sort":
+            return "Complex to simple (example)";
+        case "group":
+            return "By color (example)";
+        case "highlight":
+            return "Popular items (example)";
     }
 };
 
@@ -89,8 +103,9 @@ const ListInstructionInput = ({ openAiConfig, currentItems, action, onInput, onC
             ) : (
                 <>
                     <input
-                        placeholder="Instruction"
+                        placeholder={instructionPlaceholder(action)}
                         autoFocus
+                        style={{ width: "210px" }}
                         onChange={(e) => setContent(e.currentTarget.value)}
                         onKeyUp={(e) => {
                             if (e.key === "Enter") {
@@ -99,17 +114,23 @@ const ListInstructionInput = ({ openAiConfig, currentItems, action, onInput, onC
                         }}
                     />
                     <span style={{ paddingLeft: "8px", cursor: "pointer" }}>
+                        <Tooltip id="tooltip" />
                         <span
                             className="icon"
                             onClick={() => {
                                 setSuggestions(null);
                                 onCancel();
                             }}
+                            data-tooltip-id="tooltip"
+                            data-tooltip-content="Cancel"
                         >
                             <IconArrowBack />
                         </span>
                         &nbsp;
-                        <span className="icon" title="Suggest options" onClick={onSuggestOptions}>
+                        <span className="icon"
+                        onClick={onSuggestOptions}
+                        data-tooltip-id="tooltip"
+                        data-tooltip-content="Suggest options">
                             <IconBubbleText />
                         </span>
                     </span>

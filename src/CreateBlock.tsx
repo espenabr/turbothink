@@ -131,13 +131,13 @@ const CreateBlock = ({ openAiConfig, blocks, onCreateList, onCreateText }: Props
                             paddingBottom: "10px",
                         }}
                     >
-                        <button className="list-button" onClick={() => onCreateList("Draft list", [])}>
+                        <button className="list-button" onClick={() => onCreateList("My list", [])}>
                             Empty list
                         </button>
                         <button
                             className="list-button"
                             style={{ marginLeft: "10px" }}
-                            onClick={() => onCreateText("Draft text", "")}
+                            onClick={() => onCreateText("My text snippet", "")}
                         >
                             Empty text
                         </button>

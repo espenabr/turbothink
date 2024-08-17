@@ -4,6 +4,7 @@ import IconArrowBack from "../icons/IconArrowBack";
 import IconRefresh from "../icons/IconRefresh";
 import IconBubbleText from "../icons/IconBubbleText";
 import { OpenAiConfig } from "../model";
+import { Tooltip } from "react-tooltip";
 
 type Props = {
     openAiConfig: OpenAiConfig;
@@ -65,8 +66,9 @@ Suggest 5 different ways that this text can be transformed (no language translat
             ) : (
                 <>
                     <input
-                        placeholder="Instruction"
+                        placeholder="Translate to Spanish (example)"
                         autoFocus
+                        style={{ width: "210px" }}
                         onChange={(e) => setInstruction(e.currentTarget.value)}
                         onKeyUp={(e) => {
                             if (e.key === "Enter") {
@@ -75,19 +77,25 @@ Suggest 5 different ways that this text can be transformed (no language translat
                         }}
                     />
                     <span style={{ paddingLeft: "8px", cursor: "pointer" }}>
-                        <span
+                        <Tooltip id="tooltip" />
+                        <a
                             className="icon"
                             onClick={() => {
                                 setSuggestions(null);
                                 onCancel();
                             }}
+                            data-tooltip-id="tooltip"
+                            data-tooltip-content="Cancel"
                         >
                             <IconArrowBack />
-                        </span>
+                        </a>
                         &nbsp;
-                        <span className="icon" title="Suggest options" onClick={onSuggestOptions}>
+                        <a className="icon"
+                          onClick={onSuggestOptions}
+                          data-tooltip-id="tooltip"
+                          data-tooltip-content="Suggest options">
                             <IconBubbleText />
-                        </span>
+                        </a>
                     </span>
                 </>
             )}
