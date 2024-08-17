@@ -23,12 +23,6 @@ type SortedItems = {
     items: string[];
 };
 
-type HighlightedItems = {
-    type: "highlighted";
-    predicate: string;
-    items: string[];
-};
-
 type ItemGroup = {
     name: string;
     items: string[];
@@ -40,9 +34,9 @@ type GroupedItems = {
     groups: ItemGroup[];
 };
 
-type SuggestedListModification = FilteredItems | SortedItems | HighlightedItems | GroupedItems;
+type SuggestedListModification = FilteredItems | SortedItems | GroupedItems;
 
-export type Action = "highlight" | "filter" | "sort" | "group";
+export type Action = "filter" | "sort" | "group";
 
 const groupColors: string[] = [
     "#FFCDD2",
@@ -118,22 +112,7 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
         const items = list.items;
 
         setLoading(true);
-        if (waitingForInput === "highlight") {
-            const response = await tc.expectFiltered(
-                items.map((i) => i.text),
-                instruction,
-                undefined,
-                undefined,
-                openAiConfig.reasoningStrategy,
-            );
-            if (response.outcome === "Success") {
-                setSuggestedModification({
-                    type: "highlighted",
-                    predicate: instruction,
-                    items: response.value,
-                });
-            }
-        } else if (waitingForInput === "filter") {
+        if (waitingForInput === "filter") {
             const response = await tc.expectFiltered(
                 items.map((i) => i.text),
                 instruction,
@@ -235,9 +214,7 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
 
     const itemModification = (item: ListItem): Modification | null => {
         if (suggestedModification !== null) {
-            if (suggestedModification.type === "highlighted" && suggestedModification.items.includes(item.text)) {
-                return { type: "highlighted" };
-            } else if (suggestedModification.type === "filtered" && !suggestedModification.items.includes(item.text)) {
+            if (suggestedModification.type === "filtered" && !suggestedModification.items.includes(item.text)) {
                 return { type: "filteredOut" };
             } else if (suggestedModification.type === "sorted") {
                 const items = list.items;

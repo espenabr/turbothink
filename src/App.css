@@ -124,6 +124,11 @@
     background-color: #ececec;
 }
 
+.list-item-filtered-out {
+    text-decoration: line-through;
+    opacity: 50%;
+}
+
 /* icons */
 
 .list-item .icons {

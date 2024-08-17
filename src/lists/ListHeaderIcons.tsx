@@ -1,6 +1,5 @@
 import { useState } from "react";
 import IconClipboard from "../icons/IconClipboard";
-import IconEye from "../icons/IconEye";
 import IconFilter from "../icons/IconFilter";
 import SortDescendingIcon from "../icons/IconSortDescending";
 import IconSquares from "../icons/IconSquares";
@@ -10,22 +9,13 @@ import { Tooltip } from "react-tooltip";
 type Props = {
     displayActions: boolean;
     onSort: () => void;
-    onHighlight: () => void;
     onFilter: () => void;
     onGroup: () => void;
     onCopyToClipboard: () => void;
     onDelete: () => void;
 };
 
-const ListHeaderIcons = ({
-    displayActions,
-    onSort,
-    onHighlight,
-    onFilter,
-    onGroup,
-    onCopyToClipboard,
-    onDelete,
-}: Props) => {
+const ListHeaderIcons = ({ displayActions, onSort, onFilter, onGroup, onCopyToClipboard, onDelete }: Props) => {
     const [copied, setCopied] = useState<boolean>(false);
 
     const onCopy = () => {
@@ -41,14 +31,6 @@ const ListHeaderIcons = ({
                 <>
                     <a className="icon" onClick={onSort} data-tooltip-id="tooltip" data-tooltip-content="Sort">
                         <SortDescendingIcon />
-                    </a>
-                    <a
-                        className="icon"
-                        onClick={onHighlight}
-                        data-tooltip-id="tooltip"
-                        data-tooltip-content="Highlight"
-                    >
-                        <IconEye />
                     </a>
                     <a className="icon" onClick={onFilter} data-tooltip-id="tooltip" data-tooltip-content="Filter">
                         <IconFilter />

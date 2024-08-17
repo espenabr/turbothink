@@ -43,7 +43,6 @@ const ListHeader = ({
         }
     }, [editNameMode]);
 
-    const onClickHighlight = () => onWaitingForInput("highlight");
     const onClickFilter = () => onWaitingForInput("filter");
     const onClickSort = () => onWaitingForInput("sort");
     const onClickGroup = () => onWaitingForInput("group");
@@ -70,7 +69,7 @@ const ListHeader = ({
                         <ListInstructionInput
                             openAiConfig={openAiConfig}
                             onCancel={() => onWaitingForInput(null)}
-                            currentItems={list.items}
+                            list={list}
                             onInput={onAction}
                             action={waitingForInput}
                         />
@@ -82,7 +81,6 @@ const ListHeader = ({
                             <ListHeaderIcons
                                 displayActions={displayActions}
                                 onSort={onClickSort}
-                                onHighlight={onClickHighlight}
                                 onFilter={onClickFilter}
                                 onGroup={onClickGroup}
                                 onCopyToClipboard={onCopyToClipboard}

@@ -5,10 +5,6 @@ import { useSortable } from "@dnd-kit/sortable";
 import EditListItem from "./EditListItem";
 import ListItemContent from "./ListItemContent";
 
-export type Highlighted = {
-    type: "highlighted";
-};
-
 export type FilteredOut = {
     type: "filteredOut";
 };
@@ -24,17 +20,15 @@ export type Grouped = {
     backgroundColor: string;
 };
 
-export type Modification = Highlighted | FilteredOut | Reordered | Grouped;
+export type Modification = FilteredOut | Reordered | Grouped;
 
 const itemStyle = (mod: Modification | null): CSSProperties => {
     if (mod === null) {
         return {};
     } else {
         switch (mod.type) {
-            case "highlighted":
-                return { backgroundColor: "#f2f7be" };
             case "filteredOut":
-                return { backgroundColor: "#aaaaaa" };
+                return { textDecoration: "line-through", opacity: "30%", borderBottom: "1px solid #888" };
             case "reordered":
                 return {};
             case "grouped":

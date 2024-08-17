@@ -2,7 +2,7 @@ import { useState } from "react";
 import TangibleClient from "../tangible-gpt/TangibleClient";
 import { withoutPrefix } from "../common";
 import { Action } from "./ListElement";
-import { ListItem, OpenAiConfig } from "../model";
+import { List, OpenAiConfig } from "../model";
 import IconArrowBack from "../icons/IconArrowBack";
 import IconRefresh from "../icons/IconRefresh";
 import IconBubbleText from "../icons/IconBubbleText";
@@ -10,28 +10,30 @@ import { Tooltip } from "react-tooltip";
 
 type Props = {
     openAiConfig: OpenAiConfig;
-    currentItems: ListItem[];
+    list: List;
     action: Action;
     onInput: (s: string) => void;
     onCancel: () => void;
 };
 
-const createPrompt = (action: Action, items: ListItem[]): string => {
-    const itemsDescription = items.map((i) => i.text).join(", ");
+const createPrompt = (action: Action, list: List): string => {
+    const itemsDescription = list.items.map((i) => i.text).join(", ");
 
     switch (action) {
         case "sort":
-            return `Given the following items: ${itemsDescription}
+            return `Given the list "${list.name}" with the following items: 
+${itemsDescription}
 
 What are the 5 most obvious ways to sort these items? In ways, I mean things like "by severity", "by price", "by relevance", "by age"; etc
 The intention is to get suggestions so it's easier for a person to figure out how to sort them`;
-        case "highlight":
         case "filter":
-            return `Given the following items: ${itemsDescription}
-        
-            What are the 5 most obvious criterias for highlighting certain items? For example in a list of products, a criteria could be "very expensive"`;
+            return `Given the list "${list.name}" with the following items:
+${itemsDescription}
+
+            What are the 5 most obvious ways to select a certain type of items? (Example: In a list of products, a criteria could be "very expensive")`;
         case "group":
-            return `Given the following items: ${items.map((i) => i.text).join(", ")}
+            return `Given the list "${list.name}" with the following items: 
+${list.items.map((i) => i.text).join(", ")}
 
             What are the 5 most obvious ways to group these items? In ways, I mean things like "by severity", "by color", "by intention", "by age", etc
             Ideally the items should be grouped into more than two groups.
@@ -47,19 +49,17 @@ const instructionPlaceholder = (action: Action) => {
             return "Complex to simple (example)";
         case "group":
             return "By color (example)";
-        case "highlight":
-            return "Popular items (example)";
     }
 };
 
-const ListInstructionInput = ({ openAiConfig, currentItems, action, onInput, onCancel }: Props) => {
+const ListInstructionInput = ({ openAiConfig, list, action, onInput, onCancel }: Props) => {
     const [content, setContent] = useState<string>("");
     const [suggestions, setSuggestions] = useState<string[] | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
     const onSuggestOptions = async () => {
         const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
-        const prompt = createPrompt(action, currentItems);
+        const prompt = createPrompt(action, list);
 
         setLoading(true);
         const response = await tc.expectItems(prompt, undefined, undefined, openAiConfig.reasoningStrategy);
