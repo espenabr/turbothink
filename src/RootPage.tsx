@@ -17,6 +17,7 @@ import { arrayMove, horizontalListSortingStrategy, SortableContext } from "@dnd-
 import Tab from "./tabs/Tab";
 import Settings from "./Settings";
 import { GptModel, ReasoningStrategy } from "./tangible-gpt/model";
+import { Tooltip } from "react-tooltip";
 
 const loadWorkspaces = (): WorkspaceHeader[] => {
     const workspaces = localStorage.getItem("workspaces");
@@ -245,7 +246,8 @@ const RootPage = () => {
                         ))}
                     </SortableContext>
                 </DndContext>
-                <div className="tab" onClick={onAddTab}>
+                <Tooltip id="tooltip" />
+                <div className="tab" onClick={onAddTab} data-tooltip-id="tooltip" data-tooltip-content="New tab">
                     <strong>
                         <IconPlus />
                     </strong>

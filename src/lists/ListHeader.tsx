@@ -5,6 +5,7 @@ import ListInstructionInput from "./ListInsertuctionInput";
 import ListHeaderIcons from "./ListHeaderIcons";
 import { Action } from "./ListElement";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
+import AcceptOrRejectAction from "./AcceptOrRejectAction";
 
 type Props = {
     openAiConfig: OpenAiConfig;
@@ -18,6 +19,9 @@ type Props = {
     onWaitingForInput: (action: Action | null) => void;
     onCopyToClipboard: () => void;
     onDelete: () => void;
+
+    onReject: () => void;
+    onAccept: () => void;
 };
 
 const ListHeader = ({
@@ -32,6 +36,9 @@ const ListHeader = ({
     onWaitingForInput,
     onCopyToClipboard,
     onDelete,
+
+    onReject,
+    onAccept,
 }: Props) => {
     const [editNameMode, setEditNameMode] = useState<boolean>(false);
 
@@ -75,6 +82,8 @@ const ListHeader = ({
                             onInput={onAction}
                             action={waitingForInput}
                         />
+                    ) : waitingForModificationResponse ? (
+                        <AcceptOrRejectAction onReject={onReject} onAccept={onAccept} />
                     ) : (
                         <>
                             <span onClick={() => setEditNameMode(true)} style={{ cursor: "pointer" }}>

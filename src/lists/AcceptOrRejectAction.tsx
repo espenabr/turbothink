@@ -7,7 +7,7 @@ type Props = {
     onAccept?: () => void;
 };
 
-const AcceptOrRejectSuggestion = ({ onReject, onAccept }: Props) => (
+const AcceptOrRejectAction = ({ onReject, onAccept }: Props) => (
     <span style={{ cursor: "pointer" }}>
         <Tooltip id="tooltip" />
         {onAccept !== undefined && (
@@ -15,10 +15,10 @@ const AcceptOrRejectSuggestion = ({ onReject, onAccept }: Props) => (
                 <IconCheck />
             </a>
         )}
-        <a className="icon" onClick={() => onReject()} data-tooltip-id="tooltip" data-tooltip-content="Reject">
+        <a className="icon" onClick={onReject} data-tooltip-id="tooltip" data-tooltip-content="Reject">
             <IconArrowBack />
         </a>
     </span>
 );
 
-export default AcceptOrRejectSuggestion;
+export default AcceptOrRejectAction;

@@ -2,7 +2,6 @@ import { CSSProperties, useState } from "react";
 import ListItemElement, { Modification } from "./ListItemContainer";
 import TangibleClient from "../tangible-gpt/TangibleClient";
 import AddListItem from "./AddListItem";
-import AcceptOrRejectSuggestion from "./AcceptOrRejectSuggestion";
 import { withoutTrailingDot } from "../common";
 import { BlockHeight, createListItemId, List, ListId, ListItem, ListItemId, OpenAiConfig } from "../model";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
@@ -311,9 +310,10 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
                 onWaitingForInput={(action) => setWaitingForInput(action)}
                 onCopyToClipboard={onCopyToClipboard}
                 onDelete={onDelete}
+                onAccept={onAccept}
+                onReject={onReject}
                 key={list.id}
             />
-
             <div className={itemsClass(blockHeight)}>
                 <ul className="list">
                     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
@@ -333,19 +333,8 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
                 </ul>
             </div>
             <div>
-                {suggestedModification === null ? (
+                {suggestedModification === null && (
                     <AddListItem onAdd={(newItemText) => onAddItem(newItemText)} onExtendList={onExtendList} />
-                ) : (
-                    <AcceptOrRejectSuggestion
-                        onReject={onReject}
-                        onAccept={
-                            suggestedModification?.type === "filtered" ||
-                            suggestedModification?.type === "sorted" ||
-                            suggestedModification?.type === "grouped"
-                                ? onAccept
-                                : undefined
-                        }
-                    />
                 )}
             </div>
         </div>
