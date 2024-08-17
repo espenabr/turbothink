@@ -1,3 +1,4 @@
+import { Tooltip } from "react-tooltip";
 import IconArrowBack from "../icons/IconArrowBack";
 import IconCheck from "../icons/IconCheck";
 
@@ -8,14 +9,21 @@ type Props = {
 
 const AcceptOrRejectSuggestion = ({ onReject, onAccept }: Props) => (
     <span style={{ cursor: "pointer" }}>
+        <Tooltip id="tooltip" />
         {onAccept !== undefined && (
-            <span className="icon" onClick={() => onAccept()}>
+            <a className="icon"
+                onClick={onAccept}
+                data-tooltip-id="tooltip"
+                data-tooltip-content="Accept">
                 <IconCheck />
-            </span>
+            </a>
         )}
-        <span className="icon" onClick={() => onReject()}>
+        <a className="icon"
+            onClick={() => onReject()}
+            data-tooltip-id="tooltip"
+            data-tooltip-content="Reject">
             <IconArrowBack />
-        </span>
+        </a>
     </span>
 );
 

@@ -33,7 +33,7 @@ ${itemsDescription}
             What are the 5 most obvious ways to select a certain type of items? (Example: In a list of products, a criteria could be "very expensive")`;
         case "group":
             return `Given the list "${list.name}" with the following items: 
-${list.items.map((i) => i.text).join(", ")}
+${itemsDescription}
 
             What are the 5 most obvious ways to group these items? In ways, I mean things like "by severity", "by color", "by intention", "by age", etc
             Ideally the items should be grouped into more than two groups.
