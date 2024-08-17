@@ -295,6 +295,8 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
         onUpdateItems(list.items.filter((i) => i.id !== itemId));
     };
 
+    const waitingForModificationResponse = suggestedModification !== null;
+
     return (
         <div className="block" style={style} ref={setNodeRef} {...attributes}>
             <ListHeader
@@ -303,6 +305,7 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
                 loading={loading}
                 waitingForInput={waitingForInput}
                 listeners={listeners}
+                waitingForModificationResponse={waitingForModificationResponse}
                 onRenameList={onRenameList}
                 onAction={onAction}
                 onWaitingForInput={(action) => setWaitingForInput(action)}
@@ -318,6 +321,7 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
                             {list.items.map((item) => (
                                 <ListItemElement
                                     item={item}
+                                    waitingForModificationResponse={waitingForModificationResponse}
                                     modification={itemModification(item)}
                                     onEdit={(newText) => onEditItemText(item.id, newText)}
                                     onDelete={onDeleteItem}

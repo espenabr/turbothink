@@ -12,6 +12,7 @@ type Props = {
     loading: boolean;
     waitingForInput: Action | null;
     listeners: SyntheticListenerMap | undefined;
+    waitingForModificationResponse: boolean;
     onRenameList: (newName: string) => void;
     onAction: (instruction: string) => void;
     onWaitingForInput: (action: Action | null) => void;
@@ -25,6 +26,7 @@ const ListHeader = ({
     loading,
     waitingForInput,
     listeners,
+    waitingForModificationResponse,
     onRenameList,
     onAction,
     onWaitingForInput,
@@ -78,14 +80,16 @@ const ListHeader = ({
                             <span onClick={() => setEditNameMode(true)} style={{ cursor: "pointer" }}>
                                 <strong>{list.name}</strong>
                             </span>
-                            <ListHeaderIcons
-                                displayActions={displayActions}
-                                onSort={onClickSort}
-                                onFilter={onClickFilter}
-                                onGroup={onClickGroup}
-                                onCopyToClipboard={onCopyToClipboard}
-                                onDelete={onDelete}
-                            />
+                            {!waitingForModificationResponse && (
+                                <ListHeaderIcons
+                                    displayActions={displayActions}
+                                    onSort={onClickSort}
+                                    onFilter={onClickFilter}
+                                    onGroup={onClickGroup}
+                                    onCopyToClipboard={onCopyToClipboard}
+                                    onDelete={onDelete}
+                                />
+                            )}
                         </>
                     )}
                 </>

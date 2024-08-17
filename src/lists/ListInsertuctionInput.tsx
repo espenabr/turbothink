@@ -30,7 +30,7 @@ The intention is to get suggestions so it's easier for a person to figure out ho
             return `Given the list "${list.name}" with the following items:
 ${itemsDescription}
 
-            What are the 5 most obvious ways to select a certain type of items? (Example: In a list of products, a criteria could be "very expensive")`;
+            What are the 5 most obvious categories of items?`;
         case "group":
             return `Given the list "${list.name}" with the following items: 
 ${itemsDescription}
