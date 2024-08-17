@@ -127,10 +127,12 @@ const ListInstructionInput = ({ openAiConfig, currentItems, action, onInput, onC
                             <IconArrowBack />
                         </span>
                         &nbsp;
-                        <span className="icon"
-                        onClick={onSuggestOptions}
-                        data-tooltip-id="tooltip"
-                        data-tooltip-content="Suggest options">
+                        <span
+                            className="icon"
+                            onClick={onSuggestOptions}
+                            data-tooltip-id="tooltip"
+                            data-tooltip-content="Suggest options"
+                        >
                             <IconBubbleText />
                         </span>
                     </span>

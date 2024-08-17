@@ -132,14 +132,14 @@ const CreateBlock = ({ openAiConfig, blocks, onCreateList, onCreateText }: Props
                         }}
                     >
                         <button className="list-button" onClick={() => onCreateList("My list", [])}>
-                            Empty list
+                            New list
                         </button>
                         <button
                             className="list-button"
                             style={{ marginLeft: "10px" }}
                             onClick={() => onCreateText("My text snippet", "")}
                         >
-                            Empty text
+                            New text
                         </button>
                     </div>
 
@@ -162,7 +162,7 @@ const CreateBlock = ({ openAiConfig, blocks, onCreateList, onCreateText }: Props
                                     setInstruction("");
                                 }
                             }}
-                            placeholder="What do you want?"
+                            placeholder="What would you like?"
                         />
                         <br />
                         <button

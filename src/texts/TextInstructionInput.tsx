@@ -90,10 +90,12 @@ Suggest 5 different ways that this text can be transformed (no language translat
                             <IconArrowBack />
                         </a>
                         &nbsp;
-                        <a className="icon"
-                          onClick={onSuggestOptions}
-                          data-tooltip-id="tooltip"
-                          data-tooltip-content="Suggest options">
+                        <a
+                            className="icon"
+                            onClick={onSuggestOptions}
+                            data-tooltip-id="tooltip"
+                            data-tooltip-content="Suggest options"
+                        >
                             <IconBubbleText />
                         </a>
                     </span>
