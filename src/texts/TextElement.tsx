@@ -10,6 +10,7 @@ import TextHeader from "./TextHeader";
 import IconCheck from "../icons/IconCheck";
 import IconX from "../icons/IconX";
 import { TangibleResponse } from "../tangible-gpt/model";
+import { Tooltip } from "react-tooltip";
 
 type TransformedText = {
     instruction: string;
@@ -185,13 +186,18 @@ I only want the transformed text back, nothing else`;
             </div>
             {editContentMode && (
                 <div>
+                    <Tooltip id="tooltip" />
                     <span style={{ cursor: "pointer" }}>
-                        <span onClick={() => onUpdateContent()}>
+                        <a onClick={() => onUpdateContent()} data-tooltip-id="tooltip" data-tooltip-content="OK">
                             <IconCheck />
-                        </span>
-                        <span onClick={() => setEditContentMode(false)}>
+                        </a>
+                        <a
+                            onClick={() => setEditContentMode(false)}
+                            data-tooltip-id="tooltip"
+                            data-tooltip-content="Cancel"
+                        >
                             <IconX />
-                        </span>
+                        </a>
                     </span>
                 </div>
             )}
