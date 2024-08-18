@@ -34,7 +34,7 @@ const TextHeader = ({
     onCancel,
     onAcceptAIModification,
     onRejectAIModification,
-    onRetryWithAdditionalInstruction
+    onRetryWithAdditionalInstruction,
 }: Props) => {
     const [editNameMode, setEditNameMode] = useState<boolean>(false);
     const inputNameRef = useRef<HTMLInputElement>(null);
