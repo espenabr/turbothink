@@ -144,13 +144,17 @@ I only want the transformed text back, nothing else`;
 
     const content = transformedText !== null ? transformedText.newText : text.content;
 
-    const onEditContent = () => setEditContentMode(true);
-
     const state = interactionState(loading, editContentMode, waitingForUserInstruction, transformedText);
+
+    const onClickContent = () => {
+        if (state.type === "Display") {
+            setEditContentMode(true);
+        }
+    };
 
     return (
         <div className="block">
-            <div className="text" style={style} ref={setNodeRef} {...attributes}>
+            <div className="text" style={style} ref={setNodeRef} {...attributes} onClick={onClickContent}>
                 <TextHeader
                     openAiConfig={openAiConfig}
                     text={text}
@@ -175,9 +179,7 @@ I only want the transformed text back, nothing else`;
                             setTextContentInput={setTextContentInput}
                         />
                     ) : (
-                        <>
-                            <DisplayTextContent content={content} onEdit={onEditContent} />
-                        </>
+                        <DisplayTextContent content={content} />
                     )}
                 </div>
             </div>

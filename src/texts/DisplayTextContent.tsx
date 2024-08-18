@@ -2,7 +2,6 @@ import React from "react";
 
 type Props = {
     content: string;
-    onEdit: () => void;
 };
 
 const withLineBreaks = (s: string) => (
@@ -16,11 +15,11 @@ const withLineBreaks = (s: string) => (
     </>
 );
 
-const DisplayTextContent = ({ content, onEdit }: Props) => {
+const DisplayTextContent = ({ content }: Props) => {
     const empty = content.length === 0;
 
     return (
-        <div onClick={onEdit} className="text-display">
+        <div className="text-display">
             {empty ? <span style={{ fontStyle: "italic" }}>Click to edit</span> : withLineBreaks(content)}
         </div>
     );
