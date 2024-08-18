@@ -1,7 +1,6 @@
 import { Brand } from "./common";
 import { v4 as uuid } from "uuid";
 import { GptModel, ReasoningStrategy } from "./tangible-gpt/model";
-import { ListAction } from "./lists/ListElement";
 
 export type ListId = Brand<string, "ListId">;
 export type ListItemId = Brand<string, "ListItemId">;
@@ -45,10 +44,15 @@ export type Workspace = {
     blocks: Block[];
 };
 
+/* Actions */
+export type ListAction = "filter" | "sort" | "group";
+export type TextAction = "transform";
+
+
 /* Interaction states */
 
-type WaitingForUserInstruction = {
-    type: "WaitingForUserInstruction";
+type WaitingForUserListInstruction = {
+    type: "WaitingForUserListInstruction";
     action: ListAction;
 };
 
@@ -64,7 +68,17 @@ type Display = {
     type: "Display"
 };
 
-export type InteractionState = WaitingForUserInstruction | WaitingForUserAcceptance | Loading | Display;
+type WaitingForUserTextInstruction = {
+    type: "WaitingForUserTextInstruction";
+    action: TextAction;
+};
+
+type EditTextContent = {
+    type: "EditTextContent";
+}
+
+export type ListInteractionState = WaitingForUserListInstruction | WaitingForUserAcceptance | Loading | Display;
+export type TextInteractionState = WaitingForUserTextInstruction | EditTextContent | WaitingForUserAcceptance | Loading | Display;
 
 /* Config */
 

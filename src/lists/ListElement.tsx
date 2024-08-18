@@ -6,12 +6,13 @@ import { withoutTrailingDot } from "../common";
 import {
     BlockHeight,
     createListItemId,
-    InteractionState,
+    ListInteractionState,
     List,
     ListId,
     ListItem,
     ListItemId,
     OpenAiConfig,
+    ListAction,
 } from "../model";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -44,8 +45,6 @@ type GroupedItems = {
 };
 
 type SuggestedListModification = FilteredItems | SortedItems | GroupedItems;
-
-export type ListAction = "filter" | "sort" | "group";
 
 const groupColors: string[] = [
     "#FFCDD2",
@@ -103,11 +102,11 @@ const interactionState = (
     loading: boolean,
     waitingForUserInstruction: ListAction | null,
     suggestedModification: SuggestedListModification | null,
-): InteractionState => {
+): ListInteractionState => {
     if (loading) {
         return { type: "Loading" };
     } else if (waitingForUserInstruction !== null) {
-        return { type: "WaitingForUserInstruction", action: waitingForUserInstruction };
+        return { type: "WaitingForUserListInstruction", action: waitingForUserInstruction };
     } else if (suggestedModification !== null) {
         return { type: "WaitingForUserAcceptance" };
     } else {
@@ -126,7 +125,7 @@ type Props = {
 
 const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, onUpdateList }: Props) => {
     const [suggestedModification, setSuggestedModification] = useState<SuggestedListModification | null>(null);
-    const [waitingForUserInstruction, setWaitingForInput] = useState<ListAction | null>(null);
+    const [waitingForUserInstruction, setWaitingForUserInstruction] = useState<ListAction | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [lastResponse, setLastResponse] = useState<TangibleResponse<string[]> | TangibleResponse<ItemGroup[]> | null>(
         null,
@@ -182,7 +181,7 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
             }
         }
         setLoading(false);
-        setWaitingForInput(null);
+        setWaitingForUserInstruction(null);
     };
 
     const onRetryWithAdditionalInstruction = async (instruction: string, action: ListAction) => {
@@ -216,7 +215,7 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
             }
         }
         setLoading(false);
-        setWaitingForInput(null);
+        setWaitingForUserInstruction(null);
     };
 
     const onReject = () => setSuggestedModification(null);
@@ -359,7 +358,7 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
                 listeners={listeners}
                 onRenameList={onRenameList}
                 onAction={onAction}
-                onWaitForUserInstruction={(action) => setWaitingForInput(action)}
+                onWaitForUserInstruction={(action) => setWaitingForUserInstruction(action)}
                 onCopyToClipboard={onCopyToClipboard}
                 onDelete={onDelete}
                 onAcceptAIModification={onAccept}

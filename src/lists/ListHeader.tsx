@@ -1,8 +1,7 @@
-import { InteractionState, List, OpenAiConfig } from "../model";
+import { ListInteractionState, List, OpenAiConfig, ListAction } from "../model";
 import { useEffect, useRef, useState } from "react";
 import EditListName from "./EditListName";
 import ListInstructionInput from "./ListInsertuctionInput";
-import { ListAction } from "./ListElement";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import AcceptOrRejectAIModification from "./AcceptOrRejectAIModification";
 import ListHeaderContent from "./ListHeaderContent";
@@ -10,7 +9,7 @@ import ListHeaderContent from "./ListHeaderContent";
 type Props = {
     openAiConfig: OpenAiConfig;
     list: List;
-    interactionState: InteractionState;
+    interactionState: ListInteractionState;
     listeners: SyntheticListenerMap | undefined;
     onRenameList: (newName: string) => void;
     onAction: (instruction: string) => void;
@@ -71,7 +70,7 @@ const ListHeader = ({
                 />
             ) : (
                 <>
-                    {interactionState.type === "WaitingForUserInstruction" ? (
+                    {interactionState.type === "WaitingForUserListInstruction" ? (
                         <ListInstructionInput
                             openAiConfig={openAiConfig}
                             onCancel={() => onWaitForUserInstruction(null)}

@@ -1,4 +1,4 @@
-import { RefObject, useEffect, useState } from "react";
+import { RefObject, useEffect } from "react";
 import EditTextName from "./EditTextName";
 import TextHeaderIcons from "./TextHeaderIcons";
 
@@ -6,41 +6,43 @@ type Props = {
     name: string;
     displayActions: boolean;
     inputNameRef: RefObject<HTMLInputElement>;
+    editContentMode: boolean;
     onUpdateName: (name: string) => void;
     onTransform: () => void;
     onDelete: () => void;
     onCopyToClipboard: () => void;
+    setEditNameMode: (value: boolean) => void;
 };
 
 const TextHeaderContent = ({
     name,
     displayActions,
     inputNameRef,
+    editContentMode,
     onTransform,
     onUpdateName,
     onDelete,
     onCopyToClipboard,
+    setEditNameMode,
 }: Props) => {
-    const [editMode, setEditMode] = useState<boolean>(false);
-
     const onUpdate = (updated: string) => {
-        setEditMode(false);
+        setEditNameMode(false);
         onUpdateName(updated);
     };
 
     // highlight name input on edit
     useEffect(() => {
-        if (editMode && inputNameRef.current) {
+        if (editContentMode && inputNameRef.current) {
             inputNameRef.current.focus();
             inputNameRef.current.select();
         }
-    }, [editMode]);
+    }, [editContentMode]);
 
-    return editMode ? (
-        <EditTextName name={name} onRename={onUpdate} onCancel={() => setEditMode(false)} inputRef={inputNameRef} />
+    return editContentMode ? (
+        <EditTextName name={name} onRename={onUpdate} onCancel={() => setEditNameMode(false)} inputRef={inputNameRef} />
     ) : (
         <>
-            <span onClick={() => setEditMode(true)} style={{ cursor: "pointer" }}>
+            <span onClick={() => setEditNameMode(true)} style={{ cursor: "pointer" }}>
                 <strong>{name}</strong>
             </span>
             <TextHeaderIcons
