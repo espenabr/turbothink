@@ -54,14 +54,18 @@ const WorkspaceContainer = ({ openAiConfig, workspace, blockHeight, onUpdateBloc
     const workspaceId = workspace.id;
     const blocks = workspace.blocks;
 
-    const onGroup = (groups: ItemGroup[]) => {
+    const onGroup = (groups: ItemGroup[], afterListId: ListId) => {
         const newLists: List[] = groups.map((g) => ({
             type: "List",
             id: createListId(),
             name: g.name,
             items: g.items.map((i) => ({ id: createListItemId(), text: i })),
         }));
-        onUpdateBlocks(workspaceId, blocks.slice().concat(newLists));
+
+        const index = blocks.findIndex((b) => b.id === afterListId);
+        const updatedBlocks = [...blocks.slice(0, index + 1), ...newLists, ...blocks.slice(index + 1)];
+
+        onUpdateBlocks(workspace.id, updatedBlocks);
     };
 
     const onUpdateList = (updatedList: List) => {
@@ -142,7 +146,7 @@ const WorkspaceContainer = ({ openAiConfig, workspace, blockHeight, onUpdateBloc
                                     openAiConfig={openAiConfig}
                                     list={block}
                                     blockHeight={blockHeight}
-                                    onGroup={onGroup}
+                                    onGroup={(groups) => onGroup(groups, block.id)}
                                     onDeleteList={onDeleteBlock}
                                     onUpdateList={onUpdateList}
                                     key={block.id}
