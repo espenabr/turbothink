@@ -8,14 +8,21 @@ import { Tooltip } from "react-tooltip";
 
 type Props = {
     displayActions: boolean;
-    onSort: () => void;
-    onFilter: () => void;
-    onGroup: () => void;
+    onInitiateSort: () => void;
+    onInitiateFilter: () => void;
+    onInitiateGroup: () => void;
     onCopyToClipboard: () => void;
     onDelete: () => void;
 };
 
-const ListHeaderIcons = ({ displayActions, onSort, onFilter, onGroup, onCopyToClipboard, onDelete }: Props) => {
+const ListHeaderIcons = ({
+    displayActions,
+    onInitiateSort,
+    onInitiateFilter,
+    onInitiateGroup,
+    onCopyToClipboard,
+    onDelete,
+}: Props) => {
     const [copied, setCopied] = useState<boolean>(false);
 
     const onCopy = () => {
@@ -29,13 +36,23 @@ const ListHeaderIcons = ({ displayActions, onSort, onFilter, onGroup, onCopyToCl
             <Tooltip place="top" id="tooltip" />
             {displayActions && (
                 <>
-                    <a className="icon" onClick={onSort} data-tooltip-id="tooltip" data-tooltip-content="Sort">
+                    <a className="icon" onClick={onInitiateSort} data-tooltip-id="tooltip" data-tooltip-content="Sort">
                         <SortDescendingIcon />
                     </a>
-                    <a className="icon" onClick={onFilter} data-tooltip-id="tooltip" data-tooltip-content="Filter">
+                    <a
+                        className="icon"
+                        onClick={onInitiateFilter}
+                        data-tooltip-id="tooltip"
+                        data-tooltip-content="Filter"
+                    >
                         <IconFilter />
                     </a>
-                    <a className="icon" onClick={onGroup} data-tooltip-id="tooltip" data-tooltip-content="Group">
+                    <a
+                        className="icon"
+                        onClick={onInitiateGroup}
+                        data-tooltip-id="tooltip"
+                        data-tooltip-content="Group"
+                    >
                         <IconSquares />
                     </a>
                 </>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import TangibleClient from "../tangible-gpt/TangibleClient";
 import { withoutPrefix } from "../common";
-import { Action } from "./ListElement";
+import { ListAction } from "./ListElement";
 import { List, OpenAiConfig } from "../model";
 import IconArrowBack from "../icons/IconArrowBack";
 import IconRefresh from "../icons/IconRefresh";
@@ -11,12 +11,12 @@ import { Tooltip } from "react-tooltip";
 type Props = {
     openAiConfig: OpenAiConfig;
     list: List;
-    action: Action;
+    action: ListAction;
     onInput: (s: string) => void;
     onCancel: () => void;
 };
 
-const createPrompt = (action: Action, list: List): string => {
+const createPrompt = (action: ListAction, list: List): string => {
     const itemsDescription = list.items.map((i) => i.text).join(", ");
 
     switch (action) {
@@ -41,7 +41,7 @@ ${itemsDescription}
     }
 };
 
-const instructionPlaceholder = (action: Action) => {
+const instructionPlaceholder = (action: ListAction) => {
     switch (action) {
         case "filter":
             return "Expensive items (example)";

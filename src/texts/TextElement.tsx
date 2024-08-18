@@ -6,7 +6,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { useSortable } from "@dnd-kit/sortable";
 import { ClipboardItem } from "../WorkspaceContainer";
 import TangibleClient from "../tangible-gpt/TangibleClient";
-import AcceptOrRejectAction from "../lists/AcceptOrRejectAction";
+import AcceptOrRejectAIModification from "../lists/AcceptOrRejectAIModification";
 import TextHeader from "./TextHeader";
 import IconCheck from "../icons/IconCheck";
 import IconX from "../icons/IconX";
@@ -141,12 +141,15 @@ I only want the transformed text back, nothing else`,
                         <>
                             <DisplayTextContent content={content} onEdit={onEditContent} />
                             {transformedText !== null && (
-                                <AcceptOrRejectAction
+                                <AcceptOrRejectAIModification
                                     onReject={() => setTransformedText(null)}
                                     onAccept={() => {
                                         onUpdate({ ...text, content: transformedText.newText });
                                         setTransformedText(null);
                                     }}
+                                    onRetryWithAdditionalInstruction={() => {
+                                        
+                                     }}
                                 />
                             )}
                         </>

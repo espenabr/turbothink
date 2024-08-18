@@ -4,6 +4,7 @@ import TextHeaderIcons from "./TextHeaderIcons";
 
 type Props = {
     name: string;
+    displayActions: boolean;
     inputNameRef: RefObject<HTMLInputElement>;
     onUpdateName: (name: string) => void;
     onTransform: () => void;
@@ -11,7 +12,15 @@ type Props = {
     onCopyToClipboard: () => void;
 };
 
-const TextHeaderContent = ({ name, inputNameRef, onTransform, onUpdateName, onDelete, onCopyToClipboard }: Props) => {
+const TextHeaderContent = ({
+    name,
+    displayActions,
+    inputNameRef,
+    onTransform,
+    onUpdateName,
+    onDelete,
+    onCopyToClipboard,
+}: Props) => {
     const [editMode, setEditMode] = useState<boolean>(false);
 
     const onUpdate = (updated: string) => {
@@ -34,7 +43,12 @@ const TextHeaderContent = ({ name, inputNameRef, onTransform, onUpdateName, onDe
             <span onClick={() => setEditMode(true)} style={{ cursor: "pointer" }}>
                 <strong>{name}</strong>
             </span>
-            <TextHeaderIcons onTransform={onTransform} onDelete={onDelete} onCopyToClipboard={onCopyToClipboard} />
+            <TextHeaderIcons
+                displayActions={displayActions}
+                onTransform={onTransform}
+                onDelete={onDelete}
+                onCopyToClipboard={onCopyToClipboard}
+            />
         </>
     );
 };

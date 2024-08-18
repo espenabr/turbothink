@@ -1,44 +1,40 @@
-import { List, OpenAiConfig } from "../model";
+import { InteractionState, List, OpenAiConfig } from "../model";
 import { useEffect, useRef, useState } from "react";
 import EditListName from "./EditListName";
 import ListInstructionInput from "./ListInsertuctionInput";
-import ListHeaderIcons from "./ListHeaderIcons";
-import { Action } from "./ListElement";
+import { ListAction } from "./ListElement";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
-import AcceptOrRejectAction from "./AcceptOrRejectAction";
+import AcceptOrRejectAIModification from "./AcceptOrRejectAIModification";
+import ListHeaderContent from "./ListHeaderContent";
 
 type Props = {
     openAiConfig: OpenAiConfig;
     list: List;
-    loading: boolean;
-    waitingForInput: Action | null;
+    interactionState: InteractionState;
     listeners: SyntheticListenerMap | undefined;
-    waitingForModificationResponse: boolean;
     onRenameList: (newName: string) => void;
     onAction: (instruction: string) => void;
-    onWaitingForInput: (action: Action | null) => void;
+    onWaitForUserInstruction: (action: ListAction | null) => void;
     onCopyToClipboard: () => void;
     onDelete: () => void;
-
-    onReject: () => void;
-    onAccept: () => void;
+    onRejectAIModification: () => void;
+    onAcceptAIModification: () => void;
+    onRetryWithAdditionalInstruction: (instruction: string) => void;
 };
 
 const ListHeader = ({
     openAiConfig,
     list,
-    loading,
-    waitingForInput,
+    interactionState,
     listeners,
-    waitingForModificationResponse,
     onRenameList,
     onAction,
-    onWaitingForInput,
+    onWaitForUserInstruction,
     onCopyToClipboard,
     onDelete,
-
-    onReject,
-    onAccept,
+    onRejectAIModification,
+    onAcceptAIModification,
+    onRetryWithAdditionalInstruction,
 }: Props) => {
     const [editNameMode, setEditNameMode] = useState<boolean>(false);
 
@@ -52,15 +48,16 @@ const ListHeader = ({
         }
     }, [editNameMode]);
 
-    const onClickFilter = () => onWaitingForInput("filter");
-    const onClickSort = () => onWaitingForInput("sort");
-    const onClickGroup = () => onWaitingForInput("group");
+    const onInitiateFilter = () => onWaitForUserInstruction("filter");
+    const onInitiateSort = () => onWaitForUserInstruction("sort");
+    const onInitiateGroup = () => onWaitForUserInstruction("group");
 
     const displayActions = list.items.length > 1;
+    const displayIcons = interactionState.type !== "WaitingForUserAcceptance";
 
     return (
         <div className="list-header" {...listeners}>
-            {loading ? (
+            {interactionState.type === "Loading" ? (
                 <div className="spinner" />
             ) : editNameMode ? (
                 <EditListName
@@ -74,32 +71,32 @@ const ListHeader = ({
                 />
             ) : (
                 <>
-                    {waitingForInput !== null ? (
+                    {interactionState.type === "WaitingForUserInstruction" ? (
                         <ListInstructionInput
                             openAiConfig={openAiConfig}
-                            onCancel={() => onWaitingForInput(null)}
+                            onCancel={() => onWaitForUserInstruction(null)}
                             list={list}
                             onInput={onAction}
-                            action={waitingForInput}
+                            action={interactionState.action}
                         />
-                    ) : waitingForModificationResponse ? (
-                        <AcceptOrRejectAction onReject={onReject} onAccept={onAccept} />
+                    ) : interactionState.type === "WaitingForUserAcceptance" ? (
+                        <AcceptOrRejectAIModification
+                            onReject={onRejectAIModification}
+                            onAccept={onAcceptAIModification}
+                            onRetryWithAdditionalInstruction={onRetryWithAdditionalInstruction}
+                        />
                     ) : (
-                        <>
-                            <span onClick={() => setEditNameMode(true)} style={{ cursor: "pointer" }}>
-                                <strong>{list.name}</strong>
-                            </span>
-                            {!waitingForModificationResponse && (
-                                <ListHeaderIcons
-                                    displayActions={displayActions}
-                                    onSort={onClickSort}
-                                    onFilter={onClickFilter}
-                                    onGroup={onClickGroup}
-                                    onCopyToClipboard={onCopyToClipboard}
-                                    onDelete={onDelete}
-                                />
-                            )}
-                        </>
+                        <ListHeaderContent
+                            listName={list.name}
+                            displayIcons={displayIcons}
+                            displayActions={displayActions}
+                            onInitiateSort={onInitiateSort}
+                            onInitiateFilter={onInitiateFilter}
+                            onInitiateGroup={onInitiateGroup}
+                            onCopyToClipboard={onCopyToClipboard}
+                            onDelete={onDelete}
+                            onEnableEdit={() => setEditNameMode(true)}
+                        />
                     )}
                 </>
             )}

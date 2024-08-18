@@ -3,12 +3,22 @@ import ListItemElement, { Modification } from "./ListItemContainer";
 import TangibleClient from "../tangible-gpt/TangibleClient";
 import AddListItem from "./AddListItem";
 import { withoutTrailingDot } from "../common";
-import { BlockHeight, createListItemId, List, ListId, ListItem, ListItemId, OpenAiConfig } from "../model";
+import {
+    BlockHeight,
+    createListItemId,
+    InteractionState,
+    List,
+    ListId,
+    ListItem,
+    ListItemId,
+    OpenAiConfig,
+} from "../model";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ClipboardItem } from "../WorkspaceContainer";
 import ListHeader from "./ListHeader";
+import { TangibleResponse } from "../tangible-gpt/model";
 
 type FilteredItems = {
     type: "filtered";
@@ -35,7 +45,7 @@ type GroupedItems = {
 
 type SuggestedListModification = FilteredItems | SortedItems | GroupedItems;
 
-export type Action = "filter" | "sort" | "group";
+export type ListAction = "filter" | "sort" | "group";
 
 const groupColors: string[] = [
     "#FFCDD2",
@@ -49,6 +59,17 @@ const groupColors: string[] = [
     "#C8E6C9",
     "#DCEDC8",
 ];
+
+const toAction = (suggestedModification: SuggestedListModification): ListAction => {
+    switch (suggestedModification.type) {
+        case "filtered":
+            return "filter";
+        case "sorted":
+            return "sort";
+        case "grouped":
+            return "group";
+    }
+};
 
 const toSortedListItems = (sortedItems: string[], oldItems: ListItem[]): ListItem[] => {
     let unmatchedItems = oldItems.slice();
@@ -78,6 +99,22 @@ const itemsClass = (blockHeight: BlockHeight) => {
     }
 };
 
+const interactionState = (
+    loading: boolean,
+    waitingForUserInstruction: ListAction | null,
+    suggestedModification: SuggestedListModification | null,
+): InteractionState => {
+    if (loading) {
+        return { type: "Loading" };
+    } else if (waitingForUserInstruction !== null) {
+        return { type: "WaitingForUserInstruction", action: waitingForUserInstruction };
+    } else if (suggestedModification !== null) {
+        return { type: "WaitingForUserAcceptance" };
+    } else {
+        return { type: "Display" };
+    }
+};
+
 type Props = {
     openAiConfig: OpenAiConfig;
     list: List;
@@ -89,16 +126,16 @@ type Props = {
 
 const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, onUpdateList }: Props) => {
     const [suggestedModification, setSuggestedModification] = useState<SuggestedListModification | null>(null);
-    const [waitingForInput, setWaitingForInput] = useState<Action | null>(null);
-
+    const [waitingForUserInstruction, setWaitingForInput] = useState<ListAction | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
-
+    const [lastResponse, setLastResponse] = useState<TangibleResponse<string[]> | TangibleResponse<ItemGroup[]> | null>(
+        null,
+    );
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: { delay: 200, tolerance: 5 },
         }),
     );
-
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: list.id });
 
     const style: CSSProperties = {
@@ -106,71 +143,83 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
         transition,
     };
 
+    const updateFilterModification = (instruction: string, updatedItems: string[]) =>
+        setSuggestedModification({ type: "filtered", predicate: instruction, items: updatedItems });
+
+    const updateSortModification = (instruction: string, updatedItems: string[]) =>
+        setSuggestedModification({ type: "sorted", orderBy: instruction, items: updatedItems });
+
+    const updateGroupModification = (instruction: string, groups: ItemGroup[]) =>
+        setSuggestedModification({ type: "grouped", criteria: instruction, groups: groups });
+
     const onAction = async (instruction: string) => {
         const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
-        const items = list.items;
+        const items = list.items.map((i) => i.text);
+        const reasoning = openAiConfig.reasoningStrategy;
 
         setLoading(true);
-        if (waitingForInput === "filter") {
-            const response = await tc.expectFiltered(
-                items.map((i) => i.text),
-                instruction,
-                undefined,
-                undefined,
-                openAiConfig.reasoningStrategy,
-            );
+        if (waitingForUserInstruction === "filter") {
+            const response = await tc.expectFiltered(items, instruction, undefined, undefined, reasoning);
             if (response.outcome === "Success") {
-                setSuggestedModification({
-                    type: "filtered",
-                    predicate: instruction,
-                    items: response.value,
-                });
+                updateFilterModification(instruction, response.value);
+                setLastResponse(response);
             }
-        } else if (waitingForInput === "sort") {
-            const response = await tc.expectSorted(
-                items.map((i) => i.text),
-                instruction,
-                undefined,
-                undefined,
-                openAiConfig.reasoningStrategy,
-            );
+        } else if (waitingForUserInstruction === "sort") {
+            const response = await tc.expectSorted(items, instruction, undefined, undefined, reasoning);
             if (response.outcome === "Success") {
-                const suggested: SuggestedListModification = {
-                    type: "sorted",
-                    orderBy: instruction,
-                    items: response.value,
-                };
-                setSuggestedModification(suggested);
+                updateSortModification(instruction, response.value);
+                setLastResponse(response);
             }
-        } else if (waitingForInput === "group") {
-            const response = await tc.expectGroups(
-                items.map((i) => i.text),
-                undefined,
-                instruction,
-                undefined,
-                undefined,
-                openAiConfig.reasoningStrategy,
-            );
+        } else if (waitingForUserInstruction === "group") {
+            const response = await tc.expectGroups(items, undefined, instruction, undefined, undefined, reasoning);
             if (response.outcome === "Success") {
-                setSuggestedModification({
-                    type: "grouped",
-                    criteria: instruction,
-                    groups: response.value.map((g) => ({
-                        name: g.name,
-                        items: g.items.map((i) => withoutTrailingDot(i)),
-                    })),
-                });
+                const groups = response.value.map((g) => ({
+                    name: g.name,
+                    items: g.items.map((i) => withoutTrailingDot(i)),
+                }));
+                updateGroupModification(instruction, groups);
+                setLastResponse(response);
             }
         }
         setLoading(false);
         setWaitingForInput(null);
     };
 
-    const onReject = () => {
-        if (suggestedModification !== null) {
-            setSuggestedModification(null);
+    const onRetryWithAdditionalInstruction = async (instruction: string, action: ListAction) => {
+        const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
+        const items = list.items.map((i) => i.text);
+        const reasoning = openAiConfig.reasoningStrategy;
+        const history = lastResponse?.history;
+        const prompt = `I want you to adjust the previous attempt. Please also consider: ${instruction}`;
+
+        if (action === "filter") {
+            const response = await tc.expectFiltered(items, prompt, history, undefined, reasoning);
+            if (response.outcome === "Success") {
+                updateFilterModification(instruction, response.value);
+                setLastResponse(response);
+            }
+        } else if (action === "sort") {
+            const response = await tc.expectSorted(items, prompt, history, undefined, reasoning);
+            if (response.outcome === "Success") {
+                updateSortModification(instruction, response.value);
+                setLastResponse(response);
+            }
+        } else if (action === "group") {
+            const response = await tc.expectGroups(items, undefined, prompt, history, undefined, reasoning);
+            if (response.outcome === "Success") {
+                const groups = response.value.map((g) => ({
+                    name: g.name,
+                    items: g.items.map((i) => withoutTrailingDot(i)),
+                }));
+                updateGroupModification(instruction, groups);
+                setLastResponse(response);
+            }
         }
+        setLoading(false);
+        setWaitingForInput(null);
     };
+
+    const onReject = () => setSuggestedModification(null);
 
     const onUpdateItems = (items: ListItem[]) => {
         onUpdateList({ ...list, items: items });
@@ -293,25 +342,29 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
     const onDeleteItem = (itemId: ListItemId) => {
         onUpdateItems(list.items.filter((i) => i.id !== itemId));
     };
+    const state = interactionState(loading, waitingForUserInstruction, suggestedModification);
 
-    const waitingForModificationResponse = suggestedModification !== null;
+    const onRetryWithInstruction = (instruction: string) => {
+        if (suggestedModification !== null) {
+            onRetryWithAdditionalInstruction(instruction, toAction(suggestedModification));
+        }
+    };
 
     return (
         <div className="block" style={style} ref={setNodeRef} {...attributes}>
             <ListHeader
                 openAiConfig={openAiConfig}
                 list={list}
-                loading={loading}
-                waitingForInput={waitingForInput}
+                interactionState={state}
                 listeners={listeners}
-                waitingForModificationResponse={waitingForModificationResponse}
                 onRenameList={onRenameList}
                 onAction={onAction}
-                onWaitingForInput={(action) => setWaitingForInput(action)}
+                onWaitForUserInstruction={(action) => setWaitingForInput(action)}
                 onCopyToClipboard={onCopyToClipboard}
                 onDelete={onDelete}
-                onAccept={onAccept}
-                onReject={onReject}
+                onAcceptAIModification={onAccept}
+                onRejectAIModification={onReject}
+                onRetryWithAdditionalInstruction={onRetryWithInstruction}
                 key={list.id}
             />
             <div className={itemsClass(blockHeight)}>
@@ -321,7 +374,7 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
                             {list.items.map((item) => (
                                 <ListItemElement
                                     item={item}
-                                    waitingForModificationResponse={waitingForModificationResponse}
+                                    canModify={suggestedModification === null}
                                     modification={itemModification(item)}
                                     onEdit={(newText) => onEditItemText(item.id, newText)}
                                     onDelete={onDeleteItem}

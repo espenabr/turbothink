@@ -5,12 +5,13 @@ import IconStatusChange from "../icons/IconStatusChange";
 import { Tooltip } from "react-tooltip";
 
 type Props = {
+    displayActions: boolean;
     onTransform: () => void;
     onDelete: () => void;
     onCopyToClipboard: () => void;
 };
 
-const TextHeaderIcons = ({ onTransform, onDelete, onCopyToClipboard }: Props) => {
+const TextHeaderIcons = ({ displayActions, onTransform, onDelete, onCopyToClipboard }: Props) => {
     const [copied, setCopied] = useState<boolean>(false);
 
     const onCopy = () => {
@@ -22,13 +23,27 @@ const TextHeaderIcons = ({ onTransform, onDelete, onCopyToClipboard }: Props) =>
     return (
         <div className="icons">
             <Tooltip place="top" id="tooltip" />
-            <a className="icon" onClick={onTransform} data-tooltip-id="tooltip" data-tooltip-content="Transform text">
-                <IconStatusChange />
-            </a>
-            <a className="icon" onClick={onCopy} data-tooltip-id="tooltip" data-tooltip-content="Copy to clipboard">
-                <IconClipboard />
-            </a>
-            {copied && <div className="copied">Copied!</div>}
+            {displayActions && (
+                <>
+                    <a
+                        className="icon"
+                        onClick={onTransform}
+                        data-tooltip-id="tooltip"
+                        data-tooltip-content="Transform text"
+                    >
+                        <IconStatusChange />
+                    </a>
+                    <a
+                        className="icon"
+                        onClick={onCopy}
+                        data-tooltip-id="tooltip"
+                        data-tooltip-content="Copy to clipboard"
+                    >
+                        <IconClipboard />
+                    </a>
+                    {copied && <div className="copied">Copied!</div>}
+                </>
+            )}
             <a className="icon" onClick={onDelete} data-tooltip-id="tooltip" data-tooltip-content="Close">
                 <IconX />
             </a>

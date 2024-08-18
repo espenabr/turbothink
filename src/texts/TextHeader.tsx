@@ -48,6 +48,7 @@ const TextHeader = ({
             ) : (
                 <TextHeaderContent
                     name={text.name}
+                    displayActions={waitingForInput === null}
                     inputNameRef={inputNameRef}
                     onUpdateName={(name) => onRename(name)}
                     onTransform={onTransform}

@@ -40,12 +40,12 @@ const itemStyle = (mod: Modification | null): CSSProperties => {
 type Props = {
     item: ListItem;
     modification: Modification | null;
-    waitingForModificationResponse: boolean;
+    canModify: boolean;
     onEdit: (newText: string) => void;
     onDelete: (id: ListItemId) => void;
 };
 
-const ListItemElement = ({ item, modification, waitingForModificationResponse, onEdit, onDelete }: Props) => {
+const ListItemElement = ({ item, modification, canModify, onEdit, onDelete }: Props) => {
     const [editMode, setEditMode] = useState<boolean>(false);
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: item.id });
     const inputRef = useRef<HTMLInputElement>(null);
@@ -69,7 +69,7 @@ const ListItemElement = ({ item, modification, waitingForModificationResponse, o
         onEdit(newText);
     };
 
-    const myListeners = waitingForModificationResponse ? undefined : listeners;
+    const myListeners = !canModify ? undefined : listeners;
 
     return (
         <li
@@ -91,8 +91,8 @@ const ListItemElement = ({ item, modification, waitingForModificationResponse, o
                 <ListItemContent
                     text={item.text}
                     modification={modification}
-                    waitingForModificationResponse={waitingForModificationResponse}
-                    onEnableEdit={() => (waitingForModificationResponse ? setEditMode(true) : {})}
+                    canDelete={canModify}
+                    onEnableEdit={() => (canModify ? setEditMode(true) : {})}
                     onDelete={() => onDelete(item.id)}
                 />
             )}
