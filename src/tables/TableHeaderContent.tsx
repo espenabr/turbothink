@@ -1,30 +1,31 @@
 import { RefObject, useEffect } from "react";
-import EditTextName from "./EditTextName";
-import TextHeaderIcons from "./TextHeaderIcons";
+import TableHeaderIcons from "./TableHeaderIcons";
+import EditTableName from "./EditTableName";
 
 type Props = {
     name: string;
-    displayActions: boolean;
-    inputNameRef: RefObject<HTMLInputElement>;
     editNameMode: boolean;
+    inputNameRef: RefObject<HTMLInputElement>;
     onUpdateName: (name: string) => void;
-    onTransform: () => void;
     onDelete: () => void;
     onCopyToClipboard: () => void;
     setEditNameMode: (value: boolean) => void;
 };
 
-const TextHeaderContent = ({
+const TableHeaderContent = ({
     name,
-    displayActions,
-    inputNameRef,
     editNameMode,
-    onTransform,
+    inputNameRef,
     onUpdateName,
     onDelete,
     onCopyToClipboard,
     setEditNameMode,
 }: Props) => {
+    const onUpdate = (updated: string) => {
+        setEditNameMode(false);
+        onUpdateName(updated);
+    };
+
     // highlight name input on edit
     useEffect(() => {
         if (editNameMode && inputNameRef.current) {
@@ -33,26 +34,21 @@ const TextHeaderContent = ({
         }
     }, [editNameMode]);
 
-    const onUpdate = (updated: string) => {
-        setEditNameMode(false);
-        onUpdateName(updated);
-    };
-
     return editNameMode ? (
-        <EditTextName name={name} onRename={onUpdate} onCancel={() => setEditNameMode(false)} inputRef={inputNameRef} />
+        <EditTableName
+            name={name}
+            onRename={onUpdate}
+            onCancel={() => setEditNameMode(false)}
+            inputRef={inputNameRef}
+        />
     ) : (
         <>
             <span onClick={() => setEditNameMode(true)} style={{ cursor: "pointer" }}>
                 <strong>{name}</strong>
             </span>
-            <TextHeaderIcons
-                displayActions={displayActions}
-                onTransform={onTransform}
-                onDelete={onDelete}
-                onCopyToClipboard={onCopyToClipboard}
-            />
+            <TableHeaderIcons onDelete={onDelete} onCopyToClipboard={onCopyToClipboard} />
         </>
     );
 };
 
-export default TextHeaderContent;
+export default TableHeaderContent;

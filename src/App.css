@@ -130,8 +130,30 @@
 
 /* tables */
 
-.grid-item-2col {
+.table {
+    margin-right: 10px;
+}
+
+.table-header {
+    position: relative;
+    background-color: #badfd1;
+    padding-top: 9px;
+    padding-bottom: 12px;
+    padding-left: 10px;
+}
+
+.table-2-columns {
     grid-column: span 2;
+}
+
+.table-3-columns {
+    grid-column: span 3;
+}
+
+.table-content {
+    width: 100%;
+    background-color: white;
+    border: 1px solid #ccc;
 }
 
 /* icons */

@@ -5,42 +5,59 @@ import { withoutPrefix, withoutTrailingDot } from "./common";
 import SpecifyColumns from "./tables/SpecifyColumns";
 import { Column } from "./tangible-gpt/model";
 
-const describeContent = (block: Block) => {
-    switch (block.type) {
-        case "List":
-            return `${block.name}:\n` + block.items.map((i) => i.text).join(", ");
-        case "Text":
-            return `${block.name}:\n` + block.content;
-    }
+const describeList = (list: List) => `${list.name}:\n` + list.items.map((i) => i.text).join(", ");
+
+const describeText = (text: Text) => `${text.name}:\n` + text.content;
+
+const describeTable = (table: Table) => {
+    const header = table.columns.map((c) => c.name).join(";");
+    const rows = table.rows.map((r) => r.cells.map((c) => c.value).join(";")).join("\n");
+
+    return `Table named ${table.name} with header and rows:
+${header}
+${rows}`;
 };
 
 const describeLists = (lists: List[]) =>
-    "The following lists of items are useful information:\n" + lists.map(describeContent).join("\n") + "\n";
+    "The following lists of items are useful information:\n" + lists.map(describeList).join("\n") + "\n";
 
 const describeTexts = (texts: Text[]) =>
-    "The following is fulful information:\n" + texts.map(describeContent).join("\n") + "\n";
+    "The following is useful information:\n" + texts.map(describeText).join("\n") + "\n";
 
-const createPrompt = (instruction: string, blocks: Block[]) => {
+const describeTables = (tables: Table[]) =>
+    "The following tables are useful information:\n" + tables.map(describeTable).join("\n") + "\n";
+
+const createContextPrompt = (instruction: string, blocks: Block[]) => {
     if (blocks.length > 0) {
         const lists = blocks.filter((b) => b.type === "List");
         const texts = blocks.filter((b) => b.type === "Text");
+        const tables = blocks.filter((b) => b.type === "Table");
 
-        if (lists.length > 0 && texts.length > 0) {
-            return `${describeLists(lists)}
+        const listsDescription =
+            lists.length > 0
+                ? `
+${describeLists(lists)}
+
+${instruction}`
+                : "";
+
+        const textsDescription =
+            texts.length > 0
+                ? `
 ${describeTexts(texts)}
 
-${instruction}`;
-        } else if (lists.length > 0) {
-            return `${describeLists(lists)}
+${instruction}`
+                : "";
 
-${instruction}`;
-        } else if (texts.length > 0) {
-            return `${describeTexts(texts)}
+        const tablesDescription =
+            tables.length > 0
+                ? `
+${describeTables(tables)}
+        
+${instruction}`
+                : "";
 
-${instruction}`;
-        } else {
-            return instruction;
-        }
+        return listsDescription + textsDescription + tablesDescription;
     } else {
         return instruction;
     }
@@ -63,7 +80,7 @@ const CreateBlock = ({ openAiConfig, blocks, onCreateList, onCreateText, onCreat
 
     const onCreateListInput = async (instruction: string) => {
         const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
-        const prompt = createPrompt(
+        const prompt = createContextPrompt(
             instruction,
             blocks.filter((b) => selectedBlocks.includes(b.id)),
         );
@@ -80,7 +97,7 @@ const CreateBlock = ({ openAiConfig, blocks, onCreateList, onCreateText, onCreat
 
     const onCreateTextInput = async (instruction: string) => {
         const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
-        const prompt = createPrompt(
+        const prompt = createContextPrompt(
             instruction,
             blocks.filter((b) => selectedBlocks.includes(b.id)),
         );
@@ -90,6 +107,28 @@ const CreateBlock = ({ openAiConfig, blocks, onCreateList, onCreateText, onCreat
         if (response.outcome === "Success") {
             onCreateText(instruction, response.value);
         }
+    };
+
+    const onGenerateTable = async (instruction: string, columns: Column[]) => {
+        const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
+        const prompt = createContextPrompt(
+            instruction,
+            blocks.filter((b) => selectedBlocks.includes(b.id)),
+        );
+        setLoading(true);
+        const response = await tc.expectTable(prompt, columns);
+        if (response.outcome === "Success") {
+            onCreateTable({
+                type: "Table",
+                id: createTableId(),
+                name: instruction,
+                columns: response.value.columns,
+                rows: response.value.rows,
+            });
+        }
+        setSpecifyTableColumns(false);
+        setInstruction("");
+        setLoading(false);
     };
 
     const checkboxValue = (id: BlockId) => (selectedBlocks.includes(id) ? "checked" : undefined);
@@ -115,29 +154,11 @@ const CreateBlock = ({ openAiConfig, blocks, onCreateList, onCreateText, onCreat
 
     const allowIncludeContext = blocks.length > 0;
 
-    const onGenerateTable = async (columns: Column[]) => {
-        const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
-        setLoading(true);
-        const response = await tc.expectTable(instruction, columns);
-        if (response.outcome === "Success") {
-            onCreateTable({
-                type: "Table",
-                id: createTableId(),
-                name: instruction,
-                columns: response.value.columns,
-                rows: response.value.rows,
-            });
-        }
-        setSpecifyTableColumns(false);
-        setInstruction("");
-        setLoading(false);
-    };
-
     return specifyTableColumns ? (
         <SpecifyColumns
             instruction={instruction}
             loading={loading}
-            onGenerateTable={onGenerateTable}
+            onGenerateTable={(columns) => onGenerateTable(instruction, columns)}
             onCancel={() => setSpecifyTableColumns(false)}
         />
     ) : (

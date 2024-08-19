@@ -39,7 +39,6 @@ const SpecifyColumns = ({ instruction, loading, onGenerateTable, onCancel }: Pro
         setColumns(columns.filter((c) => c !== column));
     };
 
-    // TODO suggest columns
     return (
         <div className="create-list">
             {loading ? (

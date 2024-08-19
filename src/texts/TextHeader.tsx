@@ -61,7 +61,7 @@ const TextHeader = ({
                     name={text.name}
                     displayActions={interactionState.type === "Display"}
                     inputNameRef={inputNameRef}
-                    editContentMode={editNameMode}
+                    editNameMode={editNameMode}
                     onUpdateName={(name) => onRename(name)}
                     onTransform={onTransform}
                     onDelete={onDelete}

@@ -11,10 +11,10 @@ import {
     Block,
     Text,
     createTextId,
-    TextId,
     OpenAiConfig,
     BlockHeight,
     Table,
+    BlockId,
 } from "./model";
 import { ItemGroup } from "./tangible-gpt/model";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
@@ -32,12 +32,17 @@ type ClipboardText = {
     text: Text;
 };
 
+type ClipboardTable = {
+    type: "Table";
+    table: Table;
+};
+
 type ClipboardWorkspace = {
     type: "Workspace";
     workspace: Workspace;
 };
 
-export type ClipboardItem = ClipboardList | ClipboardText | ClipboardWorkspace;
+export type ClipboardItem = ClipboardList | ClipboardText | ClipboardWorkspace | ClipboardTable;
 
 type Props = {
     openAiConfig: OpenAiConfig;
@@ -76,6 +81,16 @@ const WorkspaceContainer = ({ openAiConfig, workspace, blockHeight, onUpdateBloc
             const index = blocks.indexOf(found);
             const updatedBlocks = blocks.slice();
             updatedBlocks[index] = updatedList;
+            onUpdateBlocks(workspaceId, updatedBlocks);
+        }
+    };
+
+    const onUpdateTable = (updatedTable: Table) => {
+        const found = blocks.find((l) => l.id === updatedTable.id);
+        if (found !== undefined && found.type === "Table") {
+            const index = blocks.indexOf(found);
+            const updatedBlocks = blocks.slice();
+            updatedBlocks[index] = updatedTable;
             onUpdateBlocks(workspaceId, updatedBlocks);
         }
     };
@@ -124,7 +139,7 @@ const WorkspaceContainer = ({ openAiConfig, workspace, blockHeight, onUpdateBloc
         }
     };
 
-    const onDeleteBlock = (id: ListId | TextId) => {
+    const onDeleteBlock = (id: BlockId) => {
         const updatedBlocks = blocks.slice().filter((b) => b.id !== id);
         onUpdateBlocks(workspaceId, updatedBlocks);
     };
@@ -159,8 +174,12 @@ const WorkspaceContainer = ({ openAiConfig, workspace, blockHeight, onUpdateBloc
                                 />
                             </div>
                         ) : block.type === "Table" ? (
-                            <div className="grid-item" key={block.id}>
-                                <TableElement table={block} />
+                            <div className={tableClass(block.columns.length)} key={block.id}>
+                                <TableElement
+                                    table={block}
+                                    onUpdate={onUpdateTable}
+                                    onDelete={() => onDeleteBlock(block.id)}
+                                />
                             </div>
                         ) : (
                             <div className="grid-item" key={block.id}>
@@ -187,6 +206,16 @@ const WorkspaceContainer = ({ openAiConfig, workspace, blockHeight, onUpdateBloc
             />
         </div>
     );
+};
+
+const tableClass = (noOfColumns: number) => {
+    if (noOfColumns <= 2) {
+        return "grid-item";
+    } else if (noOfColumns <= 4) {
+        return "grid-item table-2-columns";
+    } else {
+        return "grid-item table-3-columns";
+    }
 };
 
 export default WorkspaceContainer;

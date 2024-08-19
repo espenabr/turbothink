@@ -33,17 +33,12 @@ const TextHeaderIcons = ({ displayActions, onTransform, onDelete, onCopyToClipbo
                     >
                         <IconStatusChange />
                     </a>
-                    <a
-                        className="icon"
-                        onClick={onCopy}
-                        data-tooltip-id="tooltip"
-                        data-tooltip-content="Copy to clipboard"
-                    >
-                        <IconClipboard />
-                    </a>
-                    {copied && <div className="copied">Copied!</div>}
                 </>
             )}
+            <a className="icon" onClick={onCopy} data-tooltip-id="tooltip" data-tooltip-content="Copy to clipboard">
+                <IconClipboard />
+            </a>
+            {copied && <div className="copied">Copied!</div>}
             <a className="icon" onClick={onDelete} data-tooltip-id="tooltip" data-tooltip-content="Close">
                 <IconX />
             </a>
