@@ -59,11 +59,11 @@ export type Workspace = {
 /* Actions */
 export type ListAction = "filter" | "sort" | "group";
 export type TextAction = "transform";
-
+export type TableAction = "addColumn" | "addRow";
 
 /* Interaction states */
 
-type WaitingForUserListInstruction = {
+type WaitingForListInstruction = {
     type: "WaitingForUserListInstruction";
     action: ListAction;
 };
@@ -80,17 +80,50 @@ type Display = {
     type: "Display"
 };
 
-type WaitingForUserTextInstruction = {
+type WaitingForTextInstruction = {
     type: "WaitingForUserTextInstruction";
     action: TextAction;
 };
 
 type EditTextContent = {
     type: "EditTextContent";
-}
+};
 
-export type ListInteractionState = WaitingForUserListInstruction | WaitingForUserAcceptance | Loading | Display;
-export type TextInteractionState = WaitingForUserTextInstruction | EditTextContent | WaitingForUserAcceptance | Loading | Display;
+type WaitingForAddColumnInstruction = {
+    type: "WaitingForAddColumnInstruction";
+};
+
+type WaitingForAddRowInstruction = {
+    type: "WaitingForAddRowInstruction";
+};
+
+export type ListInteractionState = WaitingForListInstruction | WaitingForUserAcceptance | Loading | Display;
+export type TextInteractionState = WaitingForTextInstruction | EditTextContent | WaitingForUserAcceptance | Loading | Display;
+export type TableInteractionState = WaitingForAddColumnInstruction | WaitingForAddRowInstruction | Loading | Display;
+
+/* Clipboard */
+
+type ClipboardList = {
+    type: "List";
+    list: List;
+};
+
+type ClipboardText = {
+    type: "Text";
+    text: Text;
+};
+
+type ClipboardTable = {
+    type: "Table";
+    table: Table;
+};
+
+type ClipboardWorkspace = {
+    type: "Workspace";
+    workspace: Workspace;
+};
+
+export type ClipboardItem = ClipboardList | ClipboardText | ClipboardWorkspace | ClipboardTable;
 
 /* Config */
 

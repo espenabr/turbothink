@@ -22,28 +22,6 @@ import { arrayMove, rectSortingStrategy, SortableContext } from "@dnd-kit/sortab
 import TextElement from "./texts/TextElement";
 import TableElement from "./tables/TableElement";
 
-type ClipboardList = {
-    type: "List";
-    list: List;
-};
-
-type ClipboardText = {
-    type: "Text";
-    text: Text;
-};
-
-type ClipboardTable = {
-    type: "Table";
-    table: Table;
-};
-
-type ClipboardWorkspace = {
-    type: "Workspace";
-    workspace: Workspace;
-};
-
-export type ClipboardItem = ClipboardList | ClipboardText | ClipboardWorkspace | ClipboardTable;
-
 type Props = {
     openAiConfig: OpenAiConfig;
     workspace: Workspace;
@@ -176,6 +154,7 @@ const WorkspaceContainer = ({ openAiConfig, workspace, blockHeight, onUpdateBloc
                         ) : block.type === "Table" ? (
                             <div className={tableClass(block.columns.length)} key={block.id}>
                                 <TableElement
+                                    openAiConfig={openAiConfig}
                                     table={block}
                                     blockHeight={blockHeight}
                                     onUpdate={onUpdateTable}

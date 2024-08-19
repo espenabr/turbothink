@@ -964,7 +964,7 @@ ${resultColumns.map(describeColumn).join("\n")}`;
     ): Promise<TangibleResponse<Table>> => {
         const prompt = `${renderTable(table)}
 
-Expand this table with another row:
+Expand this table with another row (as the last row in the table):
 ${rowDescription}`;
 
         const responseFormatDescription = `The response must be in CSV format (semicolon separated) with columns: ${table.columns

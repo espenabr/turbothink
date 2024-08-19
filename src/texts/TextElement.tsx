@@ -4,7 +4,7 @@ import EditTextContent from "./EditTextContent";
 import TextContent from "./TextContent";
 import { CSS } from "@dnd-kit/utilities";
 import { useSortable } from "@dnd-kit/sortable";
-import { ClipboardItem } from "../WorkspaceContainer";
+import { ClipboardItem } from "../model";
 import TangibleClient from "../tangible-gpt/TangibleClient";
 import TextHeader from "./TextHeader";
 import IconCheck from "../icons/IconCheck";

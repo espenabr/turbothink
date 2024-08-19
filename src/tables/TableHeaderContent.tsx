@@ -7,6 +7,8 @@ type Props = {
     editNameMode: boolean;
     inputNameRef: RefObject<HTMLInputElement>;
     onUpdateName: (name: string) => void;
+    onInitiateAddColumn: () => void;
+    onInitiateAddRow: () => void;
     onDelete: () => void;
     onCopyToClipboard: () => void;
     setEditNameMode: (value: boolean) => void;
@@ -17,6 +19,8 @@ const TableHeaderContent = ({
     editNameMode,
     inputNameRef,
     onUpdateName,
+    onInitiateAddColumn,
+    onInitiateAddRow,
     onDelete,
     onCopyToClipboard,
     setEditNameMode,
@@ -46,7 +50,12 @@ const TableHeaderContent = ({
             <span onClick={() => setEditNameMode(true)} style={{ cursor: "pointer" }}>
                 <strong>{name}</strong>
             </span>
-            <TableHeaderIcons onDelete={onDelete} onCopyToClipboard={onCopyToClipboard} />
+            <TableHeaderIcons
+                onInitiateAddColumn={onInitiateAddColumn}
+                onInitiateAddRow={onInitiateAddRow}
+                onDelete={onDelete}
+                onCopyToClipboard={onCopyToClipboard}
+            />
         </>
     );
 };

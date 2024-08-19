@@ -10,7 +10,7 @@ const TableContent = ({ table }: Props) => {
             <thead>
                 <tr>
                     {table.columns.map((c) => (
-                        <th>{c.name}</th>
+                        <th key={c.name}>{c.name}</th>
                     ))}
                 </tr>
             </thead>
@@ -18,7 +18,7 @@ const TableContent = ({ table }: Props) => {
                 {table.rows.map((r) => (
                     <tr>
                         {r.cells.map((c) => (
-                            <td>{c.value}</td>
+                            <td key={c.column.name}>{c.value}</td>
                         ))}
                     </tr>
                 ))}

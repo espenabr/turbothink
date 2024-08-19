@@ -110,13 +110,14 @@ const CreateBlock = ({ openAiConfig, blocks, onCreateList, onCreateText, onCreat
     };
 
     const onGenerateTable = async (instruction: string, columns: Column[]) => {
+        const reasoning = openAiConfig.reasoningStrategy;
         const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
         const prompt = createContextPrompt(
             instruction,
             blocks.filter((b) => selectedBlocks.includes(b.id)),
         );
         setLoading(true);
-        const response = await tc.expectTable(prompt, columns);
+        const response = await tc.expectTable(prompt, columns, undefined, undefined, reasoning);
         if (response.outcome === "Success") {
             onCreateTable({
                 type: "Table",

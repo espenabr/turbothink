@@ -11,7 +11,7 @@ import {
     BlockHeight,
     createTableId,
 } from "./model";
-import WorkspaceContainer, { ClipboardItem } from "./WorkspaceContainer";
+import WorkspaceContainer from "./WorkspaceContainer";
 import IconPlus from "./icons/IconPlus";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
@@ -19,6 +19,7 @@ import Tab from "./tabs/Tab";
 import Settings from "./Settings";
 import { GptModel, ReasoningStrategy } from "./tangible-gpt/model";
 import { Tooltip } from "react-tooltip";
+import { ClipboardItem } from "./model";
 
 const loadWorkspaces = (): WorkspaceHeader[] => {
     const workspaces = localStorage.getItem("workspaces");
