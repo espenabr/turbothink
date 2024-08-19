@@ -204,6 +204,14 @@
     opacity: 100%;
 }
 
+.table-header .icons {
+    opacity: 20%;
+}
+
+.table-header:hover .icons {
+    opacity: 100%;
+}
+
 .icons {
     position: absolute;
     right: 10px;
