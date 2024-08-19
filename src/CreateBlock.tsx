@@ -1,7 +1,9 @@
 import { useState } from "react";
 import TangibleClient from "./tangible-gpt/TangibleClient";
-import { Block, List, ListId, OpenAiConfig, Text, TextId } from "./model";
+import { Block, BlockId, createTableId, List, ListId, OpenAiConfig, Table, TableId, Text, TextId } from "./model";
 import { withoutPrefix, withoutTrailingDot } from "./common";
+import SpecifyColumns from "./tables/SpecifyColumns";
+import { Column } from "./tangible-gpt/model";
 
 const describeContent = (block: Block) => {
     switch (block.type) {
@@ -49,12 +51,14 @@ type Props = {
     blocks: Block[];
     onCreateList: (name: string, items: string[]) => void;
     onCreateText: (name: string, content: string) => void;
+    onCreateTable: (table: Table) => void;
 };
 
-const CreateBlock = ({ openAiConfig, blocks, onCreateList, onCreateText }: Props) => {
+const CreateBlock = ({ openAiConfig, blocks, onCreateList, onCreateText, onCreateTable }: Props) => {
     const [instruction, setInstruction] = useState<string>("");
+    const [specifyTableColumns, setSpecifyTableColumns] = useState<boolean>(false);
 
-    const [selectedBlocks, setSelectedBlocks] = useState<(TextId | ListId)[]>([]);
+    const [selectedBlocks, setSelectedBlocks] = useState<(TextId | ListId | TableId)[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
     const onCreateListInput = async (instruction: string) => {
@@ -88,9 +92,9 @@ const CreateBlock = ({ openAiConfig, blocks, onCreateList, onCreateText }: Props
         }
     };
 
-    const checkboxValue = (id: ListId | TextId) => (selectedBlocks.includes(id) ? "checked" : undefined);
+    const checkboxValue = (id: BlockId) => (selectedBlocks.includes(id) ? "checked" : undefined);
 
-    const onClickCheckbox = (id: ListId | TextId) => {
+    const onClickCheckbox = (id: BlockId) => {
         if (selectedBlocks.includes(id)) {
             const updatedBlocks = selectedBlocks.slice().filter((b) => b !== id);
             setSelectedBlocks(updatedBlocks);
@@ -111,7 +115,32 @@ const CreateBlock = ({ openAiConfig, blocks, onCreateList, onCreateText }: Props
 
     const allowIncludeContext = blocks.length > 0;
 
-    return (
+    const onGenerateTable = async (columns: Column[]) => {
+        const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
+        setLoading(true);
+        const response = await tc.expectTable(instruction, columns);
+        if (response.outcome === "Success") {
+            onCreateTable({
+                type: "Table",
+                id: createTableId(),
+                name: instruction,
+                columns: response.value.columns,
+                rows: response.value.rows,
+            });
+        }
+        setSpecifyTableColumns(false);
+        setInstruction("");
+        setLoading(false);
+    };
+
+    return specifyTableColumns ? (
+        <SpecifyColumns
+            instruction={instruction}
+            loading={loading}
+            onGenerateTable={onGenerateTable}
+            onCancel={() => setSpecifyTableColumns(false)}
+        />
+    ) : (
         <div className="create-list">
             {loading ? (
                 <div
@@ -155,6 +184,7 @@ const CreateBlock = ({ openAiConfig, blocks, onCreateList, onCreateText }: Props
                         <input
                             value={instruction}
                             className="instruction-input"
+                            style={{ width: "200px" }}
                             onChange={(e) => setInstruction(e.currentTarget.value)}
                             onKeyUp={(e) => {
                                 if (e.key === "Enter" && instruction.length > 0) {
@@ -162,22 +192,30 @@ const CreateBlock = ({ openAiConfig, blocks, onCreateList, onCreateText }: Props
                                     setInstruction("");
                                 }
                             }}
-                            placeholder="What would you like?"
+                            placeholder="Describe what to generate"
                         />
                         <br />
+
                         <button
-                            style={{ width: "100px" }}
+                            style={{ width: "50px" }}
                             disabled={instruction.length <= 0}
                             onClick={() => onGenerateList()}
                         >
-                            Generate list
+                            List
                         </button>
                         <button
-                            style={{ width: "100px", marginLeft: "10px" }}
+                            style={{ width: "50px", marginLeft: "10px" }}
                             disabled={instruction.length <= 0}
                             onClick={() => onGenerateText()}
                         >
-                            Generate text
+                            Text
+                        </button>
+                        <button
+                            style={{ width: "50px", marginLeft: "10px" }}
+                            disabled={instruction.length <= 0}
+                            onClick={() => setSpecifyTableColumns(true)}
+                        >
+                            Table
                         </button>
                     </div>
 

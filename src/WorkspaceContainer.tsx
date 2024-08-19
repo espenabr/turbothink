@@ -14,11 +14,13 @@ import {
     TextId,
     OpenAiConfig,
     BlockHeight,
+    Table,
 } from "./model";
 import { ItemGroup } from "./tangible-gpt/model";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import TextElement from "./texts/TextElement";
+import TableElement from "./tables/TableElement";
 
 type ClipboardList = {
     type: "List";
@@ -102,6 +104,10 @@ const WorkspaceContainer = ({ openAiConfig, workspace, blockHeight, onUpdateBloc
         onUpdateBlocks(workspaceId, blocks.slice().concat(text));
     };
 
+    const onCreateTable = (table: Table) => {
+        onUpdateBlocks(workspaceId, blocks.slice().concat(table));
+    };
+
     const onUpdateText = (text: Text) => {
         const found = blocks.find((b) => b.id === text.id);
         if (found !== undefined && found.type === "Text") {
@@ -152,6 +158,10 @@ const WorkspaceContainer = ({ openAiConfig, workspace, blockHeight, onUpdateBloc
                                     key={block.id}
                                 />
                             </div>
+                        ) : block.type === "Table" ? (
+                            <div className="grid-item" key={block.id}>
+                                <TableElement table={block} />
+                            </div>
                         ) : (
                             <div className="grid-item" key={block.id}>
                                 <TextElement
@@ -173,6 +183,7 @@ const WorkspaceContainer = ({ openAiConfig, workspace, blockHeight, onUpdateBloc
                 blocks={blocks}
                 onCreateList={onCreateList}
                 onCreateText={onCreateText}
+                onCreateTable={onCreateTable}
             />
         </div>
     );

@@ -1,16 +1,20 @@
 import { Brand } from "./common";
 import { v4 as uuid } from "uuid";
-import { GptModel, ReasoningStrategy } from "./tangible-gpt/model";
+import { Column, GptModel, ReasoningStrategy, Row } from "./tangible-gpt/model";
 
 export type ListId = Brand<string, "ListId">;
 export type ListItemId = Brand<string, "ListItemId">;
 export type WorkspaceId = Brand<string, "WorkspaceId">;
 export type TextId = Brand<string, "TextId">;
+export type TableId = Brand<string, "TableId">;
+
+export type BlockId = ListId | TextId | TableId;
 
 export const createListId = () => uuid() as ListId;
 export const createTextId = () => uuid() as TextId;
 export const createListItemId = () => uuid() as ListItemId;
 export const createWorkspaceId = () => uuid() as WorkspaceId;
+export const createTableId = () => uuid() as TableId;
 
 export type ListItem = {
     id: ListItemId;
@@ -31,7 +35,15 @@ export type Text = {
     content: string;
 };
 
-export type Block = List | Text;
+export type Table = {
+    type: "Table";
+    id: TableId;
+    name: string;
+    columns: Column[];
+    rows: Row[];
+};
+
+export type Block = List | Text | Table;
 
 export type WorkspaceHeader = {
     id: WorkspaceId;
