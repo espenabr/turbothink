@@ -15,7 +15,7 @@ const withLineBreaks = (s: string) => (
     </>
 );
 
-const DisplayTextContent = ({ content }: Props) => {
+const TextContent = ({ content }: Props) => {
     const empty = content.length === 0;
 
     return (
@@ -25,4 +25,4 @@ const DisplayTextContent = ({ content }: Props) => {
     );
 };
 
-export default DisplayTextContent;
+export default TextContent;

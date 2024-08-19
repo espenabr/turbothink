@@ -1,7 +1,7 @@
 import { CSSProperties, useEffect, useState, useRef } from "react";
 import { BlockHeight, OpenAiConfig, Text, TextAction, TextId, TextInteractionState } from "../model";
 import EditTextContent from "./EditTextContent";
-import DisplayTextContent from "./DisplayTextContent";
+import TextContent from "./TextContent";
 import { CSS } from "@dnd-kit/utilities";
 import { useSortable } from "@dnd-kit/sortable";
 import { ClipboardItem } from "../WorkspaceContainer";
@@ -180,7 +180,7 @@ I only want the transformed text back, nothing else`;
                             setTextContentInput={setTextContentInput}
                         />
                     ) : (
-                        <DisplayTextContent content={content} />
+                        <TextContent content={content} />
                     )}
                 </div>
             </div>

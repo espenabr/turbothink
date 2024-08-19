@@ -52,32 +52,45 @@ const SpecifyColumns = ({ instruction, loading, onGenerateTable, onCancel }: Pro
                 />
             ) : (
                 <>
-                    <h3>Generate table</h3>
-                    <div>Instruction: {instruction}</div>
+                    <div style={{ marginTop: "20px" }}>Generate table of</div>
+                    <div>
+                        <strong>{instruction}</strong>
+                    </div>
                     <br />
-
+                    Add columns:
+                    <br />
+                    <br />
                     {columns.map((c) => (
-                        <div>
+                        <div className="desired-table-column" key={c.name}>
+                            &nbsp;
                             {c.name}
-                            <a onClick={() => onDelete(c)} style={{ cursor: "pointer" }}>
+                            <a
+                                className="desired-table-column-content"
+                                onClick={() => onDelete(c)}
+                                style={{ cursor: "pointer", marginRight: "10px" }}
+                            >
                                 <IconX />
                             </a>
                         </div>
                     ))}
-                    <input
-                        value={columnNameInput}
-                        onChange={(e) => setColumnNameInput(e.currentTarget.value)}
-                        onKeyUp={onKeyUp}
-                        placeholder="Column name"
-                    />
-                    <button onClick={onClickAdd}>Add</button>
-
+                    <div>
+                        <input
+                            value={columnNameInput}
+                            onChange={(e) => setColumnNameInput(e.currentTarget.value)}
+                            onKeyUp={onKeyUp}
+                            placeholder="Column name"
+                        />
+                        <button onClick={onClickAdd}>Add</button>
+                    </div>
                     <br />
                     <br />
                     <div>
-                        <a onClick={() => onGenerateTable(columns)} style={{ cursor: "pointer" }}>
-                            <IconCheck />
-                        </a>
+                        {columns.length > 0 && (
+                            <a onClick={() => onGenerateTable(columns)} style={{ cursor: "pointer" }}>
+                                <IconCheck />
+                                &nbsp;
+                            </a>
+                        )}
                         <a onClick={onCancel} style={{ cursor: "pointer" }}>
                             <IconArrowBack />
                         </a>

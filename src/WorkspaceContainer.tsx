@@ -177,8 +177,10 @@ const WorkspaceContainer = ({ openAiConfig, workspace, blockHeight, onUpdateBloc
                             <div className={tableClass(block.columns.length)} key={block.id}>
                                 <TableElement
                                     table={block}
+                                    blockHeight={blockHeight}
                                     onUpdate={onUpdateTable}
                                     onDelete={() => onDeleteBlock(block.id)}
+                                    key={block.id}
                                 />
                             </div>
                         ) : (

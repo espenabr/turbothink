@@ -9,6 +9,7 @@ import {
     createTextId,
     OpenAiConfig,
     BlockHeight,
+    createTableId,
 } from "./model";
 import WorkspaceContainer, { ClipboardItem } from "./WorkspaceContainer";
 import IconPlus from "./icons/IconPlus";
@@ -90,6 +91,11 @@ const RootPage = () => {
                 onUpdateBlocks(
                     currentWorkspace.id,
                     currentWorkspace.blocks.concat({ ...parsed.text, id: createTextId() }),
+                );
+            } else if (parsed.type === "Table") {
+                onUpdateBlocks(
+                    currentWorkspace.id,
+                    currentWorkspace.blocks.concat({ ...parsed.table, id: createTableId() }),
                 );
             } else if (parsed.type === "Workspace") {
                 onAddWorkspace({ ...parsed.workspace, id: createWorkspaceId() });

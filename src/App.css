@@ -39,6 +39,10 @@
     min-height: 100px;
     border: 1px solid #ddd;
     cursor: pointer;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 4px;
+    padding-bottom: 4px;
 }
 
 .text-display {
@@ -154,6 +158,24 @@
     width: 100%;
     background-color: white;
     border: 1px solid #ccc;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.table-content th {
+    text-align: left;
+    background-color: #eee;
+    border-bottom: #bbb solid 1px;
+}
+
+.desired-table-column {
+    background-color: white;
+    display: inline-block;
+    border: gray solid 1px;
 }
 
 /* icons */
