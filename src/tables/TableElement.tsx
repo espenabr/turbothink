@@ -79,6 +79,21 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete }: 
         });
     };
 
+    const equal = (a: string[], b: string[]) => a.length === b.length && a.every((v, i) => v === b[i]);
+
+    const onDeleteRow = (values: string[]) => {
+        onUpdate({
+            ...table,
+            rows: table.rows.filter(
+                (r) =>
+                    !equal(
+                        r.cells.map((c) => c.value.toString()),
+                        values,
+                    ),
+            ),
+        });
+    };
+
     return (
         <div className="block">
             <div className="table" ref={setNodeRef} style={style} {...attributes}>
@@ -95,7 +110,7 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete }: 
                     onCopyToClipboard={onCopyToClipboard}
                 />
                 <div className={tableContentClass(blockHeight)}>
-                    <TableContent table={table} onDeleteColumn={onDeleteColumn} />
+                    <TableContent table={table} onDeleteColumn={onDeleteColumn} onDeleteRow={onDeleteRow} />
                 </div>
             </div>
         </div>

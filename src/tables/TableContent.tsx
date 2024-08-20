@@ -4,9 +4,10 @@ import { Table } from "../model";
 type Props = {
     table: Table;
     onDeleteColumn: (columnName: string) => void;
+    onDeleteRow: (cellValues: string[]) => void;
 };
 
-const TableContent = ({ table, onDeleteColumn }: Props) => {
+const TableContent = ({ table, onDeleteColumn, onDeleteRow }: Props) => {
     return (
         <table className="table-content">
             <thead>
@@ -28,6 +29,11 @@ const TableContent = ({ table, onDeleteColumn }: Props) => {
                         {r.cells.map((c) => (
                             <td key={c.column.name}>{c.value}</td>
                         ))}
+                        <td>
+                            <a onClick={() => onDeleteRow(r.cells.map((c) => c.value.toString()))}>
+                                <IconX />
+                            </a>
+                        </td>
                     </tr>
                 ))}
             </tbody>

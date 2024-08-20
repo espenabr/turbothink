@@ -186,6 +186,14 @@
     opacity: 100%;
 }
 
+.table-content td a {
+    opacity: 20%;
+}
+
+.table-content td:hover a {
+    opacity: 100%;
+}
+
 /* icons */
 
 .list-item .icons {
