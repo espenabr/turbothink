@@ -1,5 +1,5 @@
 import { CSSProperties, useState } from "react";
-import ListItemElement, { Modification } from "./ListItemContainer";
+import ListItemElement, { FilteredOut, Grouped, Modification, Reordered } from "./ListItemContainer";
 import TangibleClient from "../tangible-gpt/TangibleClient";
 import AddListItem from "./AddListItem";
 import { withoutTrailingDot } from "../common";
@@ -130,27 +130,32 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
     const [lastResponse, setLastResponse] = useState<TangibleResponse<string[]> | TangibleResponse<ItemGroup[]> | null>(
         null,
     );
+
+    /* Drag & drop stuff */
+
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: { delay: 200, tolerance: 5 },
         }),
     );
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: list.id });
-
     const style: CSSProperties = {
         transform: CSS.Translate.toString(transform),
         transition,
     };
+    const onDragEnd = (event: DragEndEvent) => {
+        if (event.over !== null) {
+            const over = event.over;
+            if (event.active.id !== event.over.id) {
+                const oldIndex = list.items.findIndex((i) => i.id === event.active.id);
+                const newIndex = list.items.findIndex((i) => i.id === over.id);
+                const updated = arrayMove(list.items, oldIndex, newIndex);
+                onUpdateItems(updated);
+            }
+        }
+    };
 
-    const updateFilterModification = (instruction: string, updatedItems: string[]) =>
-        setSuggestedModification({ type: "filtered", predicate: instruction, items: updatedItems });
-
-    const updateSortModification = (instruction: string, updatedItems: string[]) =>
-        setSuggestedModification({ type: "sorted", orderBy: instruction, items: updatedItems });
-
-    const updateGroupModification = (instruction: string, groups: ItemGroup[]) =>
-        setSuggestedModification({ type: "grouped", criteria: instruction, groups: groups });
-
+    /* Perform action based on user instruction using LLM */
     const onAction = async (instruction: string) => {
         const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
         const items = list.items.map((i) => i.text);
@@ -182,6 +187,14 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
         }
         setLoading(false);
         setWaitingForUserInstruction(null);
+    };
+
+    /* If the user isn't happy with the suggested modification, try again with additional adjustment */
+
+    const onRetryWithInstruction = (instruction: string) => {
+        if (suggestedModification !== null) {
+            onRetryWithAdditionalInstruction(instruction, toAction(suggestedModification));
+        }
     };
 
     const onRetryWithAdditionalInstruction = async (instruction: string, action: ListAction) => {
@@ -218,29 +231,57 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
         setWaitingForUserInstruction(null);
     };
 
-    const onReject = () => setSuggestedModification(null);
+    const onUpdateItems = (items: ListItem[]) => onUpdateList({ ...list, items: items });
 
-    const onUpdateItems = (items: ListItem[]) => {
-        onUpdateList({ ...list, items: items });
+    /* Visually indicate potential suggested modification for an item in the list */
+    const itemModification = (item: ListItem): Modification | null => {
+        if (suggestedModification !== null) {
+            switch (suggestedModification.type) {
+                case "filtered":
+                    return filteredOutItem(item, suggestedModification.items);
+                case "sorted":
+                    return reorderedItem(item, list.items, suggestedModification);
+                case "grouped":
+                    return groupedItem(item, suggestedModification.groups);
+            }
+        }
+        return null; // no modification
     };
 
-    const onAccept = () => {
-        switch (suggestedModification?.type) {
-            case "filtered":
-                onUpdateItems(list.items.filter((i) => suggestedModification.items.includes(i.text)));
-                break;
-            case "sorted":
-                onUpdateItems(toSortedListItems(suggestedModification.items, list.items));
-                break;
-            case "grouped":
-                onGroup(suggestedModification.groups);
-                break;
+    const onCopyToClipboard = async () => {
+        const clipboardItem: ClipboardItem = {
+            type: "List",
+            list: list,
+        };
+        await navigator.clipboard.writeText(JSON.stringify(clipboardItem));
+    };
+
+    /* Direct list manipulation */
+
+    const onRenameList = (newName: string) => onUpdateList({ ...list, name: newName });
+
+    const onEditItem = (itemId: ListItemId, newText: string) => {
+        const found = list.items.find((i) => i.id === itemId);
+        if (found !== undefined) {
+            const index = list.items.indexOf(found);
+            const updatedItems = list.items.slice();
+            updatedItems[index] = { ...found, text: newText };
+            onUpdateList({ ...list, items: updatedItems });
         }
-        setSuggestedModification(null);
+    };
+
+    const onAddItem = (newItemText: string) => {
+        const newItem: ListItem = { id: createListItemId(), text: newItemText };
+        onUpdateList({ ...list, items: list.items.concat(newItem) });
+    };
+
+    const onDeleteItem = (itemId: ListItemId) => {
+        onUpdateItems(list.items.filter((i) => i.id !== itemId));
     };
 
     const onDelete = () => onDeleteList(list.id);
 
+    /* Extend the list with one item using LLM (based on list content) */
     const onExtendList = async () => {
         const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
         if (list.items.length > 0) {
@@ -259,102 +300,42 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
         }
     };
 
-    const itemModification = (item: ListItem): Modification | null => {
-        if (suggestedModification !== null) {
-            if (suggestedModification.type === "filtered" && !suggestedModification.items.includes(item.text)) {
-                return { type: "filteredOut" };
-            } else if (suggestedModification.type === "sorted") {
-                const items = list.items;
-                if (items.length === suggestedModification.items.length) {
-                    const suggestedItems = toSortedListItems(suggestedModification.items, items);
+    /* Show propposed modifications for user to accept or reject */
 
-                    if (suggestedItems.indexOf(item) !== items.indexOf(item)) {
-                        const index = items.indexOf(item);
-                        return suggestedItems[index] !== undefined
-                            ? {
-                                  type: "reordered",
-                                  newText: suggestedItems[index].text,
-                              }
-                            : null;
-                    } else {
-                        return null;
-                    }
-                }
-            } else if (suggestedModification.type === "grouped") {
-                const group = suggestedModification.groups.find((g) => g.items.includes(item.text));
-                if (group !== undefined) {
-                    const index = suggestedModification.groups.indexOf(group);
-                    return {
-                        type: "grouped",
-                        groupName: group.name,
-                        backgroundColor: groupColors[index],
-                    };
-                } else {
-                    return null;
-                }
-            } else {
-                return null;
-            }
+    const updateFilterModification = (instruction: string, updatedItems: string[]) =>
+        setSuggestedModification({ type: "filtered", predicate: instruction, items: updatedItems });
+
+    const updateSortModification = (instruction: string, updatedItems: string[]) =>
+        setSuggestedModification({ type: "sorted", orderBy: instruction, items: updatedItems });
+
+    const updateGroupModification = (instruction: string, groups: ItemGroup[]) =>
+        setSuggestedModification({ type: "grouped", criteria: instruction, groups: groups });
+
+    /* Accept or reject proposed modifications */
+
+    const onAccept = () => {
+        switch (suggestedModification?.type) {
+            case "filtered":
+                onUpdateItems(list.items.filter((i) => suggestedModification.items.includes(i.text)));
+                break;
+            case "sorted":
+                onUpdateItems(toSortedListItems(suggestedModification.items, list.items));
+                break;
+            case "grouped":
+                onGroup(suggestedModification.groups);
+                break;
         }
-        return null;
+        setSuggestedModification(null);
     };
 
-    const onDragEnd = (event: DragEndEvent) => {
-        if (event.over !== null) {
-            const over = event.over;
-            if (event.active.id !== event.over.id) {
-                const oldIndex = list.items.findIndex((i) => i.id === event.active.id);
-                const newIndex = list.items.findIndex((i) => i.id === over.id);
-                const updated = arrayMove(list.items, oldIndex, newIndex);
-                onUpdateItems(updated);
-            }
-        }
-    };
-
-    const onRenameList = (newName: string) => {
-        onUpdateList({ ...list, name: newName });
-    };
-
-    const onCopyToClipboard = async () => {
-        const clipboardItem: ClipboardItem = {
-            type: "List",
-            list: list,
-        };
-        await navigator.clipboard.writeText(JSON.stringify(clipboardItem));
-    };
-
-    const onEditItemText = (itemId: ListItemId, newText: string) => {
-        const found = list.items.find((i) => i.id === itemId);
-        if (found !== undefined) {
-            const index = list.items.indexOf(found);
-            const updatedItems = list.items.slice();
-            updatedItems[index] = { ...found, text: newText };
-            onUpdateList({ ...list, items: updatedItems });
-        }
-    };
-
-    const onAddItem = (newItemText: string) => {
-        const newItem: ListItem = { id: createListItemId(), text: newItemText };
-        onUpdateList({ ...list, items: list.items.concat(newItem) });
-    };
-
-    const onDeleteItem = (itemId: ListItemId) => {
-        onUpdateItems(list.items.filter((i) => i.id !== itemId));
-    };
-    const state = interactionState(loading, waitingForUserInstruction, suggestedModification);
-
-    const onRetryWithInstruction = (instruction: string) => {
-        if (suggestedModification !== null) {
-            onRetryWithAdditionalInstruction(instruction, toAction(suggestedModification));
-        }
-    };
+    const onReject = () => setSuggestedModification(null);
 
     return (
         <div className="block" style={style} ref={setNodeRef} {...attributes}>
             <ListHeader
                 openAiConfig={openAiConfig}
                 list={list}
-                interactionState={state}
+                interactionState={interactionState(loading, waitingForUserInstruction, suggestedModification)}
                 listeners={listeners}
                 onRenameList={onRenameList}
                 onAction={onAction}
@@ -375,7 +356,7 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
                                     item={item}
                                     canModify={suggestedModification === null}
                                     modification={itemModification(item)}
-                                    onEdit={(newText) => onEditItemText(item.id, newText)}
+                                    onEdit={(newText) => onEditItem(item.id, newText)}
                                     onDelete={onDeleteItem}
                                     key={item.id}
                                 />
@@ -391,6 +372,39 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
             </div>
         </div>
     );
+};
+
+const reorderedItem = (item: ListItem, currentItems: ListItem[], suggested: SortedItems): Reordered | null => {
+    const suggestedItems = toSortedListItems(suggested.items, currentItems);
+
+    if (suggestedItems.indexOf(item) !== currentItems.indexOf(item)) {
+        const index = currentItems.indexOf(item);
+        return suggestedItems[index] !== undefined
+            ? {
+                  type: "reordered",
+                  newText: suggestedItems[index].text,
+              }
+            : null;
+    } else {
+        return null;
+    }
+};
+
+const filteredOutItem = (item: ListItem, suggestedValidItems: string[]): FilteredOut | null =>
+    !suggestedValidItems.includes(item.text) ? { type: "filteredOut" } : null;
+
+const groupedItem = (item: ListItem, suggestedGroups: ItemGroup[]): Grouped | null => {
+    const group = suggestedGroups.find((g) => g.items.includes(item.text));
+    if (group !== undefined) {
+        const index = suggestedGroups.indexOf(group);
+        return {
+            type: "grouped",
+            groupName: group.name,
+            backgroundColor: groupColors[index],
+        };
+    } else {
+        return null;
+    }
 };
 
 export default ListElement;
