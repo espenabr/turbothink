@@ -58,16 +58,14 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete }: 
         setWaitingForUserInstruction(null);
     };
 
-    const onAddRow = async (description: string) => {
-        console.log("Add row!");
+    const onAddRow = async (description: string, noOfRows: number) => {
         const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
         const reasoning = openAiConfig.reasoningStrategy;
 
         setLoading(true);
-        const response = await tc.expectTableWithAddedRow(table, description, undefined, undefined, reasoning);
-
+        const response = await tc.expectAdditionalRows(table, description, noOfRows, undefined, undefined, reasoning);
         if (response.outcome === "Success") {
-            onUpdate({ ...table, columns: response.value.columns, rows: response.value.rows });
+            onUpdate({ ...table, rows: table.rows.slice().concat(response.value.rows) });
         }
         setLoading(false);
         setWaitingForUserInstruction(null);

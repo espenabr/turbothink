@@ -16,7 +16,7 @@ const TableContent = ({ table }: Props) => {
             </thead>
             <tbody>
                 {table.rows.map((r) => (
-                    <tr>
+                    <tr key={r.cells.map((c) => c.value).join()}>
                         {r.cells.map((c) => (
                             <td key={c.column.name}>{c.value}</td>
                         ))}

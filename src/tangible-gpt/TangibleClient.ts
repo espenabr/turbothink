@@ -984,13 +984,53 @@ ${table.columns.map(describeColumn).join("\n")}`;
         ).then((r) => {
             const value = parseTable(table.columns, r.value);
             if (value !== null) {
-                return success(table, r.rawMessage, r.history);
+                return success(value, r.rawMessage, r.history);
             } else {
                 const reason = "Could not parse table";
                 return failure(reason, r.rawMessage, r.history);
             }
         });
     };
+
+    public expectAdditionalRows = <I extends JSONSerializable = null, O extends JSONSerializable = null>(
+        table: Table,
+        rowDescription: string,
+        noOfRows: number = 1,
+        history: Message[] = [],
+        functionCalls: FunctionCall<I, O>[] = [],
+        reasoningStrategy: ReasoningStrategy = "Simple",
+    ): Promise<TangibleResponse<Table>> => {
+        const prompt = `${renderTable(table)}
+
+I need more ${noOfRows} rows in this table (do not not include the given rows in the response):
+${rowDescription}`;
+
+        const responseFormatDescription = `The response must be in CSV format (semicolon separated) with columns: ${table.columns
+            .map((c) => c.name)
+            .join(";")};
+No header row, just data
+
+Columns:
+${table.columns.map(describeColumn).join("\n")}`;
+
+        return this.interact(
+            initialPrompt(reasoningStrategy, prompt, responseFormatDescription),
+            history,
+            functionCalls,
+            reasoningStrategy,
+            responseFormatDescription,
+        ).then((r) => {
+            const value = parseTable(table.columns, r.value);
+            if (value !== null) {
+                return success(value, r.rawMessage, r.history);
+            } else {
+                const reason = "Could not parse table";
+                return failure(reason, r.rawMessage, r.history);
+            }
+        });
+    };
+
+
 }
 
 export default TangibleClient;
