@@ -28,22 +28,12 @@ const TabContent = ({ workspaceName, canBeDeleted, active, onEnableEdit, onCopyT
                 {active ? <strong>{workspaceName}</strong> : workspaceName}
             </a>
             <span className="tab-icons" style={{ paddingLeft: "10px" }}>
-                <a
-                    style={{ cursor: "pointer", color: "#424242" }}
-                    onClick={onCopy}
-                    data-tooltip-id="tooltip"
-                    data-tooltip-content="Copy workspace to clipboard"
-                >
+                <a onClick={onCopy} data-tooltip-id="tooltip" data-tooltip-content="Copy workspace to clipboard">
                     <IconClipboard />
                 </a>
                 {copied && <div className="copied">Copied!</div>}
                 {canBeDeleted && (
-                    <a
-                        style={{ cursor: "pointer", color: "#424242" }}
-                        onClick={() => onDelete()}
-                        data-tooltip-id="tooltip"
-                        data-tooltip-content="Close"
-                    >
+                    <a onClick={() => onDelete()} data-tooltip-id="tooltip" data-tooltip-content="Close">
                         <IconX />
                     </a>
                 )}

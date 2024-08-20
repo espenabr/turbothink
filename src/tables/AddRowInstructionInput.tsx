@@ -12,7 +12,7 @@ const AddRowInstructionInput = ({ onAddRow, onCancel }: Props) => {
     const [descriptionInput, setDescriptionInput] = useState<string>("");
 
     const onKeyUp = (event: KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === "Enter" && descriptionInput.length > 0 && noOfRows !== "") {
+        if (event.key === "Enter" && noOfRows !== "") {
             try {
                 const n = parseInt(noOfRows);
                 onAddRow(descriptionInput, n);

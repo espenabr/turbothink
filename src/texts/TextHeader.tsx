@@ -13,7 +13,7 @@ type Props = {
     onAction: (instruction: string) => void;
     onRename: (newName: string) => void;
     onCopyToClipboard: () => void;
-    onTransform: () => void;
+    onInitiateTransform: () => void;
     onDelete: () => void;
     onCancel: () => void;
     onAcceptAIModification: () => void;
@@ -29,7 +29,7 @@ const TextHeader = ({
     onAction,
     onRename,
     onCopyToClipboard,
-    onTransform,
+    onInitiateTransform,
     onDelete,
     onCancel,
     onAcceptAIModification,
@@ -63,7 +63,7 @@ const TextHeader = ({
                     inputNameRef={inputNameRef}
                     editNameMode={editNameMode}
                     onUpdateName={(name) => onRename(name)}
-                    onTransform={onTransform}
+                    onInitiateTransform={onInitiateTransform}
                     onDelete={onDelete}
                     onCopyToClipboard={onCopyToClipboard}
                     setEditNameMode={setEditNameMode}

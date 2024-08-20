@@ -6,12 +6,12 @@ import { Tooltip } from "react-tooltip";
 
 type Props = {
     displayActions: boolean;
-    onTransform: () => void;
+    onInitiateTransform: () => void;
     onDelete: () => void;
     onCopyToClipboard: () => void;
 };
 
-const TextHeaderIcons = ({ displayActions, onTransform, onDelete, onCopyToClipboard }: Props) => {
+const TextHeaderIcons = ({ displayActions, onInitiateTransform, onDelete, onCopyToClipboard }: Props) => {
     const [copied, setCopied] = useState<boolean>(false);
 
     const onCopy = () => {
@@ -27,7 +27,7 @@ const TextHeaderIcons = ({ displayActions, onTransform, onDelete, onCopyToClipbo
                 <>
                     <a
                         className="icon"
-                        onClick={onTransform}
+                        onClick={onInitiateTransform}
                         data-tooltip-id="tooltip"
                         data-tooltip-content="Transform text"
                     >

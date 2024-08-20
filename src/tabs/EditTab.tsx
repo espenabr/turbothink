@@ -24,14 +24,15 @@ const EditTab = ({ workspaceName, inputRef, onRename, onCancel }: Props) => {
         <div>
             <input
                 value={nameInput}
+                style={{ width: "80%" }}
                 onChange={(e) => setNameInput(e.currentTarget.value)}
                 onKeyUp={onInputName}
                 onPaste={onPaste}
                 ref={inputRef}
             />
-            <span style={{ cursor: "pointer", color: "green" }} onClick={onCancel}>
+            <a onClick={onCancel}>
                 <IconArrowBack />
-            </span>
+            </a>
         </div>
     );
 };

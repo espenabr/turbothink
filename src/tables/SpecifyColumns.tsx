@@ -67,7 +67,7 @@ const SpecifyColumns = ({ instruction, loading, onGenerateTable, onCancel }: Pro
                             <a
                                 className="desired-table-column-content"
                                 onClick={() => onDelete(c)}
-                                style={{ cursor: "pointer", marginRight: "10px" }}
+                                style={{ marginRight: "10px" }}
                             >
                                 <IconX />
                             </a>
@@ -86,12 +86,12 @@ const SpecifyColumns = ({ instruction, loading, onGenerateTable, onCancel }: Pro
                     <br />
                     <div>
                         {columns.length > 0 && (
-                            <a onClick={() => onGenerateTable(columns)} style={{ cursor: "pointer" }}>
+                            <a onClick={() => onGenerateTable(columns)}>
                                 <IconCheck />
                                 &nbsp;
                             </a>
                         )}
-                        <a onClick={onCancel} style={{ cursor: "pointer" }}>
+                        <a onClick={onCancel}>
                             <IconArrowBack />
                         </a>
                     </div>

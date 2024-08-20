@@ -34,6 +34,11 @@ Suggest 5 different ways that this text can be transformed (no language translat
 
     const onConfirmSuggestion = (suggestion: string) => onInput(suggestion);
 
+    const onClickCancel = () => {
+        setSuggestions(null);
+        onCancel();
+    };
+
     return (
         <div>
             {loading ? (
@@ -42,19 +47,13 @@ Suggest 5 different ways that this text can be transformed (no language translat
                 <div>
                     <strong>Select suggestion</strong>
                     &nbsp; &nbsp;
-                    <span
-                        style={{ cursor: "pointer", color: "#424242" }}
-                        onClick={() => {
-                            setSuggestions(null);
-                            onCancel();
-                        }}
-                    >
+                    <a onClick={onClickCancel}>
                         <IconArrowBack />
-                    </span>
+                    </a>
                     &nbsp;
-                    <span style={{ cursor: "pointer" }} title="Retry" onClick={onSuggestOptions}>
+                    <a title="Retry" onClick={onSuggestOptions}>
                         <IconRefresh />
-                    </span>
+                    </a>
                     <ul style={{ paddingTop: "10px" }}>
                         {suggestions.map((suggestion) => (
                             <li className="suggestion" onClick={() => onConfirmSuggestion(suggestion)}>
@@ -80,10 +79,7 @@ Suggest 5 different ways that this text can be transformed (no language translat
                         <Tooltip id="tooltip" />
                         <a
                             className="icon"
-                            onClick={() => {
-                                setSuggestions(null);
-                                onCancel();
-                            }}
+                            onClick={onClickCancel}
                             data-tooltip-id="tooltip"
                             data-tooltip-content="Cancel"
                         >

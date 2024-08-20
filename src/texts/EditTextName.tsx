@@ -30,9 +30,9 @@ const EditTextName = ({ name, inputRef, onRename, onCancel }: Props) => {
                 onPaste={onPaste}
                 ref={inputRef}
             />
-            <span className="icon" style={{ cursor: "pointer" }} onClick={onCancel}>
+            <a className="icon" onClick={onCancel}>
                 <IconArrowBack />
-            </span>
+            </a>
         </>
     );
 };

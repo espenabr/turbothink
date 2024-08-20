@@ -27,9 +27,9 @@ const ListItemContent = ({ text, modification, canDelete, onEnableEdit, onDelete
             </span>
             {canDelete && (
                 <div className="icons" style={{ backgroundColor: "white" }}>
-                    <span className="icon" style={{ cursor: "pointer" }} onClick={() => onDelete()} title="Delete">
+                    <a className="icon" onClick={() => onDelete()} title="Delete">
                         <IconX />
-                    </span>
+                    </a>
                 </div>
             )}
         </>

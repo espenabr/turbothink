@@ -8,7 +8,7 @@ type Props = {
     inputNameRef: RefObject<HTMLInputElement>;
     editNameMode: boolean;
     onUpdateName: (name: string) => void;
-    onTransform: () => void;
+    onInitiateTransform: () => void;
     onDelete: () => void;
     onCopyToClipboard: () => void;
     setEditNameMode: (value: boolean) => void;
@@ -19,7 +19,7 @@ const TextHeaderContent = ({
     displayActions,
     inputNameRef,
     editNameMode,
-    onTransform,
+    onInitiateTransform,
     onUpdateName,
     onDelete,
     onCopyToClipboard,
@@ -47,7 +47,7 @@ const TextHeaderContent = ({
             </span>
             <TextHeaderIcons
                 displayActions={displayActions}
-                onTransform={onTransform}
+                onInitiateTransform={onInitiateTransform}
                 onDelete={onDelete}
                 onCopyToClipboard={onCopyToClipboard}
             />

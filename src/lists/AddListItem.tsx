@@ -1,6 +1,7 @@
 import { KeyboardEvent, useState, ClipboardEvent } from "react";
 import IconPlaylistAdd from "../icons/IconPlaylistAdd";
 import { pasteToInput } from "../common";
+import { Tooltip } from "react-tooltip";
 
 type Props = {
     onAdd: (text: string) => void;
@@ -22,9 +23,10 @@ const AddListItem = ({ onAdd, onExtendList }: Props) => {
 
     return (
         <>
-            <span style={{ cursor: "pointer" }} title="Extend list" onClick={onExtendList}>
+            <Tooltip id="tooltip" />
+            <a onClick={onExtendList} data-tooltip-id="tooltip" data-tooltip-content="Extend list">
                 <IconPlaylistAdd />
-            </span>
+            </a>
             <input
                 value={itemInput}
                 style={{ width: "87%", marginLeft: "10px" }}

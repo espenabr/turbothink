@@ -17,38 +17,40 @@ const AddColumnInstructionInput = ({ onAddColumn, onCancel }: Props) => {
         }
     };
 
+    const onCancelInstruction = () => {
+        setColumnNameInput("");
+        setColumnDescriptionInput("");
+        onCancel();
+    };
+
     return (
         <>
             <input
                 placeholder="Column name"
                 autoFocus
-                style={{ width: "80px" }}
+                style={{ width: "130px" }}
                 value={columNameInput}
                 onChange={(e) => setColumnNameInput(e.currentTarget.value)}
                 onKeyUp={onKeyUp}
             />
             <input
                 placeholder="Description"
-                style={{ width: "120px" }}
+                style={{ width: "130px" }}
                 value={columnDescriptionInput}
                 onChange={(e) => setColumnDescriptionInput(e.currentTarget.value)}
                 onKeyUp={onKeyUp}
             />
 
-            <span style={{ paddingLeft: "8px", cursor: "pointer" }}>
+            <span style={{ paddingLeft: "8px" }}>
                 <Tooltip id="tooltip" />
-                <span
+                <a
                     className="icon"
-                    onClick={() => {
-                        setColumnNameInput("");
-                        setColumnDescriptionInput("");
-                        onCancel();
-                    }}
+                    onClick={onCancelInstruction}
                     data-tooltip-id="tooltip"
                     data-tooltip-content="Cancel"
                 >
                     <IconArrowBack />
-                </span>
+                </a>
             </span>
         </>
     );

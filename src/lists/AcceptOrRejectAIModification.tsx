@@ -20,7 +20,7 @@ const AcceptOrRejectAIModification = ({ onReject, onAccept, onRetryWithAdditiona
     };
 
     return (
-        <span style={{ cursor: "pointer" }}>
+        <span>
             <Tooltip id="tooltip" />
             {onAccept !== undefined && (
                 <a className="icon" onClick={onAccept} data-tooltip-id="tooltip" data-tooltip-content="Accept">

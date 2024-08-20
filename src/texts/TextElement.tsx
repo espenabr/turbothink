@@ -103,7 +103,7 @@ const TextElement = ({ openAiConfig, text, blockHeight, onUpdate, onDelete }: Pr
         await navigator.clipboard.writeText(JSON.stringify(clipboardItem));
     };
 
-    const onTransform = () => setWaitingForUserInstruction("transform");
+    const onInitiateTransform = () => setWaitingForUserInstruction("transform");
 
     const onAction = async (instruction: string) => {
         if (waitingForUserInstruction === "transform") {
@@ -155,7 +155,7 @@ I only want the transformed text back, nothing else`;
 
     return (
         <div className="block">
-            <div className="text" style={style} ref={setNodeRef} {...attributes} onClick={onClickContent}>
+            <div className="text" style={style} ref={setNodeRef} {...attributes}>
                 <TextHeader
                     openAiConfig={openAiConfig}
                     text={text}
@@ -164,14 +164,14 @@ I only want the transformed text back, nothing else`;
                     onAction={onAction}
                     onRename={onRenameText}
                     onCopyToClipboard={onCopyToClipboard}
-                    onTransform={onTransform}
+                    onInitiateTransform={onInitiateTransform}
                     onDelete={() => onDelete(text.id)}
                     onCancel={() => setWaitingForUserInstruction(null)}
                     onAcceptAIModification={onAccept}
                     onRejectAIModification={() => setTransformedText(null)}
                     onRetryWithAdditionalInstruction={onRetryWithAdditionalInstruction}
                 />
-                <div className={textContentClass(blockHeight, editContentMode)}>
+                <div className={textContentClass(blockHeight, editContentMode)} onClick={onClickContent}>
                     {editContentMode ? (
                         <EditTextContent
                             content={text.content}
@@ -187,18 +187,16 @@ I only want the transformed text back, nothing else`;
             {editContentMode && (
                 <div>
                     <Tooltip id="tooltip" />
-                    <span style={{ cursor: "pointer" }}>
-                        <a onClick={() => onUpdateContent()} data-tooltip-id="tooltip" data-tooltip-content="OK">
-                            <IconCheck />
-                        </a>
-                        <a
-                            onClick={() => setEditContentMode(false)}
-                            data-tooltip-id="tooltip"
-                            data-tooltip-content="Cancel"
-                        >
-                            <IconX />
-                        </a>
-                    </span>
+                    <a onClick={() => onUpdateContent()} data-tooltip-id="tooltip" data-tooltip-content="OK">
+                        <IconCheck />
+                    </a>
+                    <a
+                        onClick={() => setEditContentMode(false)}
+                        data-tooltip-id="tooltip"
+                        data-tooltip-content="Cancel"
+                    >
+                        <IconX />
+                    </a>
                 </div>
             )}
         </div>
