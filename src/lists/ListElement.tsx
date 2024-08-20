@@ -21,31 +21,6 @@ import { ClipboardItem } from "../model";
 import ListHeader from "./ListHeader";
 import { TangibleResponse } from "../tangible-gpt/model";
 
-type FilteredItems = {
-    type: "filtered";
-    predicate: string;
-    items: string[];
-};
-
-type SortedItems = {
-    type: "sorted";
-    orderBy: string;
-    items: string[];
-};
-
-type ItemGroup = {
-    name: string;
-    items: string[];
-};
-
-type GroupedItems = {
-    type: "grouped";
-    criteria: string;
-    groups: ItemGroup[];
-};
-
-type SuggestedListModification = FilteredItems | SortedItems | GroupedItems;
-
 const groupColors: string[] = [
     "#FFCDD2",
     "#F8BBD0",
@@ -58,61 +33,6 @@ const groupColors: string[] = [
     "#C8E6C9",
     "#DCEDC8",
 ];
-
-const toAction = (suggestedModification: SuggestedListModification): ListAction => {
-    switch (suggestedModification.type) {
-        case "filtered":
-            return "filter";
-        case "sorted":
-            return "sort";
-        case "grouped":
-            return "group";
-    }
-};
-
-const toSortedListItems = (sortedItems: string[], oldItems: ListItem[]): ListItem[] => {
-    let unmatchedItems = oldItems.slice();
-
-    return sortedItems.flatMap((si) => {
-        const match: ListItem | undefined = unmatchedItems.find((ui) => ui.text === si);
-
-        if (match !== undefined) {
-            unmatchedItems = unmatchedItems.filter((ui) => ui.id !== match.id);
-            return [match];
-        } else {
-            return [];
-        }
-    });
-};
-
-const itemsClass = (blockHeight: BlockHeight) => {
-    switch (blockHeight) {
-        case "Unlimited":
-            return "";
-        case "Short":
-            return "scrollable-block short-block";
-        case "Medium":
-            return "scrollable-block medium-block";
-        case "Tall":
-            return "scrollable-block tall-block";
-    }
-};
-
-const interactionState = (
-    loading: boolean,
-    waitingForUserInstruction: ListAction | null,
-    suggestedModification: SuggestedListModification | null,
-): ListInteractionState => {
-    if (loading) {
-        return { type: "Loading" };
-    } else if (waitingForUserInstruction !== null) {
-        return { type: "WaitingForUserListInstruction", action: waitingForUserInstruction };
-    } else if (suggestedModification !== null) {
-        return { type: "WaitingForUserAcceptance" };
-    } else {
-        return { type: "Display" };
-    }
-};
 
 type Props = {
     openAiConfig: OpenAiConfig;
@@ -155,6 +75,8 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
         }
     };
 
+    const onUpdateItems = (items: ListItem[]) => onUpdateList({ ...list, items: items });
+
     /* Perform action based on user instruction using LLM */
     const onAction = async (instruction: string) => {
         const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
@@ -191,12 +113,6 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
 
     /* If the user isn't happy with the suggested modification, try again with additional adjustment */
 
-    const onRetryWithInstruction = (instruction: string) => {
-        if (suggestedModification !== null) {
-            onRetryWithAdditionalInstruction(instruction, toAction(suggestedModification));
-        }
-    };
-
     const onRetryWithAdditionalInstruction = async (instruction: string, action: ListAction) => {
         const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
         const items = list.items.map((i) => i.text);
@@ -204,6 +120,7 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
         const history = lastResponse?.history;
         const prompt = `I want you to adjust the previous attempt. Please also consider: ${instruction}`;
 
+        setLoading(true);
         if (action === "filter") {
             const response = await tc.expectFiltered(items, prompt, history, undefined, reasoning);
             if (response.outcome === "Success") {
@@ -231,7 +148,11 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
         setWaitingForUserInstruction(null);
     };
 
-    const onUpdateItems = (items: ListItem[]) => onUpdateList({ ...list, items: items });
+    const onRetryWithInstruction = (instruction: string) => {
+        if (suggestedModification !== null) {
+            onRetryWithAdditionalInstruction(instruction, toAction(suggestedModification));
+        }
+    };
 
     /* Visually indicate potential suggested modification for an item in the list */
     const itemModification = (item: ListItem): Modification | null => {
@@ -256,7 +177,7 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
         await navigator.clipboard.writeText(JSON.stringify(clipboardItem));
     };
 
-    /* Direct list manipulation */
+    /* Direct manipulation */
 
     const onRenameList = (newName: string) => onUpdateList({ ...list, name: newName });
 
@@ -374,6 +295,31 @@ const ListElement = ({ openAiConfig, list, blockHeight, onGroup, onDeleteList, o
     );
 };
 
+type FilteredItems = {
+    type: "filtered";
+    predicate: string;
+    items: string[];
+};
+
+type SortedItems = {
+    type: "sorted";
+    orderBy: string;
+    items: string[];
+};
+
+type ItemGroup = {
+    name: string;
+    items: string[];
+};
+
+type GroupedItems = {
+    type: "grouped";
+    criteria: string;
+    groups: ItemGroup[];
+};
+
+type SuggestedListModification = FilteredItems | SortedItems | GroupedItems;
+
 const reorderedItem = (item: ListItem, currentItems: ListItem[], suggested: SortedItems): Reordered | null => {
     const suggestedItems = toSortedListItems(suggested.items, currentItems);
 
@@ -404,6 +350,61 @@ const groupedItem = (item: ListItem, suggestedGroups: ItemGroup[]): Grouped | nu
         };
     } else {
         return null;
+    }
+};
+
+const toAction = (suggestedModification: SuggestedListModification): ListAction => {
+    switch (suggestedModification.type) {
+        case "filtered":
+            return "filter";
+        case "sorted":
+            return "sort";
+        case "grouped":
+            return "group";
+    }
+};
+
+const toSortedListItems = (sortedItems: string[], oldItems: ListItem[]): ListItem[] => {
+    let unmatchedItems = oldItems.slice();
+
+    return sortedItems.flatMap((si) => {
+        const match: ListItem | undefined = unmatchedItems.find((ui) => ui.text === si);
+
+        if (match !== undefined) {
+            unmatchedItems = unmatchedItems.filter((ui) => ui.id !== match.id);
+            return [match];
+        } else {
+            return [];
+        }
+    });
+};
+
+const itemsClass = (blockHeight: BlockHeight) => {
+    switch (blockHeight) {
+        case "Unlimited":
+            return "";
+        case "Short":
+            return "scrollable-block short-block";
+        case "Medium":
+            return "scrollable-block medium-block";
+        case "Tall":
+            return "scrollable-block tall-block";
+    }
+};
+
+const interactionState = (
+    loading: boolean,
+    waitingForUserInstruction: ListAction | null,
+    suggestedModification: SuggestedListModification | null,
+): ListInteractionState => {
+    if (loading) {
+        return { type: "Loading" };
+    } else if (waitingForUserInstruction !== null) {
+        return { type: "WaitingForUserListInstruction", action: waitingForUserInstruction };
+    } else if (suggestedModification !== null) {
+        return { type: "WaitingForUserAcceptance" };
+    } else {
+        return { type: "Display" };
     }
 };
 

@@ -20,14 +20,12 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete }: 
     const [loading, setLoading] = useState<boolean>(false);
     const [waitingForUserInstruction, setWaitingForUserInstruction] = useState<TableAction | null>(null);
 
+    /* Drag & drop */
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: table.id });
-
     const style: CSSProperties = {
         transform: CSS.Translate.toString(transform),
         transition,
     };
-
-    const onRename = (newName: string) => onUpdate({ ...table, name: newName });
 
     const onCopyToClipboard = async () => {
         const clipboardItem: ClipboardItem = {
@@ -36,6 +34,8 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete }: 
         };
         await navigator.clipboard.writeText(JSON.stringify(clipboardItem));
     };
+
+    /* Actions using LLM */
 
     const onAddColumn = async (name: string, description: string) => {
         const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
@@ -58,6 +58,8 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete }: 
         setWaitingForUserInstruction(null);
     };
 
+    /* Direct manipulation */
+
     const onAddRow = async (description: string, noOfRows: number) => {
         const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
         const reasoning = openAiConfig.reasoningStrategy;
@@ -79,20 +81,20 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete }: 
         });
     };
 
-    const equal = (a: string[], b: string[]) => a.length === b.length && a.every((v, i) => v === b[i]);
-
     const onDeleteRow = (values: string[]) => {
         onUpdate({
             ...table,
             rows: table.rows.filter(
                 (r) =>
-                    !equal(
+                    !equalArrays(
                         r.cells.map((c) => c.value.toString()),
                         values,
                     ),
             ),
         });
     };
+
+    const onRename = (newName: string) => onUpdate({ ...table, name: newName });
 
     return (
         <div className="block">
@@ -116,6 +118,8 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete }: 
         </div>
     );
 };
+
+const equalArrays = (a: string[], b: string[]) => a.length === b.length && a.every((v, i) => v === b[i]);
 
 const tableContentClass = (blockHeight: BlockHeight) => {
     switch (blockHeight) {
