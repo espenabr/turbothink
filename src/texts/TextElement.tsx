@@ -11,42 +11,7 @@ import IconCheck from "../icons/IconCheck";
 import IconX from "../icons/IconX";
 import { TangibleResponse } from "../tangible-gpt/model";
 import { Tooltip } from "react-tooltip";
-
-type TransformedText = {
-    instruction: string;
-    newText: string;
-};
-
-const textContentClass = (blockHeight: BlockHeight, editContentMode: boolean) => {
-    switch (blockHeight) {
-        case "Unlimited":
-        case "Medium":
-            return editContentMode ? "medium-block" : "text-content scrollable-block medium-block";
-        case "Short":
-            return editContentMode ? "medium-block" : "text-content scrollable-block short-block";
-        case "Tall":
-            return editContentMode ? "medium-block" : "text-content scrollable-block tall-block";
-    }
-};
-
-const interactionState = (
-    loading: boolean,
-    editContentMode: boolean,
-    waitingForUserInstruction: TextAction | null,
-    transformedText: TransformedText | null,
-): TextInteractionState => {
-    if (loading) {
-        return { type: "Loading" };
-    } else if (editContentMode) {
-        return { type: "EditTextContent" };
-    } else if (waitingForUserInstruction !== null) {
-        return { type: "WaitingForUserTextInstruction", action: waitingForUserInstruction };
-    } else if (transformedText !== null) {
-        return { type: "WaitingForUserAcceptance" };
-    } else {
-        return { type: "Display" };
-    }
-};
+import { Message } from "../tangible-gpt/GptApiClient";
 
 type Props = {
     openAiConfig: OpenAiConfig;
@@ -105,36 +70,25 @@ const TextElement = ({ openAiConfig, text, blockHeight, onUpdate, onDelete }: Pr
 
     const onInitiateTransform = () => setWaitingForUserInstruction("transform");
 
+    /* Transform text using LLM */
     const onAction = async (instruction: string) => {
         if (waitingForUserInstruction === "transform") {
-            const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
-            const reasoning = openAiConfig.reasoningStrategy;
-            const prompt = `Given the following text:
-            ${text.content}
----end of text---
-
-Transform it given the following instruction: ${instruction}
-I only want the transformed text back, nothing else`;
-
             setLoading(true);
-            const response = await tc.expectPlainText(prompt, undefined, undefined, reasoning);
-            if (response.outcome === "Success") {
-                setTransformedText({ instruction: instruction, newText: response.value });
-                setLastResponse(response);
+            const transformed = await transformWithLLM(openAiConfig, text.content, instruction);
+            if (transformed.outcome === "Success") {
+                setTransformedText({ instruction: instruction, newText: transformed.value });
+                setLastResponse(transformed);
             }
         }
         setLoading(false);
         setWaitingForUserInstruction(null);
     };
 
+    /* If the user isn't happy, retry with adjustment instruction */
     const onRetryWithAdditionalInstruction = async (instruction: string) => {
-        if (transformedText !== null) {
-            const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
-            const reasoning = openAiConfig.reasoningStrategy;
-            const prompt = `I want you to adjust the previous attempt. Please also consider: ${instruction}`;
-
+        if (lastResponse !== null) {
             setLoading(true);
-            const response = await tc.expectPlainText(prompt, lastResponse?.history, undefined, reasoning);
+            const response = await retryTransformWithLLM(openAiConfig, instruction, lastResponse?.history);
             if (response.outcome === "Success") {
                 setTransformedText({ instruction: instruction, newText: response.value });
                 setLastResponse(response);
@@ -201,6 +155,73 @@ I only want the transformed text back, nothing else`;
             )}
         </div>
     );
+};
+
+type TransformedText = {
+    instruction: string;
+    newText: string;
+};
+
+const textContentClass = (blockHeight: BlockHeight, editContentMode: boolean) => {
+    switch (blockHeight) {
+        case "Unlimited":
+        case "Medium":
+            return editContentMode ? "medium-block" : "text-content scrollable-block medium-block";
+        case "Short":
+            return editContentMode ? "medium-block" : "text-content scrollable-block short-block";
+        case "Tall":
+            return editContentMode ? "medium-block" : "text-content scrollable-block tall-block";
+    }
+};
+
+const interactionState = (
+    loading: boolean,
+    editContentMode: boolean,
+    waitingForUserInstruction: TextAction | null,
+    transformedText: TransformedText | null,
+): TextInteractionState => {
+    if (loading) {
+        return { type: "Loading" };
+    } else if (editContentMode) {
+        return { type: "EditTextContent" };
+    } else if (waitingForUserInstruction !== null) {
+        return { type: "WaitingForUserTextInstruction", action: waitingForUserInstruction };
+    } else if (transformedText !== null) {
+        return { type: "WaitingForUserAcceptance" };
+    } else {
+        return { type: "Display" };
+    }
+};
+
+const transformTextPrompt = (text: string, instruction: string) => {
+    return `Given the following text:
+${text}
+---end of text---
+
+Transform it given the following instruction: ${instruction}
+I only want the transformed text back, nothing else`;
+};
+
+const transformWithLLM = (
+    config: OpenAiConfig,
+    text: string,
+    instruction: string,
+): Promise<TangibleResponse<string>> => {
+    const tc = new TangibleClient(config.key, config.model);
+    const reasoning = config.reasoningStrategy;
+    const prompt = transformTextPrompt(text, instruction);
+    return tc.expectPlainText(prompt, undefined, undefined, reasoning);
+};
+
+const retryTransformWithLLM = async (
+    config: OpenAiConfig,
+    instruction: string,
+    history: Message[],
+): Promise<TangibleResponse<string>> => {
+    const tc = new TangibleClient(config.key, config.model);
+    const reasoning = config.reasoningStrategy;
+    const prompt = `I want you to adjust the previous attempt. Please also consider: ${instruction}`;
+    return tc.expectPlainText(prompt, history, undefined, reasoning);
 };
 
 export default TextElement;

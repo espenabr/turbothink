@@ -6,7 +6,8 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSSProperties, useState } from "react";
 import { CSS } from "@dnd-kit/utilities";
 import TangibleClient from "../tangible-gpt/TangibleClient";
-import { Column } from "../tangible-gpt/model";
+import { Column, TangibleResponse } from "../tangible-gpt/model";
+import { Table as TangibleTable } from "../tangible-gpt/model";
 
 type Props = {
     openAiConfig: OpenAiConfig;
@@ -38,19 +39,8 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete }: 
     /* Actions using LLM */
 
     const onAddColumn = async (name: string, description: string) => {
-        const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
-        const reasoning = openAiConfig.reasoningStrategy;
-
-        const column: Column = { type: "TextColumn", name: name };
         setLoading(true);
-        const response = await tc.expectTableWithAddedColumn(
-            column,
-            description,
-            table,
-            undefined,
-            undefined,
-            reasoning,
-        );
+        const response = await addColumnWithLLM(openAiConfig, table, name, description);
         if (response.outcome === "Success") {
             onUpdate({ ...table, columns: response.value.columns, rows: response.value.rows });
         }
@@ -58,20 +48,17 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete }: 
         setWaitingForUserInstruction(null);
     };
 
-    /* Direct manipulation */
-
     const onAddRow = async (description: string, noOfRows: number) => {
-        const tc = new TangibleClient(openAiConfig.key, openAiConfig.model);
-        const reasoning = openAiConfig.reasoningStrategy;
-
         setLoading(true);
-        const response = await tc.expectAdditionalRows(table, description, noOfRows, undefined, undefined, reasoning);
+        const response = await additionalRowsWithLLM(openAiConfig, table, description, noOfRows);
         if (response.outcome === "Success") {
             onUpdate({ ...table, rows: table.rows.slice().concat(response.value.rows) });
         }
         setLoading(false);
         setWaitingForUserInstruction(null);
     };
+
+    /* Direct manipulation */
 
     const onDeleteColumn = (columnName: string) => {
         onUpdate({
@@ -144,6 +131,29 @@ const interactionState = (loading: boolean, waitingForUserInstruction: TableActi
     } else {
         return { type: "Display" };
     }
+};
+
+const addColumnWithLLM = (
+    config: OpenAiConfig,
+    table: Table,
+    columnName: string,
+    description: string,
+): Promise<TangibleResponse<TangibleTable>> => {
+    const tc = new TangibleClient(config.key, config.model);
+    const reasoning = config.reasoningStrategy;
+    const column: Column = { type: "TextColumn", name: columnName };
+    return tc.expectTableWithAddedColumn(column, description, table, undefined, undefined, reasoning);
+};
+
+const additionalRowsWithLLM = (
+    config: OpenAiConfig,
+    table: Table,
+    description: string,
+    noOfRows: number,
+): Promise<TangibleResponse<TangibleTable>> => {
+    const tc = new TangibleClient(config.key, config.model);
+    const reasoning = config.reasoningStrategy;
+    return tc.expectAdditionalRows(table, description, noOfRows, undefined, undefined, reasoning);
 };
 
 export default TableElement;
