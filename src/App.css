@@ -178,6 +178,14 @@
     border: gray solid 1px;
 }
 
+.table-content th a {
+    opacity: 20%;
+}
+
+.table-content th:hover a {
+    opacity: 100%;
+}
+
 /* icons */
 
 .list-item .icons {

@@ -4,3 +4,7 @@ body {
     flex-direction: column;
     background-color: white;
 }
+
+a {
+    cursor: pointer;
+}

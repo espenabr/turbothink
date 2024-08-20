@@ -71,6 +71,14 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete }: 
         setWaitingForUserInstruction(null);
     };
 
+    const onDeleteColumn = (columnName: string) => {
+        onUpdate({
+            ...table,
+            columns: table.columns.filter((c) => c.name !== columnName),
+            rows: table.rows.map((r) => ({ cells: r.cells.filter((c) => c.column.name !== columnName) })),
+        });
+    };
+
     return (
         <div className="block">
             <div className="table" ref={setNodeRef} style={style} {...attributes}>
@@ -87,7 +95,7 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete }: 
                     onCopyToClipboard={onCopyToClipboard}
                 />
                 <div className={tableContentClass(blockHeight)}>
-                    <TableContent table={table} />
+                    <TableContent table={table} onDeleteColumn={onDeleteColumn} />
                 </div>
             </div>
         </div>
