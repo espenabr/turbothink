@@ -52,8 +52,8 @@ to extract the relevant content fra the URL provided.
 ```
 > cd website_to_clipboard
 > python -m venv ./venv
-> pip install -r requirements.txt
 > source venv/bin/activate
+> pip install -r requirements.txt
 > python w2c.py <url>
 ```
 
