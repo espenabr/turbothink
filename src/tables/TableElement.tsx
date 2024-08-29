@@ -6,7 +6,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSSProperties, useState } from "react";
 import { CSS } from "@dnd-kit/utilities";
 import TangibleClient from "../tangible-gpt/TangibleClient";
-import { Cell, Column, Row, TangibleResponse } from "../tangible-gpt/model";
+import { Cell, Column, Row, TangibleResponse, TextColumn } from "../tangible-gpt/model";
 import { Table as TangibleTable } from "../tangible-gpt/model";
 
 type Props = {
@@ -39,7 +39,7 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete, on
 
     /* Actions using LLM */
 
-    const onAddColumn = async (name: string, description: string) => {
+    const onAddColumnWithLLM = async (name: string, description: string) => {
         setLoading(true);
         const response = await addColumnWithLLM(openAiConfig, table, name, description);
         if (response.outcome === "Success") {
@@ -70,10 +70,23 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete, on
             rows: table.rows.map((r) => {
                 const updatedCells = [...r.cells.slice(0, columnIndex), ...r.cells.slice(columnIndex + 1)];
                 return {
-                    ...table.rows,
+                    ...r,
                     cells: updatedCells,
                 };
             }),
+        });
+    };
+
+    const onAddColumn = () => {
+        const columns = table.columns;
+        const newColumn: TextColumn = { type: "TextColumn", name: "New Column" };
+
+        onUpdate({
+            ...table,
+            columns: columns.concat(newColumn),
+            rows: table.rows.map((row) => ({
+                cells: row.cells.concat({ type: "TextCell", column: newColumn, value: "-" }),
+            })),
         });
     };
 
@@ -147,7 +160,7 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete, on
                     listeners={listeners}
                     onCancel={() => setWaitingForUserInstruction(null)}
                     onRename={onRename}
-                    onAddColumn={onAddColumn}
+                    onAddColumn={onAddColumnWithLLM}
                     onAddRowsWithLLM={onAddRowWithLLM}
                     onDelete={onDelete}
                     onWaitForTableInstruction={(action) => setWaitingForUserInstruction(action)}
@@ -161,6 +174,7 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete, on
                         onUpdateColumnHeader={onUpdateColumnHeader}
                         onUpdateCellContent={onUpdateCellContent}
                         onAddRow={onAddRow}
+                        onAddColumn={onAddColumn}
                     />
                 </div>
             </div>

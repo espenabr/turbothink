@@ -1,3 +1,4 @@
+import IconPlus from "../icons/IconPlus";
 import IconX from "../icons/IconX";
 import { Table } from "../model";
 import { Row } from "../tangible-gpt/model";
@@ -12,6 +13,7 @@ type Props = {
     onUpdateColumnHeader: (columnIndex: number, newName: string) => void;
     onUpdateCellContent: (rowIndex: number, columnIndex: number, newContent: string | number | boolean) => void;
     onAddRow: (row: Row) => void;
+    onAddColumn: () => void;
 };
 
 const TableContent = ({
@@ -21,6 +23,7 @@ const TableContent = ({
     onUpdateColumnHeader,
     onUpdateCellContent,
     onAddRow,
+    onAddColumn,
 }: Props) => {
     return (
         <table className="table-content">
@@ -28,13 +31,17 @@ const TableContent = ({
                 <tr>
                     {table.columns.map((c, i) => (
                         <TableColumnHeader
-                            columnIndex={i}
                             columnName={c.name}
                             onDeleteColumn={() => onDeleteColumn(i)}
                             onUpdateColumnHeader={(newName) => onUpdateColumnHeader(i, newName)}
                             key={c.name}
                         />
                     ))}
+                    <th>
+                        <a onClick={onAddColumn}>
+                            <IconPlus />
+                        </a>
+                    </th>
                 </tr>
             </thead>
             <tbody>

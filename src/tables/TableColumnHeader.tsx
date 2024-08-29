@@ -3,7 +3,6 @@ import IconX from "../icons/IconX";
 import EditTableColumnName from "./EditTableColumnName";
 
 type Props = {
-    columnIndex: number;
     columnName: string;
     onDeleteColumn: () => void;
     onUpdateColumnHeader: (newName: string) => void;
