@@ -6,7 +6,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSSProperties, useState } from "react";
 import { CSS } from "@dnd-kit/utilities";
 import TangibleClient from "../tangible-gpt/TangibleClient";
-import { Column, TangibleResponse } from "../tangible-gpt/model";
+import { Cell, Column, Row, TangibleResponse } from "../tangible-gpt/model";
 import { Table as TangibleTable } from "../tangible-gpt/model";
 
 type Props = {
@@ -60,11 +60,19 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete }: 
 
     /* Direct manipulation */
 
-    const onDeleteColumn = (columnName: string) => {
+    const onDeleteColumn = (columnIndex: number) => {
+        const columns = table.columns;
+
         onUpdate({
             ...table,
-            columns: table.columns.filter((c) => c.name !== columnName),
-            rows: table.rows.map((r) => ({ cells: r.cells.filter((c) => c.column.name !== columnName) })),
+            columns: [...columns.slice(0, columnIndex), ...columns.slice(columnIndex + 1)],
+            rows: table.rows.map((r) => {
+                const updatedCells = [...r.cells.slice(0, columnIndex), ...r.cells.slice(columnIndex + 1)];
+                return {
+                    ...table.rows,
+                    cells: updatedCells,
+                };
+            }),
         });
     };
 
@@ -83,6 +91,52 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete }: 
 
     const onRename = (newName: string) => onUpdate({ ...table, name: newName });
 
+    const onUpdateCellContent = (rowIndex: number, columnIndex: number, newContent: string | number | boolean) => {
+        const row = table.rows[rowIndex];
+        const cell = row.cells[columnIndex];
+
+        const updateCell = (updatedCell: Cell) => {
+            const updatedRow: Row = {
+                ...row,
+                cells: [...row.cells.slice(0, columnIndex), updatedCell, ...row.cells.slice(columnIndex + 1)],
+            };
+            onUpdate({
+                ...table,
+                rows: [...table.rows.slice(0, rowIndex), updatedRow, ...table.rows.slice(rowIndex + 1)],
+            });
+        };
+
+        if (typeof newContent === "string" && (cell.type === "TextCell" || cell.type === "EnumCell")) {
+            updateCell({ ...cell, value: newContent });
+        } else if (typeof newContent === "number" && cell.type === "NumberCell") {
+            updateCell({ ...cell, value: newContent });
+        } else if (typeof newContent === "boolean" && cell.type === "BooleanCell") {
+            updateCell({ ...cell, value: newContent });
+        } else if (typeof newContent === "string" && cell.type === "TextCell") {
+            updateCell({ ...cell, value: newContent });
+        } else {
+            console.warn(`Unable to update cell of type ${cell.type} with ${typeof newContent} value`);
+        }
+    };
+
+    const onUpdateColumnHeader = (columnIndex: number, newHeader: string) => {
+        const columns = table.columns;
+        const updatedColumn: Column = { ...columns[columnIndex], name: newHeader };
+
+        onUpdate({
+            ...table,
+            columns: [...columns.slice(0, columnIndex), updatedColumn, ...columns.slice(columnIndex + 1)],
+            rows: table.rows.map((row) => {
+                const cell = row.cells[columnIndex];
+                const updatedCell: Cell = { ...cell, column: { ...cell.column, name: newHeader } };
+                return {
+                    ...row,
+                    cells: [...row.cells.slice(0, columnIndex), updatedCell, ...row.cells.slice(columnIndex + 1)],
+                };
+            }),
+        });
+    };
+
     return (
         <div className="block">
             <div className="table" ref={setNodeRef} style={style} {...attributes}>
@@ -99,7 +153,13 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete }: 
                     onCopyToClipboard={onCopyToClipboard}
                 />
                 <div className={tableContentClass(blockHeight)}>
-                    <TableContent table={table} onDeleteColumn={onDeleteColumn} onDeleteRow={onDeleteRow} />
+                    <TableContent
+                        table={table}
+                        onDeleteColumn={onDeleteColumn}
+                        onDeleteRow={onDeleteRow}
+                        onUpdateColumnHeader={onUpdateColumnHeader}
+                        onUpdateCellContent={onUpdateCellContent}
+                    />
                 </div>
             </div>
         </div>
