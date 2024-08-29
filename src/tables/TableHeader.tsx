@@ -12,7 +12,7 @@ type Props = {
     onCancel: () => void;
     onRename: (newName: string) => void;
     onAddColumn: (name: string, description: string) => void;
-    onAddRow: (description: string, noOfRows: number) => void;
+    onAddRowsWithLLM: (description: string, noOfRows: number) => void;
     onCopyToClipboard: () => void;
     onDelete: () => void;
     onWaitForTableInstruction: (action: TableAction) => void;
@@ -25,7 +25,7 @@ const TableHeader = ({
     onCancel,
     onRename,
     onAddColumn,
-    onAddRow,
+    onAddRowsWithLLM,
     onCopyToClipboard,
     onDelete,
     onWaitForTableInstruction,
@@ -38,7 +38,7 @@ const TableHeader = ({
             {interactionState.type === "WaitingForAddColumnInstruction" ? (
                 <AddColumnInstructionInput onAddColumn={onAddColumn} onCancel={onCancel} />
             ) : interactionState.type === "WaitingForAddRowInstruction" ? (
-                <AddRowInstructionInput onAddRow={onAddRow} onCancel={onCancel} />
+                <AddRowInstructionInput onAddRow={onAddRowsWithLLM} onCancel={onCancel} />
             ) : interactionState.type === "Loading" ? (
                 <div className="spinner" />
             ) : (

@@ -15,8 +15,9 @@ import {
     BlockHeight,
     Table,
     BlockId,
+    TableId,
 } from "./model";
-import { ItemGroup } from "./tangible-gpt/model";
+import { ItemGroup, Row } from "./tangible-gpt/model";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import TextElement from "./texts/TextElement";
@@ -69,6 +70,16 @@ const WorkspaceContainer = ({ openAiConfig, workspace, blockHeight, onUpdateBloc
             const index = blocks.indexOf(found);
             const updatedBlocks = blocks.slice();
             updatedBlocks[index] = updatedTable;
+            onUpdateBlocks(workspaceId, updatedBlocks);
+        }
+    };
+
+    const onAddTableRow = (tableId: TableId, row: Row) => {
+        const found = blocks.find((b) => b.id === tableId);
+        if (found !== undefined && found.type === "Table") {
+            const index = blocks.indexOf(found);
+            const updatedBlocks = blocks.slice();
+            updatedBlocks[index] = { ...found, rows: found.rows.concat(row) };
             onUpdateBlocks(workspaceId, updatedBlocks);
         }
     };
@@ -159,6 +170,7 @@ const WorkspaceContainer = ({ openAiConfig, workspace, blockHeight, onUpdateBloc
                                     blockHeight={blockHeight}
                                     onUpdate={onUpdateTable}
                                     onDelete={() => onDeleteBlock(block.id)}
+                                    onAddRow={(row) => onAddTableRow(block.id, row)}
                                     key={block.id}
                                 />
                             </div>

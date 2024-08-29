@@ -70,22 +70,22 @@ export type TangibleEitherResponse<L, R> = {
     history: Message[];
 };
 
-type TextColumn = {
+export type TextColumn = {
     type: "TextColumn";
     name: string;
 };
 
-type BooleanColumn = {
+export type BooleanColumn = {
     type: "BooleanColumn";
     name: string;
 };
 
-type NumberColumn = {
+export type NumberColumn = {
     type: "NumberColumn";
     name: string;
 };
 
-type EnumColumn = {
+export type EnumColumn = {
     type: "EnumColumn";
     name: string;
     options: string[];

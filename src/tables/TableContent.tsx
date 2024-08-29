@@ -1,5 +1,7 @@
 import IconX from "../icons/IconX";
 import { Table } from "../model";
+import { Row } from "../tangible-gpt/model";
+import AddTableRow from "./AddTableRow";
 import TableCellContent from "./TableCellContent";
 import TableColumnHeader from "./TableColumnHeader";
 
@@ -9,9 +11,17 @@ type Props = {
     onDeleteRow: (cellValues: string[]) => void;
     onUpdateColumnHeader: (columnIndex: number, newName: string) => void;
     onUpdateCellContent: (rowIndex: number, columnIndex: number, newContent: string | number | boolean) => void;
+    onAddRow: (row: Row) => void;
 };
 
-const TableContent = ({ table, onDeleteColumn, onDeleteRow, onUpdateColumnHeader, onUpdateCellContent }: Props) => {
+const TableContent = ({
+    table,
+    onDeleteColumn,
+    onDeleteRow,
+    onUpdateColumnHeader,
+    onUpdateCellContent,
+    onAddRow,
+}: Props) => {
     return (
         <table className="table-content">
             <thead>
@@ -43,6 +53,7 @@ const TableContent = ({ table, onDeleteColumn, onDeleteRow, onUpdateColumnHeader
                         </td>
                     </tr>
                 ))}
+                <AddTableRow columns={table.columns} onAdd={onAddRow} />
             </tbody>
         </table>
     );

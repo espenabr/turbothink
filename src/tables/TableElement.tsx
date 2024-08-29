@@ -15,9 +15,10 @@ type Props = {
     blockHeight: BlockHeight;
     onUpdate: (updatedTable: Table) => void;
     onDelete: () => void;
+    onAddRow: (row: Row) => void;
 };
 
-const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete }: Props) => {
+const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete, onAddRow }: Props) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [waitingForUserInstruction, setWaitingForUserInstruction] = useState<TableAction | null>(null);
 
@@ -48,7 +49,7 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete }: 
         setWaitingForUserInstruction(null);
     };
 
-    const onAddRow = async (description: string, noOfRows: number) => {
+    const onAddRowWithLLM = async (description: string, noOfRows: number) => {
         setLoading(true);
         const response = await additionalRowsWithLLM(openAiConfig, table, description, noOfRows);
         if (response.outcome === "Success") {
@@ -147,7 +148,7 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete }: 
                     onCancel={() => setWaitingForUserInstruction(null)}
                     onRename={onRename}
                     onAddColumn={onAddColumn}
-                    onAddRow={onAddRow}
+                    onAddRowsWithLLM={onAddRowWithLLM}
                     onDelete={onDelete}
                     onWaitForTableInstruction={(action) => setWaitingForUserInstruction(action)}
                     onCopyToClipboard={onCopyToClipboard}
@@ -159,6 +160,7 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete }: 
                         onDeleteRow={onDeleteRow}
                         onUpdateColumnHeader={onUpdateColumnHeader}
                         onUpdateCellContent={onUpdateCellContent}
+                        onAddRow={onAddRow}
                     />
                 </div>
             </div>
