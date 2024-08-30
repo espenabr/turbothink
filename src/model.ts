@@ -77,7 +77,7 @@ type Loading = {
 };
 
 type Display = {
-    type: "Display"
+    type: "Display";
 };
 
 type WaitingForTextInstruction = {
@@ -98,7 +98,12 @@ type WaitingForAddRowInstruction = {
 };
 
 export type ListInteractionState = WaitingForListInstruction | WaitingForUserAcceptance | Loading | Display;
-export type TextInteractionState = WaitingForTextInstruction | EditTextContent | WaitingForUserAcceptance | Loading | Display;
+export type TextInteractionState =
+    | WaitingForTextInstruction
+    | EditTextContent
+    | WaitingForUserAcceptance
+    | Loading
+    | Display;
 export type TableInteractionState = WaitingForAddColumnInstruction | WaitingForAddRowInstruction | Loading | Display;
 
 /* Clipboard */

@@ -1,5 +1,5 @@
 import { useState, KeyboardEvent, ClipboardEvent } from "react";
-import { pasteToInput, validKey } from "./common";
+import { pasteToInput, validKey } from "../common";
 
 type Props = {
     currentKey: string;

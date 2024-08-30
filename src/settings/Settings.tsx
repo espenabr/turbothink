@@ -1,7 +1,7 @@
+import { GptModel, ReasoningStrategy } from "../tangible-gpt/model";
+import { BlockHeight } from "../model";
+import IconBrandGithub from "../icons/IconBrandGithub";
 import InputOpenAiKey from "./InputOpenAiKey";
-import { GptModel, ReasoningStrategy } from "./tangible-gpt/model";
-import { BlockHeight } from "./model";
-import IconBrandGithub from "./icons/IconBrandGithub";
 
 type ModelOption = {
     value: GptModel;

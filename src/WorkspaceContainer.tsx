@@ -1,5 +1,5 @@
 import CreateBlock from "./create/CreateBlock";
-import ListElement from "./lists/ListElement";
+import ListElement from "./lists/ListBlock";
 import {
     createListId,
     createListItemId,
@@ -20,8 +20,8 @@ import {
 import { ItemGroup, Row } from "./tangible-gpt/model";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
-import TextElement from "./texts/TextElement";
-import TableElement from "./tables/TableElement";
+import TextElement from "./texts/TextBlock";
+import TableElement from "./tables/TableBlock";
 
 type Props = {
     openAiConfig: OpenAiConfig;

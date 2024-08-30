@@ -69,9 +69,9 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete, on
             ...table,
             columns: [...columns.slice(0, columnIndex), ...columns.slice(columnIndex + 1)],
             rows: table.rows.map((r) => ({
-                    ...r,
-                    cells: withoutElement(r.cells, columnIndex),
-            }))
+                ...r,
+                cells: withoutElement(r.cells, columnIndex),
+            })),
         });
     };
 
@@ -110,11 +110,11 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete, on
         const updateCell = (updatedCell: Cell) => {
             const updatedRow: Row = {
                 ...row,
-                cells: withReplacedElement(row.cells, columnIndex, updatedCell)
+                cells: withReplacedElement(row.cells, columnIndex, updatedCell),
             };
             onUpdate({
                 ...table,
-                rows: withReplacedElement(table.rows, rowIndex, updatedRow)
+                rows: withReplacedElement(table.rows, rowIndex, updatedRow),
             });
         };
 
@@ -143,7 +143,7 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete, on
                 const updatedCell: Cell = { ...cell, column: { ...cell.column, name: newHeader } };
                 return {
                     ...row,
-                    cells: withReplacedElement(row.cells, columnIndex, updatedCell)
+                    cells: withReplacedElement(row.cells, columnIndex, updatedCell),
                 };
             }),
         });

@@ -27,16 +27,16 @@ const AddTableRow = ({ columns, onAdd }: Props) => {
 
         if (column.type === "BooleanColumn" && typeof newValue === "boolean") {
             const updated: Cell = { ...cell, type: "BooleanCell", value: newValue };
-            setRow({ cells: withReplacedElement(cells, columnIndex, updated )});
+            setRow({ cells: withReplacedElement(cells, columnIndex, updated) });
         } else if (column.type === "NumberColumn" && typeof newValue === "number") {
             const updated: Cell = { ...cell, type: "NumberCell", value: newValue };
-            setRow({ cells: withReplacedElement(cells, columnIndex, updated) })
+            setRow({ cells: withReplacedElement(cells, columnIndex, updated) });
         } else if (column.type === "EnumColumn" && typeof newValue === "string") {
             const updated: Cell = { ...cell, type: "EnumCell", value: newValue };
-            setRow({ cells: withReplacedElement(cells, columnIndex, updated) })
+            setRow({ cells: withReplacedElement(cells, columnIndex, updated) });
         } else if (column.type === "TextColumn" && typeof newValue === "string") {
             const updated: Cell = { ...cell, type: "TextCell", value: newValue };
-            setRow({ cells: withReplacedElement(cells, columnIndex, updated) })
+            setRow({ cells: withReplacedElement(cells, columnIndex, updated) });
         }
     };
 

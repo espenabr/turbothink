@@ -135,7 +135,7 @@ const serializeCell = (cell: Cell): string => {
     }
 };
 
-const withoutQuotes = (s: string) => s.replace(/"/g, '');
+const withoutQuotes = (s: string) => s.replace(/"/g, "");
 
 const renderTable = (table: Table) => {
     const columnNames = table.columns.map((c) => c.name).join(";");
@@ -1029,8 +1029,6 @@ ${table.columns.map(describeColumn).join("\n")}`;
             }
         });
     };
-
-
 }
 
 export default TangibleClient;
