@@ -1,26 +1,25 @@
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import ListItemElement, { FilteredOut, Grouped, Modification, Reordered } from "./ListItemContainer";
+import ListItemContainer, { FilteredOut, Grouped, Modification, Reordered } from "./ListItemContainer";
 import { BlockHeight, List, ListItem, ListItemId } from "../model";
 import { toSortedListItems } from "./ListBlock";
+import { equalArrays } from "../common";
+import { memo } from "react";
 
 type Props = {
     list: List;
     blockHeight: BlockHeight;
     suggestedModification: SuggestedListModification | null;
-    onUpdateItems: (items: ListItem[]) => void;
     onUpdateList: (updatedList: List) => void;
 };
 
-const ListContent = ({ list, blockHeight, suggestedModification, onUpdateItems, onUpdateList }: Props) => {
+const ListContent = ({ list, blockHeight, suggestedModification, onUpdateList }: Props) => {
     /* Drag & drop */
-
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: { delay: 200, tolerance: 5 },
         }),
     );
-
     const onDragEnd = (event: DragEndEvent) => {
         if (event.over !== null) {
             const over = event.over;
@@ -28,7 +27,7 @@ const ListContent = ({ list, blockHeight, suggestedModification, onUpdateItems, 
                 const oldIndex = list.items.findIndex((i) => i.id === event.active.id);
                 const newIndex = list.items.findIndex((i) => i.id === over.id);
                 const updated = arrayMove(list.items, oldIndex, newIndex);
-                onUpdateItems(updated);
+                onUpdateList({ ...list, items: updated });
             }
         }
     };
@@ -59,7 +58,7 @@ const ListContent = ({ list, blockHeight, suggestedModification, onUpdateItems, 
     };
 
     const onDeleteItem = (itemId: ListItemId) => {
-        onUpdateItems(list.items.filter((i) => i.id !== itemId));
+        onUpdateList({ ...list, items: list.items.filter((i) => i.id !== itemId) });
     };
 
     return (
@@ -68,7 +67,7 @@ const ListContent = ({ list, blockHeight, suggestedModification, onUpdateItems, 
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
                     <SortableContext items={list.items} strategy={verticalListSortingStrategy}>
                         {list.items.map((item) => (
-                            <ListItemElement
+                            <ListItemContainer
                                 item={item}
                                 canModify={suggestedModification === null}
                                 modification={itemModification(item)}
@@ -168,4 +167,38 @@ const groupedItem = (item: ListItem, suggestedGroups: ItemGroup[]): Grouped | nu
     }
 };
 
-export default ListContent;
+const equalListItems = (a: ListItem, b: ListItem) => a.id === b.id && a.text === b.text;
+
+export const equalLists = (a: List, b: List) =>
+    a.id === b.id &&
+    a.name === b.name &&
+    a.items.every((v, i) => equalListItems(v, b.items[i])) &&
+    a.items.length === b.items.length;
+
+const equalItemGroups = (a: ItemGroup, b: ItemGroup) => a.name === b.name && equalArrays(a.items, b.items);
+
+export const equalSuggestedModifications = (
+    a: SuggestedListModification | null,
+    b: SuggestedListModification | null,
+) => {
+    if (a === null && b === null) {
+        return true;
+    } else if (a !== null && b !== null) {
+        if (a.type === "grouped" && b.type === "grouped") {
+            return (
+                a.criteria === b.criteria &&
+                a.groups.every((g, i) => g.name === b.groups[i].name && equalItemGroups(g, b.groups[i]))
+            );
+        } else {
+            return a.type === b.type;
+        }
+    }
+    return false;
+};
+
+const areEqual = (prev: Props, next: Props) =>
+    equalLists(prev.list, next.list) &&
+    equalSuggestedModifications(prev.suggestedModification, next.suggestedModification) &&
+    prev.blockHeight === next.blockHeight;
+
+export default memo(ListContent, areEqual);

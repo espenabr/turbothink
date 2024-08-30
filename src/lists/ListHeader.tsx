@@ -1,5 +1,5 @@
 import { ListInteractionState, List, OpenAiConfig, ListAction } from "../model";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import EditListName from "./EditListName";
 import ListInstructionInput from "./ListInsertuctionInput";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
@@ -36,7 +36,6 @@ const ListHeader = ({
     onRetryWithAdditionalInstruction,
 }: Props) => {
     const [editNameMode, setEditNameMode] = useState<boolean>(false);
-
     const inputNameRef = useRef<HTMLInputElement>(null);
 
     // highlight name input on edit
@@ -103,4 +102,9 @@ const ListHeader = ({
     );
 };
 
-export default ListHeader;
+const areEqual = (prev: Props, next: Props) =>
+    prev.list.name === next.list.name &&
+    prev.list.items.length === next.list.items.length &&
+    prev.interactionState.type === next.interactionState.type;
+
+export default memo(ListHeader, areEqual);

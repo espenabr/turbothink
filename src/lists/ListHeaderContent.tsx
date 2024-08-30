@@ -1,3 +1,4 @@
+import { memo } from "react";
 import ListHeaderIcons from "./ListHeaderIcons";
 
 type Props = {
@@ -40,4 +41,9 @@ const ListHeaderContent = ({
     </>
 );
 
-export default ListHeaderContent;
+const areEqual = (prev: Props, next: Props) =>
+    prev.listName === next.listName &&
+    prev.displayActions === next.displayActions &&
+    prev.displayIcons === next.displayIcons;
+
+export default memo(ListHeaderContent, areEqual);
