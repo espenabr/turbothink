@@ -38,7 +38,11 @@ export function equalArrays<T>(a: T[], b: T[]) {
 }
 
 export function withReplacedElement<T>(elements: T[], index: number, replacer: T) {
-    return [...elements.slice(0, index), replacer, ...elements.slice(index)];
+    const zz = [...elements.slice(0, index), replacer, ...elements.slice(index + 1)];
+
+    console.log(zz);
+
+    return zz;
 }
 
 export function withoutElement<T>(elements: T[], index: number) {

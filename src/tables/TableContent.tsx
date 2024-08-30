@@ -46,7 +46,7 @@ const TableContent = ({
             </thead>
             <tbody>
                 {table.rows.map((row, rowIndex) => (
-                    <tr key={row.cells.map((c) => c.value).join()}>
+                    <tr key={row.cells.map((c) => c.value).join("-")}>
                         {row.cells.map((cell, columnIndex) => (
                             <TableCellContent
                                 cell={cell}

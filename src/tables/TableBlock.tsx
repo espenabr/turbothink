@@ -68,7 +68,7 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete, on
         onUpdate({
             ...table,
             columns: [...columns.slice(0, columnIndex), ...columns.slice(columnIndex + 1)],
-            rows: table.rows.map((r) => ({
+            rows: table.rows.slice().map((r) => ({
                 ...r,
                 cells: withoutElement(r.cells, columnIndex),
             })),
@@ -81,9 +81,9 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete, on
 
         onUpdate({
             ...table,
-            columns: columns.concat(newColumn),
-            rows: table.rows.map((row) => ({
-                cells: row.cells.concat({ type: "TextCell", column: newColumn, value: "-" }),
+            columns: columns.slice().concat(newColumn),
+            rows: table.rows.slice().map((row) => ({
+                cells: row.cells.slice().concat({ type: "TextCell", column: newColumn, value: "-" }),
             })),
         });
     };
@@ -123,8 +123,6 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete, on
         } else if (typeof newContent === "number" && cell.type === "NumberCell") {
             updateCell({ ...cell, value: newContent });
         } else if (typeof newContent === "boolean" && cell.type === "BooleanCell") {
-            updateCell({ ...cell, value: newContent });
-        } else if (typeof newContent === "string" && cell.type === "TextCell") {
             updateCell({ ...cell, value: newContent });
         } else {
             console.warn(`Unable to update cell of type ${cell.type} with ${typeof newContent} value`);
