@@ -8,7 +8,7 @@ import { CSS } from "@dnd-kit/utilities";
 import TangibleClient from "../tangible-gpt/TangibleClient";
 import { Cell, Column, Row, TangibleResponse, TextColumn } from "../tangible-gpt/model";
 import { Table as TangibleTable } from "../tangible-gpt/model";
-import { equalArrays } from "../common";
+import { equalArrays, withoutElement, withReplacedElement } from "../common";
 
 type Props = {
     openAiConfig: OpenAiConfig;
@@ -68,13 +68,10 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete, on
         onUpdate({
             ...table,
             columns: [...columns.slice(0, columnIndex), ...columns.slice(columnIndex + 1)],
-            rows: table.rows.map((r) => {
-                const updatedCells = [...r.cells.slice(0, columnIndex), ...r.cells.slice(columnIndex + 1)];
-                return {
+            rows: table.rows.map((r) => ({
                     ...r,
-                    cells: updatedCells,
-                };
-            }),
+                    cells: withoutElement(r.cells, columnIndex),
+            }))
         });
     };
 
@@ -113,11 +110,11 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete, on
         const updateCell = (updatedCell: Cell) => {
             const updatedRow: Row = {
                 ...row,
-                cells: [...row.cells.slice(0, columnIndex), updatedCell, ...row.cells.slice(columnIndex + 1)],
+                cells: withReplacedElement(row.cells, columnIndex, updatedCell)
             };
             onUpdate({
                 ...table,
-                rows: [...table.rows.slice(0, rowIndex), updatedRow, ...table.rows.slice(rowIndex + 1)],
+                rows: withReplacedElement(table.rows, rowIndex, updatedRow)
             });
         };
 
@@ -140,13 +137,13 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete, on
 
         onUpdate({
             ...table,
-            columns: [...columns.slice(0, columnIndex), updatedColumn, ...columns.slice(columnIndex + 1)],
+            columns: withReplacedElement(columns, columnIndex, updatedColumn),
             rows: table.rows.map((row) => {
                 const cell = row.cells[columnIndex];
                 const updatedCell: Cell = { ...cell, column: { ...cell.column, name: newHeader } };
                 return {
                     ...row,
-                    cells: [...row.cells.slice(0, columnIndex), updatedCell, ...row.cells.slice(columnIndex + 1)],
+                    cells: withReplacedElement(row.cells, columnIndex, updatedCell)
                 };
             }),
         });

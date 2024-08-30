@@ -1,4 +1,4 @@
-import CreateBlock from "./CreateBlock";
+import CreateBlock from "./create/CreateBlock";
 import ListElement from "./lists/ListElement";
 import {
     createListId,

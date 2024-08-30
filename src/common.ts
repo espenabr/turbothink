@@ -34,3 +34,11 @@ export const pasteToInput = (event: ClipboardEvent, value: string, set: (value: 
 export const validKey = (s: string) => s.length > 40 && s.substring(0, 3) === "sk-";
 
 export const equalArrays = (a: string[], b: string[]) => a.length === b.length && a.every((v, i) => v === b[i]);
+
+export function withReplacedElement<T>(elements: T[], index: number, replacer: T) {
+    return [ ...elements.slice(0, index), replacer, ...elements.slice(index) ];
+}
+
+export function withoutElement<T>(elements: T[], index: number) {
+    return [ ...elements.slice(0, index), ...elements.slice(index) ];
+}

@@ -1,9 +1,9 @@
 import { useState } from "react";
-import TangibleClient from "./tangible-gpt/TangibleClient";
-import { Block, BlockId, createTableId, List, ListId, OpenAiConfig, Table, TableId, Text, TextId } from "./model";
-import { withoutPrefix, withoutTrailingDot } from "./common";
-import SpecifyColumns from "./tables/SpecifyColumns";
-import { Column } from "./tangible-gpt/model";
+import TangibleClient from "../tangible-gpt/TangibleClient";
+import { Block, BlockId, createTableId, List, ListId, OpenAiConfig, Table, TableId, Text, TextId } from "../model";
+import { withoutPrefix, withoutTrailingDot } from "../common";
+import SpecifyColumns from "./SpecifyColumns";
+import { Column } from "../tangible-gpt/model";
 
 const describeList = (list: List) => `${list.name}:\n` + list.items.map((i) => i.text).join(", ");
 

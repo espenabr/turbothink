@@ -2,9 +2,9 @@ import IconPlus from "../icons/IconPlus";
 import IconX from "../icons/IconX";
 import { Table } from "../model";
 import { Row } from "../tangible-gpt/model";
-import AddTableRow from "./AddTableRow";
-import TableCellContent from "./TableCellContent";
-import TableColumnHeader from "./TableColumnHeader";
+import AddTableRow from "./AddRow";
+import TableCellContent from "./CellContent";
+import TableColumnHeader from "./ColumnHeader";
 
 type Props = {
     table: Table;

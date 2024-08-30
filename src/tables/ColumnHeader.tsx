@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import IconX from "../icons/IconX";
-import EditTableColumnName from "./EditTableColumnName";
+import EditTableColumnName from "./EditColumnName";
 
 type Props = {
     columnName: string;

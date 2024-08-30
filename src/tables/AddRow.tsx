@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Cell, Column, Row } from "../tangible-gpt/model";
-import AddBooleanCell from "./AddBooleanCell";
-import AddNumberCell from "./AddNumberCell";
-import AddTextCellInput from "./AddTextCellInput";
+import AddBooleanCell from "./AddRowBooleanCell";
+import AddNumberCell from "./AddRowNumberCell";
+import AddTextCellInput from "./AddRowTextCell";
 import IconCheck from "../icons/IconCheck";
-import AddEnumCell from "./AddEnumCell";
+import AddEnumCell from "./AddRowEnumCell";
+import { withReplacedElement } from "../common";
 
 type Props = {
     columns: Column[];
@@ -25,37 +26,17 @@ const AddTableRow = ({ columns, onAdd }: Props) => {
         const cell = cells[columnIndex];
 
         if (column.type === "BooleanColumn" && typeof newValue === "boolean") {
-            setRow({
-                cells: [
-                    ...cells.slice(0, columnIndex),
-                    { ...cell, type: "BooleanCell", value: newValue },
-                    ...cells.slice(columnIndex + 1),
-                ],
-            });
+            const updated: Cell = { ...cell, type: "BooleanCell", value: newValue };
+            setRow({ cells: withReplacedElement(cells, columnIndex, updated )});
         } else if (column.type === "NumberColumn" && typeof newValue === "number") {
-            setRow({
-                cells: [
-                    ...cells.slice(0, columnIndex),
-                    { ...cell, type: "NumberCell", value: newValue },
-                    ...cells.slice(columnIndex + 1),
-                ],
-            });
+            const updated: Cell = { ...cell, type: "NumberCell", value: newValue };
+            setRow({ cells: withReplacedElement(cells, columnIndex, updated) })
         } else if (column.type === "EnumColumn" && typeof newValue === "string") {
-            setRow({
-                cells: [
-                    ...cells.slice(0, columnIndex),
-                    { ...cell, type: "EnumCell", value: newValue },
-                    ...cells.slice(columnIndex + 1),
-                ],
-            });
+            const updated: Cell = { ...cell, type: "EnumCell", value: newValue };
+            setRow({ cells: withReplacedElement(cells, columnIndex, updated) })
         } else if (column.type === "TextColumn" && typeof newValue === "string") {
-            setRow({
-                cells: [
-                    ...cells.slice(0, columnIndex),
-                    { ...cell, type: "TextCell", value: newValue },
-                    ...cells.slice(columnIndex + 1),
-                ],
-            });
+            const updated: Cell = { ...cell, type: "TextCell", value: newValue };
+            setRow({ cells: withReplacedElement(cells, columnIndex, updated) })
         }
     };
 
