@@ -51,6 +51,7 @@ const TableContent = ({
                             <TableCellContent
                                 cell={cell}
                                 onUpdateContent={(newContent) => onUpdateCellContent(rowIndex, columnIndex, newContent)}
+                                key={cell.column.name}
                             />
                         ))}
                         <td>

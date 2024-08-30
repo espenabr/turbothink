@@ -32,3 +32,5 @@ export const pasteToInput = (event: ClipboardEvent, value: string, set: (value: 
 };
 
 export const validKey = (s: string) => s.length > 40 && s.substring(0, 3) === "sk-";
+
+export const equalArrays = (a: string[], b: string[]) => a.length === b.length && a.every((v, i) => v === b[i]);

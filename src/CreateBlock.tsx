@@ -153,6 +153,18 @@ const CreateBlock = ({ openAiConfig, blocks, onCreateList, onCreateText, onCreat
         setInstruction("");
     };
 
+    const onCreateNewTable = () => {
+        const column: Column = { type: "TextColumn", name: "Stuff" };
+
+        onCreateTable({
+            type: "Table",
+            name: "My table",
+            id: createTableId(),
+            columns: [column],
+            rows: [],
+        });
+    };
+
     const allowIncludeContext = blocks.length > 0;
 
     return specifyTableColumns ? (
@@ -191,6 +203,9 @@ const CreateBlock = ({ openAiConfig, blocks, onCreateList, onCreateText, onCreat
                             onClick={() => onCreateText("My text snippet", "")}
                         >
                             New text
+                        </button>
+                        <button className="list-button" style={{ marginLeft: "10px" }} onClick={onCreateNewTable}>
+                            New table
                         </button>
                     </div>
 

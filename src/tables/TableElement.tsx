@@ -8,6 +8,7 @@ import { CSS } from "@dnd-kit/utilities";
 import TangibleClient from "../tangible-gpt/TangibleClient";
 import { Cell, Column, Row, TangibleResponse, TextColumn } from "../tangible-gpt/model";
 import { Table as TangibleTable } from "../tangible-gpt/model";
+import { equalArrays } from "../common";
 
 type Props = {
     openAiConfig: OpenAiConfig;
@@ -79,7 +80,7 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete, on
 
     const onAddColumn = () => {
         const columns = table.columns;
-        const newColumn: TextColumn = { type: "TextColumn", name: "New Column" };
+        const newColumn: TextColumn = { type: "TextColumn", name: "New column" };
 
         onUpdate({
             ...table,
@@ -181,8 +182,6 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete, on
         </div>
     );
 };
-
-const equalArrays = (a: string[], b: string[]) => a.length === b.length && a.every((v, i) => v === b[i]);
 
 const tableContentClass = (blockHeight: BlockHeight) => {
     switch (blockHeight) {
