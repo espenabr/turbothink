@@ -933,7 +933,9 @@ ${intention}`;
 
         const responseFormatDescription = `The response must be in CSV format (semicolon separated) with columns: ${resultColumns
             .map((c) => c.name)
-            .join(";")} header row, just data
+            .join(";")} 
+
+No header row, just data
 
 Columns:
 ${resultColumns.map(describeColumn).join("\n")}`;
