@@ -201,7 +201,7 @@ const WorkspaceContainer = ({ openAiConfig, workspace, blockHeight, onUpdateBloc
     );
 };
 
-const tableClass = (noOfColumns: number) => {
+const tableClass = (noOfColumns: number): string => {
     if (noOfColumns <= 2) {
         return "grid-item";
     } else if (noOfColumns <= 4) {

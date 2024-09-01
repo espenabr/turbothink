@@ -108,7 +108,7 @@ type GroupedItems = {
 
 export type SuggestedListModification = FilteredItems | SortedItems | GroupedItems;
 
-const groupColors: string[] = [
+const groupColors: readonly string[] = [
     "#FFCDD2",
     "#F8BBD0",
     "#E1BEE7",

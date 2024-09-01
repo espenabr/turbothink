@@ -46,12 +46,12 @@ const TableContent = ({
             </thead>
             <tbody>
                 {table.rows.map((row, rowIndex) => (
-                    <tr key={row.cells.map((c) => c.value).join("-")}>
+                    <tr key={rowIndex}>
                         {row.cells.map((cell, columnIndex) => (
                             <TableCellContent
                                 cell={cell}
                                 onUpdateContent={(newContent) => onUpdateCellContent(rowIndex, columnIndex, newContent)}
-                                key={cell.column.name}
+                                key={columnIndex}
                             />
                         ))}
                         <td>

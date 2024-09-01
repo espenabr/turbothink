@@ -162,7 +162,7 @@ type TransformedText = {
     newText: string;
 };
 
-const textContentClass = (blockHeight: BlockHeight, editContentMode: boolean) => {
+const textContentClass = (blockHeight: BlockHeight, editContentMode: boolean): string => {
     switch (blockHeight) {
         case "Unlimited":
         case "Medium":
