@@ -6,7 +6,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSSProperties, useState } from "react";
 import { CSS } from "@dnd-kit/utilities";
 import TangibleClient from "../tangible-gpt/TangibleClient";
-import { Cell, Column, Row, TangibleResponse, TextColumn } from "../tangible-gpt/model";
+import { Cell, Column, Row, TangibleResponse, TextCell, TextColumn } from "../tangible-gpt/model";
 import { Table as TangibleTable } from "../tangible-gpt/model";
 import { equalArrays, withoutElement, withReplacedElement } from "../common";
 
@@ -78,12 +78,13 @@ const TableElement = ({ openAiConfig, table, blockHeight, onUpdate, onDelete, on
     const onAddColumn = () => {
         const columns = table.columns;
         const newColumn: TextColumn = { type: "TextColumn", name: "New column" };
+        const newCell: TextCell = { type: "TextCell", column: newColumn, value: "" };
 
         onUpdate({
             ...table,
             columns: columns.slice().concat(newColumn),
             rows: table.rows.slice().map((row) => ({
-                cells: row.cells.slice().concat({ type: "TextCell", column: newColumn, value: "-" }),
+                cells: row.cells.slice().concat(newCell),
             })),
         });
     };

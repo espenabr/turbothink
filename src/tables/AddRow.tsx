@@ -12,7 +12,7 @@ type Props = {
     onAdd: (row: Row) => void;
 };
 
-const AddTableRow = ({ columns, onAdd }: Props) => {
+const AddRow = ({ columns, onAdd }: Props) => {
     const [row, setRow] = useState<Row>(emptyRow(columns));
 
     const onAddRow = () => {
@@ -49,7 +49,11 @@ const AddTableRow = ({ columns, onAdd }: Props) => {
     const getStringValue = (columnIndex: number) => {
         const cell = row.cells[columnIndex];
         // TOOD handle wrong type
-        return cell.type === "TextCell" || cell.type === "EnumCell" ? cell.value : "";
+        if (cell !== undefined) {
+            return cell.type === "TextCell" || cell.type === "EnumCell" ? cell.value : "";
+        } else {
+            return "";
+        }
     };
 
     const getNumberValue = (columnIndex: number) => {
@@ -61,7 +65,7 @@ const AddTableRow = ({ columns, onAdd }: Props) => {
     return (
         <tr>
             {columns.map((column, columnIndex) => (
-                <td key={column.name}>
+                <td key={columnIndex}>
                     {column.type === "BooleanColumn" ? (
                         <AddBooleanCell
                             value={getBooleanValue(columnIndex)}
@@ -112,4 +116,4 @@ const toEmptyCell = (column: Column): Cell => {
     }
 };
 
-export default AddTableRow;
+export default AddRow;

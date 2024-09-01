@@ -2,7 +2,7 @@ import IconPlus from "../icons/IconPlus";
 import IconX from "../icons/IconX";
 import { Table } from "../model";
 import { Row } from "../tangible-gpt/model";
-import AddTableRow from "./AddRow";
+import AddRow from "./AddRow";
 import TableCellContent from "./CellContent";
 import TableColumnHeader from "./ColumnHeader";
 
@@ -29,12 +29,12 @@ const TableContent = ({
         <table className="table-content">
             <thead>
                 <tr>
-                    {table.columns.map((c, i) => (
+                    {table.columns.map((column, columnIndex) => (
                         <TableColumnHeader
-                            columnName={c.name}
-                            onDeleteColumn={() => onDeleteColumn(i)}
-                            onUpdateColumnHeader={(newName) => onUpdateColumnHeader(i, newName)}
-                            key={c.name}
+                            columnName={column.name}
+                            onDeleteColumn={() => onDeleteColumn(columnIndex)}
+                            onUpdateColumnHeader={(newName) => onUpdateColumnHeader(columnIndex, newName)}
+                            key={columnIndex}
                         />
                     ))}
                     <th>
@@ -61,7 +61,7 @@ const TableContent = ({
                         </td>
                     </tr>
                 ))}
-                <AddTableRow columns={table.columns} onAdd={onAddRow} />
+                <AddRow columns={table.columns} onAdd={onAddRow} />
             </tbody>
         </table>
     );

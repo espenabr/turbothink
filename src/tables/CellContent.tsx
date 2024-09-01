@@ -19,22 +19,35 @@ const TableCellContent = ({ cell, onUpdateContent }: Props) => {
         }
     }, [editMode]);
 
+    const onUpdate = (newContent: string | number | boolean) => {
+        onUpdateContent(newContent);
+        setEditMode(false);
+    };
+
     return (
         <td>
             {editMode ? (
                 <EditCellContent
                     cell={cell}
                     inputRef={inputRef}
-                    onUpdate={onUpdateContent}
+                    onUpdate={onUpdate}
                     onCancel={() => setEditMode(false)}
                 />
             ) : (
                 <span style={{ cursor: "pointer" }} onClick={() => setEditMode(true)}>
-                    {cell.value}
+                    {cellValue(cell)}
                 </span>
             )}
         </td>
     );
+};
+
+const cellValue = (cell: Cell): JSX.Element => {
+    if (cell.type === "TextCell") {
+        return cell.value.length > 0 ? <span>{cell.value}</span> : <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>;
+    } else {
+        return <span>cell.value.toString()</span>;
+    }
 };
 
 export default TableCellContent;
