@@ -1,4 +1,4 @@
-import { CSSProperties, memo, useEffect, useRef, useState } from "react";
+import { CSSProperties, useEffect, useRef, useState } from "react";
 import { CSS } from "@dnd-kit/utilities";
 import { ListItem, ListItemId } from "../model";
 import { useSortable } from "@dnd-kit/sortable";
@@ -100,23 +100,24 @@ const ListItemContainer = ({ item, modification, canModify, onEdit, onDelete }: 
     );
 };
 
-const equalModification = (a: Modification | null, b: Modification | null) => {
-    if (a === null && b === null) {
-        return true;
-    } else if (a !== null && b !== null) {
-        if (a.type === "grouped" && b.type === "grouped") {
-            return a.backgroundColor === b.backgroundColor && a.groupName === b.groupName;
-        } else {
-            return a.type === b.type;
-        }
-    } else {
-        return false;
-    }
-};
+//const equalModification = (a: Modification | null, b: Modification | null) => {
+//    if (a === null && b === null) {
+//        return true;
+//    } else if (a !== null && b !== null) {
+//        if (a.type === "grouped" && b.type === "grouped") {
+//            return a.backgroundColor === b.backgroundColor && a.groupName === b.groupName;
+//        } else {
+//            return a.type === b.type;
+//        }
+//    } else {
+//        return false;
+//    }
+//};
 
-const areEqual = (prev: Props, next: Props) =>
-    prev.item.text === next.item.text &&
-    equalModification(prev.modification, next.modification) &&
-    prev.canModify === next.canModify;
+//const areEqual = (prev: Props, next: Props) =>
+//    prev.item.text === next.item.text &&
+//    equalModification(prev.modification, next.modification) &&
+//    prev.canModify === next.canModify;
 
-export default memo(ListItemContainer, areEqual);
+//export default memo(ListItemContainer, areEqual);
+export default ListItemContainer;

@@ -1,4 +1,4 @@
-import { CSSProperties, memo, useState } from "react";
+import { CSSProperties, useState } from "react";
 import TangibleClient from "../tangible-gpt/TangibleClient";
 import AddListItem from "./AddListItem";
 import { withoutTrailingDot } from "../common";
@@ -17,7 +17,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { ClipboardItem } from "../model";
 import ListHeader from "./ListHeader";
 import { ItemGroup, TangibleResponse } from "../tangible-gpt/model";
-import ListContent, { equalLists, SuggestedListModification } from "./ListContent";
+import ListContent, { SuggestedListModification } from "./ListContent";
 
 type Props = {
     openAiConfig: OpenAiConfig;
@@ -267,12 +267,13 @@ const interactionState = (
     }
 };
 
-const equalOpenAiConfig = (a: OpenAiConfig, b: OpenAiConfig) =>
-    a.key === b.key && a.model === b.model && a.reasoningStrategy === b.reasoningStrategy;
+//const equalOpenAiConfig = (a: OpenAiConfig, b: OpenAiConfig) =>
+//    a.key === b.key && a.model === b.model && a.reasoningStrategy === b.reasoningStrategy;
 
-const areEqual = (prev: Props, next: Props) =>
-    equalOpenAiConfig(prev.openAiConfig, next.openAiConfig) &&
-    equalLists(prev.list, next.list) &&
-    prev.blockHeight === next.blockHeight;
+//const areEqual = (prev: Props, next: Props) =>
+//    equalOpenAiConfig(prev.openAiConfig, next.openAiConfig) &&
+//    equalLists(prev.list, next.list) &&
+//    prev.blockHeight === next.blockHeight;
 
-export default memo(ListElement, areEqual);
+//export default memo(ListElement, areEqual);
+export default ListElement;

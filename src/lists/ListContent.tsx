@@ -4,7 +4,8 @@ import ListItemContainer, { FilteredOut, Grouped, Modification, Reordered } from
 import { BlockHeight, List, ListItem, ListItemId } from "../model";
 import { toSortedListItems } from "./ListBlock";
 import { equalArrays } from "../common";
-import { memo } from "react";
+import { useEffect } from "react";
+import { debugList } from "../WorkspaceContainer";
 
 type Props = {
     list: List;
@@ -14,6 +15,11 @@ type Props = {
 };
 
 const ListContent = ({ list, blockHeight, suggestedModification, onUpdateList }: Props) => {
+    // Debug
+    useEffect(() => {
+        console.log("List changed: ", debugList(list));
+    }, [list]);
+
     /* Drag & drop */
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -58,7 +64,7 @@ const ListContent = ({ list, blockHeight, suggestedModification, onUpdateList }:
     };
 
     const onDeleteItem = (itemId: ListItemId) => {
-        onUpdateList({ ...list, items: list.items.filter((i) => i.id !== itemId) });
+        onUpdateList({ ...list, items: list.items.slice().filter((i) => i.id !== itemId) });
     };
 
     return (
@@ -141,9 +147,9 @@ const reorderedItem = (item: ListItem, currentItems: ListItem[], suggested: Sort
         const index = currentItems.indexOf(item);
         return suggestedItems[index] !== undefined
             ? {
-                  type: "reordered",
-                  newText: suggestedItems[index].text,
-              }
+                type: "reordered",
+                newText: suggestedItems[index].text,
+            }
             : null;
     } else {
         return null;
@@ -172,6 +178,7 @@ const equalListItems = (a: ListItem, b: ListItem) => a.id === b.id && a.text ===
 export const equalLists = (a: List, b: List) =>
     a.id === b.id &&
     a.name === b.name &&
+    a.items.length === b.items.length &&
     a.items.every((v, i) => equalListItems(v, b.items[i])) &&
     a.items.length === b.items.length;
 
@@ -196,9 +203,10 @@ export const equalSuggestedModifications = (
     return false;
 };
 
-const areEqual = (prev: Props, next: Props) =>
-    equalLists(prev.list, next.list) &&
-    equalSuggestedModifications(prev.suggestedModification, next.suggestedModification) &&
-    prev.blockHeight === next.blockHeight;
+//const areEqual = (prev: Props, next: Props) =>
+//    equalLists(prev.list, next.list) &&
+//    equalSuggestedModifications(prev.suggestedModification, next.suggestedModification) &&
+//    prev.blockHeight === next.blockHeight;
 
-export default memo(ListContent, areEqual);
+//export default memo(ListContent, areEqual);
+export default ListContent;

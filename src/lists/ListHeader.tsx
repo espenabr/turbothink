@@ -1,5 +1,5 @@
 import { ListInteractionState, List, OpenAiConfig, ListAction } from "../model";
-import { memo, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import EditListName from "./EditListName";
 import ListInstructionInput from "./ListInsertuctionInput";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
@@ -102,9 +102,10 @@ const ListHeader = ({
     );
 };
 
-const areEqual = (prev: Props, next: Props) =>
-    prev.list.name === next.list.name &&
-    prev.list.items.length === next.list.items.length &&
-    prev.interactionState.type === next.interactionState.type;
+//const areEqual = (prev: Props, next: Props) =>
+//    prev.list.name === next.list.name &&
+//    prev.list.items.length === next.list.items.length &&
+//    prev.interactionState.type === next.interactionState.type;
 
-export default memo(ListHeader, areEqual);
+//export default memo(ListHeader, areEqual);
+export default ListHeader;

@@ -1,4 +1,4 @@
-import { CSSProperties, memo } from "react";
+import { CSSProperties } from "react";
 import IconX from "../icons/IconX";
 import { Modification } from "./ListItemContainer";
 
@@ -36,7 +36,8 @@ const ListItemContent = ({ text, modification, canDelete, onEnableEdit, onDelete
     );
 };
 
-const areEqual = (prev: Props, next: Props) =>
-    prev.text === next.text && prev.modification === next.modification && prev.canDelete === next.canDelete;
+//const areEqual = (prev: Props, next: Props) =>
+//    prev.text === next.text && prev.modification === next.modification && prev.canDelete === next.canDelete;
 
-export default memo(ListItemContent, areEqual);
+//export default memo(ListItemContent, areEqual);
+export default ListItemContent;

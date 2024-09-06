@@ -211,4 +211,6 @@ const tableClass = (noOfColumns: number): string => {
     }
 };
 
+export const debugList = (list: List) => list.items.map(i => i.text).join(", ");
+
 export default WorkspaceContainer;
