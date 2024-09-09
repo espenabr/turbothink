@@ -46,7 +46,7 @@ const TableContent = ({
             </thead>
             <tbody>
                 {table.rows.map((row, rowIndex) => (
-                    <tr key={rowIndex}>
+                    <tr key={rowIndex} style={{ borderBottom: "solid lightgray 1px" }}>
                         {row.cells.map((cell, columnIndex) => (
                             <TableCellContent
                                 cell={cell}

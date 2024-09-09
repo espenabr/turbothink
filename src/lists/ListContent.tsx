@@ -4,8 +4,6 @@ import ListItemContainer, { FilteredOut, Grouped, Modification, Reordered } from
 import { BlockHeight, List, ListItem, ListItemId } from "../model";
 import { toSortedListItems } from "./ListBlock";
 import { equalArrays } from "../common";
-import { useEffect } from "react";
-import { debugList } from "../WorkspaceContainer";
 
 type Props = {
     list: List;
@@ -15,11 +13,6 @@ type Props = {
 };
 
 const ListContent = ({ list, blockHeight, suggestedModification, onUpdateList }: Props) => {
-    // Debug
-    useEffect(() => {
-        console.log("List changed: ", debugList(list));
-    }, [list]);
-
     /* Drag & drop */
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -147,9 +140,9 @@ const reorderedItem = (item: ListItem, currentItems: ListItem[], suggested: Sort
         const index = currentItems.indexOf(item);
         return suggestedItems[index] !== undefined
             ? {
-                type: "reordered",
-                newText: suggestedItems[index].text,
-            }
+                  type: "reordered",
+                  newText: suggestedItems[index].text,
+              }
             : null;
     } else {
         return null;
