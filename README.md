@@ -3,12 +3,11 @@
 An experiment in integrating LLMs with UI elements.
 
 Chat interfaces like ChatGPT require significant mental effort in formulating prompts and interpreting
-the response. The hypothesis is that familiar UI elements like lists can reduce the friction of usage
+the response. The hypothesis is that familiar UI elements like lists and tables can reduce the friction of usage
 for many use cases.
 
 This is a standalone client-side web application and does not submit any data to a server except
-the OpenAI API. The `gpt-4` model is used by default, but other OpenAI chat completion APIs should
-work as well.
+the OpenAI API.
 
 All data is stored in your browser's local storage. If you want to be on the safe side and avoid
 losing your data, workspaces and lists can be copied as JSON to the clipboard and pasted later.
@@ -60,7 +59,7 @@ You can now paste this as a text block into the webapp!
 
 ## Future improvements
 
--   More complex UI elements like tables and nested lists
--   Plain-text elements to add more context
+-   More complex UI elements like nested lists and diagrams
+-   Sort/filter/grouping for tables
 -   Smoother user experience
 -   Display errors when things go wrong
